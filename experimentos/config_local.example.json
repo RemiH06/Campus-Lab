@@ -1,4 +1,5 @@
 {
   "raiz_galeria": "Y:\\Galería",
-  "raiz_sincronizada_fotos": "C:\\Users\\TU_USUARIO\\ITESO\\Proyecto Campus como laboratorio - FOTOS"
+  "raiz_sincronizada_documentos": "C:\\Users\\TU_USUARIO\\ITESO\\Proyecto Campus como laboratorio - Documentos",
+  "prefijo_relativo_fotos": "Bases de datos/FOTOS/"
 }
