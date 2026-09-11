@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Revisor de especies · Campus Lab</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="/vendor/react.production.min.js"></script>
+<script src="/vendor/react-dom.production.min.js"></script>
+<style>
+  :root{
+    --azul:#004270; --cian:#00c4ff; --texto:#2C343A; --texto-suave:#656d7e;
+    --fondo:#f2f2f5; --borde:#dde1e6; --verde:#1a7f4e; --rojo:#b3261e;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Segoe UI",Roboto,Arial,sans-serif;background:var(--fondo);color:var(--texto);}
+  header{background:var(--azul);color:#fff;padding:14px 24px;display:flex;justify-content:space-between;align-items:center;}
+  header h1{font-size:1.1rem;margin:0;}
+  header .contador{font-size:.9rem;color:#bfe3f5;}
+  main{max-width:1280px;margin:0 auto;padding:24px;}
+  .vacio{text-align:center;padding:60px 20px;color:var(--texto-suave);}
+  .tarjeta{background:#fff;border:1px solid var(--borde);border-radius:12px;padding:20px;margin-bottom:16px;}
+  .layout{display:grid;grid-template-columns:400px 1fr;gap:24px;align-items:start;}
+  @media (max-width:900px){.layout{grid-template-columns:1fr;}}
+  .foto-principal{width:100%;height:400px;object-fit:cover;border-radius:10px;display:block;background:#eee;position:sticky;top:16px;}
+  .badge{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+    padding:3px 9px;border-radius:20px;background:var(--cian);color:#00243a;margin-bottom:10px;}
+  .badge.grupo{background:#ffd166;color:#4a3200;}
+  .sugerencia{border:1px solid var(--borde);border-radius:10px;padding:14px;margin-bottom:10px;}
+  .sugerencia-header{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+  .sugerencia-header h3{margin:0;font-size:1.15rem;color:var(--azul);font-style:italic;}
+  .sugerencia-botones{display:flex;gap:8px;flex-shrink:0;}
+  .sugerencia .meta{font-size:.85rem;color:var(--texto-suave);margin:4px 0 8px;}
+  .refs{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0;}
+  .refs img{width:180px;height:180px;object-fit:cover;border-radius:8px;border:1px solid var(--borde);}
+  .refs-etiqueta{font-size:.8rem;color:var(--texto-suave);width:100%;}
+  button{cursor:pointer;border:none;border-radius:8px;padding:9px 16px;font-size:.9rem;font-weight:600;}
+  .btn-confirmar{background:var(--verde);color:#fff;}
+  .btn-rechazar{background:#fff;color:var(--rojo);border:1px solid var(--rojo);}
+  .btn-confirmar:disabled,.btn-rechazar:disabled{opacity:.5;cursor:default;}
+  .buscador{margin-top:18px;border-top:1px solid var(--borde);padding-top:14px;}
+  .buscador input{width:100%;padding:8px 10px;border:1px solid var(--borde);border-radius:8px;font-size:.9rem;}
+  .resultado-busqueda{display:flex;justify-content:space-between;align-items:center;padding:8px 4px;border-bottom:1px solid var(--borde);font-size:.88rem;}
+  .resultado-busqueda button{padding:5px 12px;font-size:.8rem;background:var(--azul);color:#fff;}
+  .grupo-aviso{background:#fff8e6;border:1px solid #ffd166;border-radius:8px;padding:10px 14px;font-size:.85rem;margin-bottom:14px;}
+  .grupo-aviso label{display:flex;align-items:center;gap:6px;margin-top:6px;cursor:pointer;}
+  .error{color:var(--rojo);font-size:.85rem;margin-top:8px;}
+  .carga-error{max-width:600px;margin:60px auto;padding:20px;background:#fff3cd;border:1px solid #ffe69c;border-radius:10px;}
+</style>
+</head>
+<body>
+<div id="root">Cargando…</div>
+<script>
+"use strict";
+// Sin JSX ni Babel a propósito: la versión anterior dependía de un CDN externo
+// (unpkg + babel standalone, ~2.4MB) y en la red de ITESO se quedaba en blanco
+// sin ningún error visible que pudiéramos diagnosticar a distancia. React y
+// ReactDOM ahora están vendorizados en static/vendor/, cero llamadas de red
+// para que la app cargue. Es más verboso de leer que JSX, pero no puede fallar
+// por bloqueo de CDN.
+var h = React.createElement;
+var useState = React.useState, useEffect = React.useEffect, useCallback = React.useCallback;
+
+function pistaDesdeBreadcrumb(breadcrumb) {
+  // El ultimo segmento a veces es un codigo de individuo ("106_0209"), no un nombre -
+  // se toma el ultimo segmento que traiga alguna letra.
+  if (!breadcrumb) return null;
+  var segmentos = breadcrumb.split("/").map(function (s) { return s.trim(); }).reverse();
+  for (var i = 0; i < segmentos.length; i++) {
+    if (/[a-zA-Z]/.test(segmentos[i])) return segmentos[i];
+  }
+  return null;
+}
+
+function Sugerencia(props) {
+  var s = props.s, onElegir = props.onElegir, onRechazar = props.onRechazar, enviando = props.enviando, fotoIdActual = props.fotoIdActual;
+  var refsState = useState(null); var referencias = refsState[0], setReferencias = refsState[1];
+
+  useEffect(function () {
+    var params = new URLSearchParams({ excluir_foto_id: fotoIdActual });
+    if (s.especie_id) params.set("especie_id", s.especie_id);
+    else if (s.nombre_cientifico) params.set("nombre_cientifico", s.nombre_cientifico);
+    fetch("/api/referencias?" + params.toString())
+      .then(function (r) { return r.json(); })
+      .then(setReferencias)
+      .catch(function () { setReferencias({ catalogo: [], internet: [] }); });
+  }, [s.especie_id, s.nombre_cientifico, fotoIdActual]);
+
+  var metaPartes = [];
+  if (s.familia) metaPartes.push("Familia: " + s.familia);
+  if (s.genero) metaPartes.push("Género: " + s.genero);
+  metaPartes.push(s.score != null ? "Confianza Pl@ntNet: " + Math.round(s.score * 100) + "%" : "Reconstruido del nombre de archivo");
+
+  var botonesHeader = [
+    h("button", {
+      className: "btn-confirmar", key: "confirmar", disabled: enviando,
+      onClick: function () { onElegir(s); },
+    }, "Es esta especie"),
+  ];
+  if (onRechazar) {
+    botonesHeader.push(h("button", {
+      className: "btn-rechazar", key: "rechazar", disabled: enviando,
+      onClick: onRechazar,
+    }, "No es esta especie"));
+  }
+
+  var hijos = [
+    h("div", { className: "sugerencia-header", key: "header" }, [
+      h("h3", { key: "titulo" }, s.nombre_cientifico),
+      h("div", { className: "sugerencia-botones", key: "botones" }, botonesHeader),
+    ]),
+    h("div", { className: "meta", key: "meta" }, metaPartes.join(" · ")),
+  ];
+
+  function filaDeReferencias(etiqueta, imgs, key) {
+    if (!imgs || imgs.length === 0) return null;
+    var refsHijos = [h("span", { className: "refs-etiqueta", key: "etiqueta" }, etiqueta)];
+    imgs.forEach(function (img, i) {
+      var src = typeof img === "number" ? "/api/foto/" + img + "/imagen" : img;
+      refsHijos.push(h("img", { key: i, src: src, alt: "referencia", loading: "lazy" }));
+    });
+    return h("div", { className: "refs", key: key }, refsHijos);
+  }
+
+  if (referencias) {
+    hijos.push(filaDeReferencias("Ya confirmadas de esta especie en Campus Lab:", referencias.catalogo, "refs-catalogo"));
+    hijos.push(filaDeReferencias("Referencia de iNaturalist (no son de Campus Lab):", referencias.internet, "refs-internet"));
+  }
+
+  return h("div", { className: "sugerencia" }, hijos);
+}
+
+function Buscador(props) {
+  var onElegir = props.onElegir, enviando = props.enviando;
+  var qState = useState(props.valorInicial || ""); var q = qState[0], setQ = qState[1];
+  var resState = useState([]); var resultados = resState[0], setResultados = resState[1];
+
+  useEffect(function () {
+    if (q.trim().length < 2) { setResultados([]); return; }
+    var t = setTimeout(function () {
+      fetch("/api/especies/buscar?q=" + encodeURIComponent(q))
+        .then(function (r) { return r.json(); })
+        .then(setResultados)
+        .catch(function () { setResultados([]); });
+    }, 250);
+    return function () { clearTimeout(t); };
+  }, [q]);
+
+  var filas = resultados.map(function (r, i) {
+    return h("div", { className: "resultado-busqueda", key: i }, [
+      h("span", { key: "nombre" }, h("i", null, r.nombre_cientifico), " — " + r.nombre_comun),
+      h("button", {
+        key: "elegir", disabled: enviando,
+        onClick: function () { onElegir({ nombre_cientifico: r.nombre_cientifico }); },
+      }, "Elegir"),
+    ]);
+  });
+
+  return h("div", { className: "buscador" }, [
+    h("input", {
+      key: "input",
+      placeholder: "Buscar otra especie (nombre común o científico, solo lista oficial ITESO)...",
+      value: q,
+      onChange: function (e) { setQ(e.target.value); },
+    }),
+  ].concat(filas));
+}
+
+function Item(props) {
+  var item = props.item, onDecidido = props.onDecidido;
+  var enviandoState = useState(false); var enviando = enviandoState[0], setEnviando = enviandoState[1];
+  var grupoState = useState(true); var aplicarGrupo = grupoState[0], setAplicarGrupo = grupoState[1];
+  var errorState = useState(null); var error = errorState[0], setError = errorState[1];
+
+  var enviarDecision = useCallback(function (body) {
+    setEnviando(true);
+    setError(null);
+    fetch("/api/decision", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    })
+      .then(function (r) { if (!r.ok) throw new Error("El servidor respondió con error"); return r.json(); })
+      .then(function (resp) { onDecidido(item, resp); })
+      .catch(function (e) { setError(e.message); setEnviando(false); });
+  }, [item, onDecidido]);
+
+  function confirmarSugerencia(s) {
+    var grupo = (item.categoria === "codigo_especimen" && aplicarGrupo) ? (item.grupo_miembros || []) : [];
+    enviarDecision({
+      foto_id: item.foto_id, accion: "confirmar",
+      nombre_cientifico: s.nombre_cientifico, especie_id: s.especie_id || null,
+      aplicar_a_grupo: grupo,
+    });
+  }
+
+  function rechazar() {
+    var primera = item.sugerencias[0];
+    enviarDecision({ foto_id: item.foto_id, accion: "rechazar", nombre_cientifico: primera ? primera.nombre_cientifico : null });
+  }
+
+  var etiquetas = {
+    plantnet: "Sugerencia Pl@ntNet",
+    plantnet_bajo_umbral: "Pl@ntNet, confianza baja: revisar",
+    posible_cientifico: "Nombre reconstruido del archivo",
+    ambiguo: "Nombre ambiguo, elige una",
+    codigo_especimen: "Mismo individuo, sin sugerencia",
+  };
+
+  var columnaDerecha = [];
+
+  if (item.categoria === "codigo_especimen" && item.grupo_miembros) {
+    var pistaCarpeta = pistaDesdeBreadcrumb(item.grupo_breadcrumb);
+    columnaDerecha.push(h("div", { className: "grupo-aviso", key: "grupo" }, [
+      "Esta foto es parte de un grupo de " + (item.grupo_miembros.length + 1) + " fotos del mismo individuo (código ",
+      h("code", { key: "codigo" }, item.grupo_token),
+      "). Sin sugerencia automática — usa el buscador de abajo. ",
+      pistaCarpeta ? h("div", { key: "pista", style: { marginTop: "6px" } }, [
+        "Pista, carpeta original: ", h("b", { key: "b" }, item.grupo_breadcrumb),
+      ]) : null,
+      h("label", { key: "checkbox" }, [
+        h("input", {
+          key: "input", type: "checkbox", checked: aplicarGrupo,
+          onChange: function (e) { setAplicarGrupo(e.target.checked); },
+        }),
+        "Aplicar la misma especie a las otras " + item.grupo_miembros.length + " fotos del grupo",
+      ]),
+    ]));
+  }
+
+  var mostrarRechazar = item.sugerencias.length === 1 && item.categoria !== "codigo_especimen";
+  item.sugerencias.forEach(function (s, i) {
+    columnaDerecha.push(h(Sugerencia, {
+      key: "sug" + i, s: s, onElegir: confirmarSugerencia,
+      onRechazar: mostrarRechazar ? rechazar : null,
+      enviando: enviando, fotoIdActual: item.foto_id,
+    }));
+  });
+
+  var pistaBusqueda = item.categoria === "codigo_especimen" ? pistaDesdeBreadcrumb(item.grupo_breadcrumb) : null;
+  columnaDerecha.push(h(Buscador, { key: "buscador", onElegir: confirmarSugerencia, enviando: enviando, valorInicial: pistaBusqueda }));
+  if (error) columnaDerecha.push(h("div", { className: "error", key: "error" }, error));
+
+  return h("div", { className: "tarjeta" }, [
+    h("span", { className: "badge", key: "badge" }, etiquetas[item.categoria] || item.categoria),
+    h("div", { className: "layout", key: "layout" }, [
+      h("div", { key: "izq" }, h("img", {
+        className: "foto-principal",
+        src: "/api/foto/" + item.foto_id + "/imagen",
+        alt: "Foto " + item.foto_id,
+      })),
+      h("div", { key: "der" }, columnaDerecha),
+    ]),
+  ]);
+}
+
+function App() {
+  var itemsState = useState(null); var items = itemsState[0], setItems = itemsState[1];
+  var revisadasState = useState(0); var revisadas = revisadasState[0], setRevisadas = revisadasState[1];
+  var errorCargaState = useState(null); var errorCarga = errorCargaState[0], setErrorCarga = errorCargaState[1];
+
+  var cargarCola = useCallback(function () {
+    fetch("/api/cola")
+      .then(function (r) { if (!r.ok) throw new Error("status " + r.status); return r.json(); })
+      .then(function (data) { setItems(data.items); })
+      .catch(function (e) { setErrorCarga(e.message); });
+  }, []);
+
+  useEffect(function () { cargarCola(); }, [cargarCola]);
+
+  var onDecidido = useCallback(function (item, resp) {
+    setRevisadas(function (n) { return n + 1 + (resp.propagadas || 0); });
+    setItems(function (prev) {
+      var idsFueraDeJuego = { };
+      idsFueraDeJuego[item.foto_id] = true;
+      if (item.grupo_miembros && resp.propagadas > 0) {
+        item.grupo_miembros.forEach(function (id) { idsFueraDeJuego[id] = true; });
+      }
+      return prev.filter(function (i) { return !idsFueraDeJuego[i.foto_id]; });
+    });
+  }, []);
+
+  if (errorCarga) {
+    return h("div", { className: "carga-error" }, [
+      h("strong", { key: "t" }, "No se pudo cargar la cola: "), errorCarga,
+      h("p", { key: "p" }, "¿Está corriendo backend.py? ¿Estás en la red de ITESO (necesaria para leer Y:\\Galería)?"),
+    ]);
+  }
+
+  if (items === null) return h("main", null, h("p", null, "Cargando cola..."));
+
+  return h(React.Fragment, null, [
+    h("header", { key: "header" }, [
+      h("h1", { key: "h1" }, "Revisor de especies · Campus Lab"),
+      h("span", { className: "contador", key: "contador" }, items.length + " pendientes · " + revisadas + " revisadas esta sesión"),
+    ]),
+    h("main", { key: "main" },
+      items.length === 0
+        ? h("div", { className: "vacio" }, [h("h2", { key: "h2" }, "Cola vacía 🎉"), h("p", { key: "p" }, "No hay nada esperando revisión ahora mismo.")])
+        : h(Item, { key: items[0].foto_id, item: items[0], onDecidido: onDecidido })
+    ),
+  ]);
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(h(App));
+</script>
+</body>
+</html>
