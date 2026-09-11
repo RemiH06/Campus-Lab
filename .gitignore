@@ -6,6 +6,26 @@ experimentos/bd
 experimentos/config_local.json
 miro
 reestructura/config_local.json
+reestructura/salida
 
 perso
 reestructura/notebooks/config_local.json
+reestructura/notebooks/BASE DATOS GENERAL.xlsx
+reestructura/notebooks/BASE_DATOS_GENERAL.xlsx
+steps.md
+CLAUDE.md
+
+web/img
+
+# web/Pre trae fuentes de trabajo (fotos, .url, docx sueltos) que no van a git, pero los
+# HTML ya listos para pegar en Liferay y el docx maestro si son el entregable real.
+web/Pre/*
+!web/Pre/Arboretum
+!web/Pre/JardinSuculentas
+
+web/Pre/Arboretum/*
+!web/Pre/Arboretum/*.html
+!web/Pre/Arboretum/*MASTER*.docx
+
+web/Pre/JardinSuculentas/*
+!web/Pre/JardinSuculentas/*.html
