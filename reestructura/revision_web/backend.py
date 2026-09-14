@@ -16,9 +16,10 @@ No inventa nombres nuevos: toda sugerencia y todo resultado de busqueda sale de
 referencia_nombres_comunes (espejo de BASE_DATOS_GENERAL.xlsx), igual que ya hace
 Especies_PlantNet.ipynb con su filtro ESPECIES_OFICIALES.
 
-Uso: python backend.py, luego abrir http://localhost:8000
+Uso: python backend.py, luego abrir http://localhost:8040
 """
 
+import concurrent.futures
 import json
 import re
 import sqlite3
@@ -96,6 +97,46 @@ def cargar_config():
     if not RUTA_CONFIG.exists():
         raise FileNotFoundError(f"No se encontro {RUTA_CONFIG}. Copia config_local.example.json y ajustalo.")
     return json.loads(RUTA_CONFIG.read_text(encoding="utf-8"))
+
+
+_ITESO_DISPONIBLE = None
+
+
+def red_iteso_disponible():
+    """Chequeo de una sola vez por corrida del servidor (cacheado), con timeout corto.
+    Un drive de red desconectado (Y:\\) puede colgarse varios segundos/minutos en
+    cualquier acceso, incluyendo un simple .exists(); sin este cache, cada foto que no
+    esta en el espejo local congelaria la revision entera esperando a la red."""
+    global _ITESO_DISPONIBLE
+    if _ITESO_DISPONIBLE is None:
+        # OJO: nada de "with ThreadPoolExecutor(...) as ex", su __exit__ hace
+        # shutdown(wait=True) y espera a que el hilo colgado termine igual, tirando
+        # el timeout de result() a la basura. shutdown(wait=False) suelta el hilo
+        # colgado en segundo plano y regresa de inmediato.
+        ex = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+        futuro = ex.submit(lambda: Path("Y:/").exists())
+        try:
+            _ITESO_DISPONIBLE = futuro.result(timeout=2)
+        except concurrent.futures.TimeoutError:
+            _ITESO_DISPONIBLE = False
+        ex.shutdown(wait=False)
+    return _ITESO_DISPONIBLE
+
+
+def resolver_ruta_legible(ruta_actual):
+    """Mismo mecanismo que 'resolver_ruta_legible' en Especies_PlantNet.ipynb: si hay un
+    espejo local configurado (trabajo fuera de la red de ITESO, 'ruta_espejo_local_fotos'
+    en config_local.json) y la foto ya se copio ahi, usa esa copia. Si no esta ahi Y la
+    red de ITESO no responde, regresa None de una vez (ver red_iteso_disponible) en vez
+    de intentar .exists() contra Y:\\ y colgarse. Si hay red, usa la ruta real normal."""
+    ruta_espejo = cargar_config().get("ruta_espejo_local_fotos")
+    if ruta_espejo:
+        local = Path(ruta_espejo) / Path(ruta_actual).name
+        if local.exists():
+            return local
+    if not red_iteso_disponible():
+        return None
+    return Path(ruta_actual)
 
 
 def con():
@@ -309,6 +350,17 @@ def armar_cola():
                 "grupo_miembros": [f for f in foto_ids if f != foto_id],
             })
 
+    # Quitar de la cola visible las fotos que ahorita no se pueden ver (no estan en el
+    # espejo local y la red de ITESO no responde): de nada sirve mandar a revisar una
+    # sugerencia si no se puede ver la foto. No se pierden ni se tocan en la base, solo
+    # no aparecen en esta lista hasta que si se puedan ver (de vuelta en ITESO, o si se
+    # copian al espejo local mas adelante).
+    foto_ids_cola = [item["foto_id"] for item in cola]
+    if foto_ids_cola:
+        placeholders = ",".join("?" * len(foto_ids_cola))
+        rutas = dict(c.execute(f"SELECT id, ruta_actual FROM fotos WHERE id IN ({placeholders})", foto_ids_cola).fetchall())
+        cola = [item for item in cola if resolver_ruta_legible(rutas.get(item["foto_id"], "")) is not None]
+
     c.close()
     return cola
 
@@ -326,9 +378,9 @@ def api_imagen(foto_id: int):
     c.close()
     if not fila:
         raise HTTPException(404, "Foto no encontrada")
-    ruta = Path(fila["ruta_actual"])
-    if not ruta.exists():
-        raise HTTPException(404, f"Archivo no accesible: {ruta} (¿estás en la red de ITESO?)")
+    ruta = resolver_ruta_legible(fila["ruta_actual"])
+    if ruta is None or not ruta.exists():
+        raise HTTPException(404, f"Archivo no accesible: {fila['ruta_actual']} (no está en el espejo local y la red de ITESO no responde ahorita)")
     try:
         with Image.open(ruta) as img:
             img = ImageOps.exif_transpose(img)
@@ -459,4 +511,4 @@ if __name__ == "__main__":
     import uvicorn
     cargar_config()  # falla rapido si falta config_local.json, antes de levantar el server
     print(f"Base de datos: {RUTA_BD.resolve()} ({'existe' if RUTA_BD.exists() else 'NO ENCONTRADA'})")
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=8040)
