@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Revisor · Ave/Insecto/Ninguno</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{ --azul:#004270; --texto:#2C343A; --texto-suave:#656d7e; --fondo:#f2f2f5; --borde:#dde1e6; --verde:#1a7f4e; }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Segoe UI",Roboto,Arial,sans-serif;background:var(--fondo);color:var(--texto);}
+  header{background:var(--azul);color:#f6f8fa;padding:14px 24px;}
+  header h1{font-size:1.1rem;margin:0 0 4px;}
+  header p{margin:0;font-size:.85rem;color:#bfe3f5;}
+  main{max-width:700px;margin:0 auto;padding:20px;}
+  .tarjeta{background:#fff;border:1px solid var(--borde);border-radius:12px;padding:20px;text-align:center;}
+  .tarjeta img{max-width:100%;max-height:60vh;border-radius:8px;background:#eee;display:block;margin:0 auto 14px;}
+  .badge{display:inline-block;font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:10px;}
+  .badge.insecto{background:#ffe08a;color:#5c4300;}
+  .badge.ave{background:#a8d8ff;color:#00304d;}
+  .badge.sin-score{background:#e0e0e0;color:#555;}
+  .meta{font-size:.85rem;color:var(--texto-suave);margin-bottom:16px;}
+  .decisiones{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+  .decisiones button{padding:14px 24px;border-radius:10px;border:none;font-size:1rem;font-weight:600;cursor:pointer;min-width:120px;}
+  .btn-ave{background:#a8d8ff;color:#00304d;}
+  .btn-insecto{background:#ffe08a;color:#5c4300;}
+  .btn-ninguno{background:#e0e0e0;color:#333;}
+  .decisiones button:hover{filter:brightness(0.95);}
+  .decisiones button:disabled{opacity:.5;cursor:default;}
+  .vacio,.cargando{text-align:center;padding:60px 20px;color:var(--texto-suave);}
+  .saltar{margin-top:14px;background:none;border:none;color:var(--texto-suave);text-decoration:underline;cursor:pointer;font-size:.85rem;}
+</style>
+</head>
+<body>
+<header>
+  <h1>Revisor · Ave / Insecto / Ninguno (todo el catálogo)</h1>
+  <p id="contador">Cargando…</p>
+</header>
+<main>
+  <div id="contenido"><div class="cargando">Cargando…</div></div>
+</main>
+<script>
+"use strict";
+
+var itemsGlobal = [];
+var cola = [];
+var enviando = false;
+
+function badgeHtml(item) {
+  if (item.tipo_probable === null) return '<span class="badge sin-score">Sin evaluar por BioCLIP</span>';
+  var etiqueta = item.tipo_probable === "insecto" ? "🐛 Insecto" : "🐦 Ave";
+  return '<span class="badge ' + item.tipo_probable + '">' + etiqueta + ' (BioCLIP: ' + Math.round(item.score * 100) + '%)</span>';
+}
+
+function actualizarCola() {
+  cola = itemsGlobal.filter(function (it) { return it.disponible && !it.decision; });
+}
+
+function actualizarContador() {
+  var revisadas = itemsGlobal.filter(function (it) { return it.decision; }).length;
+  var sinRed = itemsGlobal.filter(function (it) { return !it.disponible; }).length;
+  document.getElementById("contador").textContent =
+    cola.length + " pendientes · " + revisadas + " revisadas esta sesión" +
+    (sinRed > 0 ? " · " + sinRed + " sin red/espejo local" : "");
+}
+
+function pintarItemActual() {
+  var cont = document.getElementById("contenido");
+  actualizarContador();
+  if (cola.length === 0) {
+    cont.innerHTML = '<div class="vacio">🎉 No hay nada pendiente ahorita.</div>';
+    return;
+  }
+  var item = cola[0];
+  enviando = false;
+  cont.innerHTML =
+    '<div class="tarjeta">' +
+      '<img src="/api/foto/' + item.foto_id + '/imagen" alt="Foto ' + item.foto_id + '">' +
+      '<div>' + badgeHtml(item) + '</div>' +
+      '<div class="meta">Foto ' + item.foto_id + (item.especie_confirmada ? ' · ' + item.especie_confirmada : '') + '</div>' +
+      '<div class="decisiones">' +
+        '<button class="btn-ave" data-d="ave">🐦 Ave</button>' +
+        '<button class="btn-insecto" data-d="insecto">🐛 Insecto</button>' +
+        '<button class="btn-ninguno" data-d="ninguno">✕ Ninguno</button>' +
+      '</div>' +
+      '<button class="saltar">Saltar por ahora →</button>' +
+    '</div>';
+
+  cont.querySelectorAll(".decisiones button").forEach(function (btn) {
+    btn.onclick = function () { enviarDecision(item, btn.dataset.d); };
+  });
+  cont.querySelector(".saltar").onclick = function () {
+    cola.push(cola.shift());
+    pintarItemActual();
+  };
+}
+
+function enviarDecision(item, decision) {
+  if (enviando) return;
+  enviando = true;
+  document.querySelectorAll(".decisiones button").forEach(function (b) { b.disabled = true; });
+  fetch("/api/decision", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ foto_id: item.foto_id, decision: decision }),
+  })
+    .then(function () {
+      item.decision = decision;
+      cola.shift();
+      pintarItemActual();
+    })
+    .catch(function () {
+      enviando = false;
+      document.querySelectorAll(".decisiones button").forEach(function (b) { b.disabled = false; });
+    });
+}
+
+fetch("/api/galeria")
+  .then(function (r) { return r.json(); })
+  .then(function (data) {
+    itemsGlobal = data.items;
+    actualizarCola();
+    pintarItemActual();
+  })
+  .catch(function (e) {
+    document.getElementById("contador").textContent = "Error al cargar: " + e.message;
+  });
+</script>
+</body>
+</html>
