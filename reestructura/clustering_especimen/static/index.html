@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Clustering por espécimen</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{ --azul:#004270; --texto:#2C343A; --texto-suave:#656d7e; --fondo:#f2f2f5; --borde:#dde1e6; --verde:#1a7f4e; --amarillo:#a67c00; }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Segoe UI",Roboto,Arial,sans-serif;background:var(--fondo);color:var(--texto);}
+  header{background:var(--azul);color:#f6f8fa;padding:14px 24px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
+  header h1{font-size:1.1rem;margin:0;white-space:nowrap;}
+  header select{padding:6px 10px;border-radius:6px;border:none;font-size:.9rem;}
+  main{max-width:1000px;margin:0 auto;padding:20px 20px 90px;}
+  section{margin-bottom:26px;}
+  section h2{font-size:.95rem;color:var(--texto-suave);border-bottom:1px solid var(--borde);padding-bottom:6px;}
+  .grupo{background:#fff;border:1px solid var(--borde);border-radius:10px;padding:12px;margin-bottom:12px;}
+  .grupo-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:.85rem;color:var(--texto-suave);}
+  .tira{display:flex;gap:8px;flex-wrap:wrap;}
+  .foto-card{position:relative;width:110px;text-align:center;font-size:.72rem;color:var(--texto-suave);}
+  .foto-card img{width:110px;height:110px;object-fit:cover;border-radius:6px;background:#e0e0e0;display:block;}
+  .foto-card input[type=checkbox]{position:absolute;top:4px;left:4px;width:18px;height:18px;}
+  .foto-card .quitar{position:absolute;top:4px;right:4px;background:#fff;border:1px solid var(--borde);border-radius:50%;width:20px;height:20px;line-height:18px;cursor:pointer;font-size:.75rem;}
+  .foto-card .especie{display:block;margin-top:3px;}
+  .btn{padding:8px 14px;border-radius:8px;border:none;font-size:.85rem;font-weight:600;cursor:pointer;background:var(--verde);color:#fff;}
+  .btn:disabled{opacity:.4;cursor:default;}
+  .btn-secundario{background:#e0e0e0;color:#333;}
+  .vacio{color:var(--texto-suave);font-size:.85rem;padding:10px 0;}
+  .barra-flotante{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--borde);padding:10px 20px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;}
+  .barra-flotante select{padding:6px 10px;border-radius:6px;border:1px solid var(--borde);}
+  .manual{background:#fff;border:1px solid var(--borde);border-radius:10px;padding:10px 14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:.85rem;}
+  .manual input{width:80px;padding:5px;border-radius:6px;border:1px solid var(--borde);}
+  .cargando{color:var(--texto-suave);padding:30px;text-align:center;}
+</style>
+</head>
+<body>
+<header>
+  <h1>Clustering por espécimen</h1>
+  <select id="selectorGenero"><option>Cargando géneros…</option></select>
+</header>
+<main>
+  <div class="manual">
+    <strong>Override manual:</strong>
+    <span>mover foto</span>
+    <input type="number" id="inputFotoManual" placeholder="id foto">
+    <span>al grupo</span>
+    <input type="number" id="inputGrupoManual" placeholder="id grupo">
+    <button class="btn btn-secundario" id="btnMoverManual">Mover</button>
+    <span style="color:var(--texto-suave);">(para cuando la foto correcta está en otro género)</span>
+  </div>
+  <div id="contenido"><div class="cargando">Selecciona un género arriba.</div></div>
+</main>
+<div class="barra-flotante" id="barraFlotante" style="display:none;">
+  <span id="contadorSeleccion">0 seleccionadas</span>
+  <select id="selectorDestino"><option value="">Nuevo grupo</option></select>
+  <button class="btn" id="btnConfirmarSeleccion">Confirmar grupo</button>
+  <button class="btn btn-secundario" id="btnLimpiarSeleccion">Limpiar selección</button>
+</div>
+<script>
+"use strict";
+
+var seleccionadas = new Set();
+var datosGeneroActual = null;
+
+function badgeEspecie(foto) {
+  return foto.especie ? foto.especie : "(sin especie)";
+}
+
+function fotoCardHtml(foto, quitable) {
+  var chip = quitable
+    ? '<button class="quitar" data-quitar="' + foto.foto_id + '" title="Quitar del grupo">✕</button>'
+    : '<input type="checkbox" data-check="' + foto.foto_id + '" ' + (seleccionadas.has(foto.foto_id) ? "checked" : "") + '>';
+  return (
+    '<div class="foto-card">' +
+      chip +
+      '<img src="/api/foto/' + foto.foto_id + '/imagen" alt="Foto ' + foto.foto_id + '">' +
+      '<span>#' + foto.foto_id + '</span>' +
+      '<span class="especie">' + badgeEspecie(foto) + '</span>' +
+    '</div>'
+  );
+}
+
+function actualizarBarra() {
+  var barra = document.getElementById("barraFlotante");
+  var contador = document.getElementById("contadorSeleccion");
+  var selectorDestino = document.getElementById("selectorDestino");
+  if (seleccionadas.size === 0) {
+    barra.style.display = "none";
+    return;
+  }
+  barra.style.display = "flex";
+  contador.textContent = seleccionadas.size + " seleccionada(s)";
+  var opciones = '<option value="">Nuevo grupo</option>';
+  if (datosGeneroActual) {
+    datosGeneroActual.grupos_confirmados.forEach(function (g) {
+      opciones += '<option value="' + g.grupo_id + '">Unir a grupo #' + g.grupo_id + "</option>";
+    });
+  }
+  selectorDestino.innerHTML = opciones;
+}
+
+function pintarGenero(data) {
+  datosGeneroActual = data;
+  seleccionadas.clear();
+  var cont = document.getElementById("contenido");
+  var html = "";
+
+  html += "<section><h2>Grupos confirmados</h2>";
+  if (data.grupos_confirmados.length === 0) {
+    html += '<div class="vacio">Todavía no hay grupos confirmados en este género.</div>';
+  } else {
+    data.grupos_confirmados.forEach(function (g) {
+      html +=
+        '<div class="grupo"><div class="grupo-header">Grupo #' + g.grupo_id + " · " + g.fotos.length + ' foto(s)</div>' +
+        '<div class="tira">' + g.fotos.map(function (f) { return fotoCardHtml(f, true); }).join("") + "</div></div>";
+    });
+  }
+  html += "</section>";
+
+  html += "<section><h2>Propuestas (fotos parecidas entre sí, sin confirmar)</h2>";
+  if (data.propuestas.length === 0) {
+    html += '<div class="vacio">No se detectaron fotos parecidas entre sí en este género por ahora.</div>';
+  } else {
+    data.propuestas.forEach(function (p, idx) {
+      html +=
+        '<div class="grupo"><div class="grupo-header"><span>Propuesta ' + (idx + 1) + " · " + p.fotos.length + ' foto(s)</span>' +
+        '<button class="btn" data-confirmar-propuesta="' + idx + '">Confirmar como grupo</button></div>' +
+        '<div class="tira">' + p.fotos.map(function (f) { return fotoCardHtml(f, false); }).join("") + "</div></div>";
+    });
+  }
+  html += "</section>";
+
+  html += "<section><h2>Sueltas (sin pareja detectada, agrúpalas a mano si sabes que van juntas)</h2>";
+  if (data.sueltas.length === 0) {
+    html += '<div class="vacio">Ninguna.</div>';
+  } else {
+    html += '<div class="tira">' + data.sueltas.map(function (f) { return fotoCardHtml(f, false); }).join("") + "</div>";
+  }
+  html += "</section>";
+
+  cont.innerHTML = html;
+
+  cont.querySelectorAll("[data-check]").forEach(function (chk) {
+    chk.onchange = function () {
+      var id = parseInt(chk.dataset.check, 10);
+      if (chk.checked) seleccionadas.add(id); else seleccionadas.delete(id);
+      actualizarBarra();
+    };
+  });
+  cont.querySelectorAll("[data-quitar]").forEach(function (btn) {
+    btn.onclick = function () {
+      fetch("/api/grupo/foto/" + btn.dataset.quitar, { method: "DELETE" })
+        .then(function () { cargarGenero(data.genero); });
+    };
+  });
+  cont.querySelectorAll("[data-confirmar-propuesta]").forEach(function (btn) {
+    btn.onclick = function () {
+      var idx = parseInt(btn.dataset.confirmarPropuesta, 10);
+      var fotoIds = data.propuestas[idx].fotos.map(function (f) { return f.foto_id; });
+      fetch("/api/grupo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ foto_ids: fotoIds }),
+      }).then(function () { cargarGenero(data.genero); });
+    };
+  });
+
+  actualizarBarra();
+}
+
+function cargarGenero(genero) {
+  document.getElementById("contenido").innerHTML = '<div class="cargando">Cargando…</div>';
+  fetch("/api/genero/" + encodeURIComponent(genero))
+    .then(function (r) { return r.json(); })
+    .then(pintarGenero);
+}
+
+document.getElementById("btnConfirmarSeleccion").onclick = function () {
+  if (seleccionadas.size === 0) return;
+  var destino = document.getElementById("selectorDestino").value;
+  var cuerpo = { foto_ids: Array.from(seleccionadas) };
+  if (destino) cuerpo.grupo_id = parseInt(destino, 10);
+  fetch("/api/grupo", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(cuerpo),
+  }).then(function () {
+    if (datosGeneroActual) cargarGenero(datosGeneroActual.genero);
+  });
+};
+
+document.getElementById("btnLimpiarSeleccion").onclick = function () {
+  seleccionadas.clear();
+  if (datosGeneroActual) pintarGenero(datosGeneroActual);
+};
+
+document.getElementById("btnMoverManual").onclick = function () {
+  var fotoId = parseInt(document.getElementById("inputFotoManual").value, 10);
+  var grupoId = parseInt(document.getElementById("inputGrupoManual").value, 10);
+  if (!fotoId || !grupoId) return;
+  fetch("/api/grupo", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ foto_ids: [fotoId], grupo_id: grupoId }),
+  }).then(function () {
+    if (datosGeneroActual) cargarGenero(datosGeneroActual.genero);
+  });
+};
+
+fetch("/api/generos")
+  .then(function (r) { return r.json(); })
+  .then(function (data) {
+    var sel = document.getElementById("selectorGenero");
+    sel.innerHTML = data.generos
+      .map(function (g) {
+        return '<option value="' + g.genero + '">' + g.genero + " (" + g.pendientes + " pendientes / " + g.total + ")</option>";
+      })
+      .join("");
+    sel.onchange = function () { cargarGenero(sel.value); };
+    if (data.generos.length > 0) cargarGenero(data.generos[0].genero);
+  });
+</script>
+</body>
+</html>

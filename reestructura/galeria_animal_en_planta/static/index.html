@@ -20,19 +20,26 @@
   .badge.sin-score{background:#e0e0e0;color:#555;}
   .meta{font-size:.85rem;color:var(--texto-suave);margin-bottom:16px;}
   .decisiones{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
-  .decisiones button{padding:14px 24px;border-radius:10px;border:none;font-size:1rem;font-weight:600;cursor:pointer;min-width:120px;}
+  .decisiones button{padding:12px 18px;border-radius:10px;border:none;font-size:.92rem;font-weight:600;cursor:pointer;min-width:110px;}
+  .decisiones button .tecla{opacity:.6;font-weight:400;font-size:.78rem;display:block;}
   .btn-ave{background:#a8d8ff;color:#00304d;}
   .btn-insecto{background:#ffe08a;color:#5c4300;}
-  .btn-ninguno{background:#e0e0e0;color:#333;}
+  .btn-mamifero{background:#d9b38c;color:#3d2811;}
+  .btn-anfibio_reptil{background:#b7e4c7;color:#1b4332;}
+  .btn-hongo{background:#e0c3fc;color:#3d2461;}
+  .btn-planta{background:#c5e8b7;color:#284a1b;}
+  .btn-sin_sujeto{background:#e0e0e0;color:#333;}
   .decisiones button:hover{filter:brightness(0.95);}
   .decisiones button:disabled{opacity:.5;cursor:default;}
   .vacio,.cargando{text-align:center;padding:60px 20px;color:var(--texto-suave);}
   .saltar{margin-top:14px;background:none;border:none;color:var(--texto-suave);text-decoration:underline;cursor:pointer;font-size:.85rem;}
+  .deshacer{display:block;margin:10px auto 0;background:none;border:1px solid var(--borde);border-radius:8px;padding:6px 14px;color:var(--texto-suave);cursor:pointer;font-size:.82rem;}
+  .deshacer:disabled{opacity:.4;cursor:default;}
 </style>
 </head>
 <body>
 <header>
-  <h1>Revisor · Ave / Insecto / Ninguno (todo el catálogo)</h1>
+  <h1>Revisor · todo el catálogo</h1>
   <p id="contador">Cargando…</p>
 </header>
 <main>
@@ -44,6 +51,17 @@
 var itemsGlobal = [];
 var cola = [];
 var enviando = false;
+var historial = [];
+
+var OPCIONES = [
+  { d: "ave", etiqueta: "🐦 Ave", tecla: "1" },
+  { d: "insecto", etiqueta: "🐛 Insecto", tecla: "2" },
+  { d: "mamifero", etiqueta: "🐾 Mamífero", tecla: "3" },
+  { d: "anfibio_reptil", etiqueta: "🐸 Anfibio/Reptil", tecla: "4" },
+  { d: "hongo", etiqueta: "🍄 Hongo", tecla: "5" },
+  { d: "planta", etiqueta: "🌿 Planta (sin animal)", tecla: "6" },
+  { d: "sin_sujeto", etiqueta: "🎨 Sin sujeto claro", tecla: "7" },
+];
 
 function badgeHtml(item) {
   if (item.tipo_probable === null) return '<span class="badge sin-score">Sin evaluar por BioCLIP</span>';
@@ -72,17 +90,17 @@ function pintarItemActual() {
   }
   var item = cola[0];
   enviando = false;
+  var botonesHtml = OPCIONES.map(function (op) {
+    return '<button class="btn-' + op.d + '" data-d="' + op.d + '">' + op.etiqueta + '<span class="tecla">tecla ' + op.tecla + '</span></button>';
+  }).join("");
   cont.innerHTML =
     '<div class="tarjeta">' +
       '<img src="/api/foto/' + item.foto_id + '/imagen" alt="Foto ' + item.foto_id + '">' +
       '<div>' + badgeHtml(item) + '</div>' +
       '<div class="meta">Foto ' + item.foto_id + (item.especie_confirmada ? ' · ' + item.especie_confirmada : '') + '</div>' +
-      '<div class="decisiones">' +
-        '<button class="btn-ave" data-d="ave">🐦 Ave</button>' +
-        '<button class="btn-insecto" data-d="insecto">🐛 Insecto</button>' +
-        '<button class="btn-ninguno" data-d="ninguno">✕ Ninguno</button>' +
-      '</div>' +
-      '<button class="saltar">Saltar por ahora →</button>' +
+      '<div class="decisiones">' + botonesHtml + '</div>' +
+      '<button class="saltar">Saltar por ahora (tecla 0) →</button>' +
+      '<button class="deshacer"' + (historial.length === 0 ? ' disabled' : '') + '>↩ Deshacer última (tecla Z)</button>' +
     '</div>';
 
   cont.querySelectorAll(".decisiones button").forEach(function (btn) {
@@ -92,6 +110,7 @@ function pintarItemActual() {
     cola.push(cola.shift());
     pintarItemActual();
   };
+  cont.querySelector(".deshacer").onclick = deshacerUltima;
 }
 
 function enviarDecision(item, decision) {
@@ -104,6 +123,7 @@ function enviarDecision(item, decision) {
     body: JSON.stringify({ foto_id: item.foto_id, decision: decision }),
   })
     .then(function () {
+      historial.push(item.foto_id);
       item.decision = decision;
       cola.shift();
       pintarItemActual();
@@ -113,6 +133,44 @@ function enviarDecision(item, decision) {
       document.querySelectorAll(".decisiones button").forEach(function (b) { b.disabled = false; });
     });
 }
+
+function deshacerUltima() {
+  if (enviando || historial.length === 0) return;
+  var fotoId = historial.pop();
+  var item = itemsGlobal.filter(function (it) { return it.foto_id === fotoId; })[0];
+  if (!item) { pintarItemActual(); return; }
+  enviando = true;
+  fetch("/api/decision/" + fotoId, { method: "DELETE" })
+    .then(function () {
+      enviando = false;
+      item.decision = null;
+      actualizarCola();
+      cola = cola.filter(function (it) { return it.foto_id !== fotoId; });
+      cola.unshift(item);
+      pintarItemActual();
+    })
+    .catch(function () {
+      enviando = false;
+      historial.push(fotoId);
+    });
+}
+
+document.addEventListener("keydown", function (e) {
+  if (enviando) return;
+  if ((e.key === "z" || e.key === "Z") && historial.length > 0) {
+    deshacerUltima();
+    return;
+  }
+  if (cola.length === 0) return;
+  var item = cola[0];
+  if (e.key === "0") {
+    cola.push(cola.shift());
+    pintarItemActual();
+    return;
+  }
+  var opcion = OPCIONES.filter(function (op) { return op.tecla === e.key; })[0];
+  if (opcion) enviarDecision(item, opcion.d);
+});
 
 fetch("/api/galeria")
   .then(function (r) { return r.json(); })

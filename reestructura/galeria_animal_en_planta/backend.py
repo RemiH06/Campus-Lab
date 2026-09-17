@@ -1,11 +1,12 @@
 """
 Revisor de TODO el catalogo (confirmado o no, cualquier reino): para cada foto, Remi
-decide a mano "Ave" / "Insecto" / "Ninguno" (tabla revision_animal_en_planta). Esto
-sirve como filtro humano previo, mas confiable que el triage automatico de CLIP
-(reino_sugerido/tipo_sugerido), antes de meterle cualquier modelo de identificacion de
-ave o insecto especifico. Cuando hay un score de deteccion_animal_en_planta (solo
-existe para las fotos de planta ya confirmadas que se corrieron con BioCLIP) se
-muestra como referencia, pero no filtra nada.
+decide a mano una de: ave, insecto, mamifero, anfibio_reptil, hongo, planta (sin
+animal), sin_sujeto (raiz/suelo/corteza, tomas artisticas sin sujeto identificable) -
+tabla revision_animal_en_planta. Esto sirve como filtro humano previo, mas confiable
+que el triage automatico de CLIP (reino_sugerido/tipo_sugerido), antes de meterle
+cualquier modelo de identificacion de ave o insecto especifico. Cuando hay un score de
+deteccion_animal_en_planta (solo existe para las fotos de planta ya confirmadas que se
+corrieron con BioCLIP) se muestra como referencia, pero no filtra nada.
 
 No duplica fotos todavia, solo registra la decision humana.
 
@@ -33,15 +34,24 @@ app = FastAPI()
 def con():
     c = sqlite3.connect(RUTA_BD)
     c.row_factory = sqlite3.Row
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS revision_animal_en_planta (
-            foto_id INTEGER PRIMARY KEY,
-            decision TEXT,
-            revisor TEXT,
-            fecha TEXT DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
     return c
+
+
+# Crear la tabla una sola vez al arrancar, no en cada request: un DDL por cada llamada
+# choca con cualquier otro proceso que tenga una transaccion de escritura larga abierta
+# al mismo tiempo (nos paso con el script de embeddings de especimen_embeddings, que
+# antes solo comiteaba cada 100 fotos y dejaba el lock de escritura minutos abierto).
+_c_inicial = sqlite3.connect(RUTA_BD)
+_c_inicial.execute("""
+    CREATE TABLE IF NOT EXISTS revision_animal_en_planta (
+        foto_id INTEGER PRIMARY KEY,
+        decision TEXT,
+        revisor TEXT,
+        fecha TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+""")
+_c_inicial.commit()
+_c_inicial.close()
 
 
 _ITESO_DISPONIBLE = None
@@ -128,20 +138,35 @@ def api_galeria():
     return {"total": len(items), "disponibles": disponibles, "items": items}
 
 
+DECISIONES_VALIDAS = ("ave", "insecto", "mamifero", "anfibio_reptil", "hongo", "planta", "sin_sujeto")
+
+
 class Decision(BaseModel):
     foto_id: int
-    decision: str  # "ave" | "insecto" | "ninguno"
+    decision: str
 
 
 @app.post("/api/decision")
 def api_decision(d: Decision):
-    if d.decision not in ("ave", "insecto", "ninguno"):
-        raise HTTPException(400, "decision debe ser 'ave', 'insecto' o 'ninguno'")
+    if d.decision not in DECISIONES_VALIDAS:
+        raise HTTPException(400, f"decision debe ser una de: {DECISIONES_VALIDAS}")
     c = con()
     c.execute(
         "INSERT OR REPLACE INTO revision_animal_en_planta (foto_id, decision, revisor) VALUES (?,?,?)",
         (d.foto_id, d.decision, "Lambda Heredia"),
     )
+    c.commit()
+    c.close()
+    return {"ok": True}
+
+
+@app.delete("/api/decision/{foto_id}")
+def api_borrar_decision(foto_id: int):
+    """Deshacer: regresa la foto a pendiente (sin decision), para el boton/tecla de
+    deshacer del frontend. El frontend decide cual foto deshacer via su propio
+    historial de la sesion, no hay ambiguedad de 'cual fue la ultima' aqui."""
+    c = con()
+    c.execute("DELETE FROM revision_animal_en_planta WHERE foto_id=?", (foto_id,))
     c.commit()
     c.close()
     return {"ok": True}
