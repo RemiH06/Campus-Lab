@@ -103,6 +103,7 @@ def api_galeria():
         LEFT JOIN especies e ON e.id = f.especie_id
         LEFT JOIN revision_animal_en_planta r ON r.foto_id = f.id
         WHERE f.ruta_actual NOT LIKE '%.db'
+          AND f.id NOT IN (SELECT foto_id FROM archivos_no_procesables)
         ORDER BY (d.score_insecto IS NULL), MAX(d.score_insecto, d.score_ave) DESC, f.id
     """).fetchall()
     c.close()
@@ -190,7 +191,13 @@ def api_imagen(foto_id: int):
             img.thumbnail((500, 500), Image.LANCZOS)
             buf = BytesIO()
             img.save(buf, "JPEG", quality=80)
-            return Response(content=buf.getvalue(), media_type="image/jpeg")
+            # Cache-Control explicito: sin esto el navegador no siempre reutiliza la
+            # respuesta de la precarga (new Image() en el frontend) para la misma URL
+            # cuando el <img> real la vuelve a pedir un momento despues.
+            return Response(
+                content=buf.getvalue(), media_type="image/jpeg",
+                headers={"Cache-Control": "private, max-age=86400"},
+            )
     except Exception as e:
         raise HTTPException(500, f"No se pudo abrir/redimensionar: {e}")
 

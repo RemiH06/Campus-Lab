@@ -145,6 +145,20 @@ def con():
     return c
 
 
+# Columna de control para las sugerencias de iNaturalist: sin esto, rechazar una
+# sugerencia de una foto que ya estaba en limbo (estado='pendiente_revision') no
+# cambia ningun campo que el query de la cola filtre, y la foto reaparaceria en la
+# cola para siempre. Se marca "revisado" en cuanto se toma CUALQUIER decision sobre
+# esa foto (confirmar o rechazar), sin importar si la sugerencia vino de iNaturalist
+# o de otro origen (no-op inofensivo si la foto no tiene fila en inaturalist_intentos).
+_c_inicial = sqlite3.connect(RUTA_BD)
+_cols_inaturalist = [r[1] for r in _c_inicial.execute("PRAGMA table_info(inaturalist_intentos)")]
+if _cols_inaturalist and "revisado" not in _cols_inaturalist:
+    _c_inicial.execute("ALTER TABLE inaturalist_intentos ADD COLUMN revisado INTEGER DEFAULT 0")
+    _c_inicial.commit()
+_c_inicial.close()
+
+
 # ---- Misma logica de parseo/clasificacion que Resolucion_Nombres.ipynb ----
 # (copiada a proposito, no importada: este backend no depende de que el notebook
 # se haya corrido en esta sesion, solo de que referencia_nombres_comunes este en la BD).
@@ -350,6 +364,38 @@ def armar_cola():
                 "grupo_miembros": [f for f in foto_ids if f != foto_id],
             })
 
+    # 3. Sugerencias de iNaturalist: cubre tanto fotos nuevas (ave/insecto/mamifero/
+    # hongo/anfibio_reptil/planta, especie_id NULL) como fotos que ya estaban en limbo
+    # (Stanhopea, Oncidium, etc.) y ahora tambien tienen una sugerencia de iNaturalist
+    # ademas de la sugerencia original rechazada. "confirmar" aqui las saca del limbo
+    # de una vez (estado='usable'); "rechazar" dejar la foto en limbo con esta sugerencia
+    # como la mas reciente (no inventa nombre, tal como el resto del archivo).
+    de_inaturalist = c.execute("""
+        SELECT ii.foto_id, ii.grupo, ii.nombre_sugerido, ii.score
+        FROM inaturalist_intentos ii JOIN fotos f ON f.id = ii.foto_id
+        WHERE ii.nombre_sugerido IS NOT NULL
+          AND f.especie_id IS NULL AND f.ruta_actual NOT LIKE '%.db'
+          AND (ii.revisado IS NULL OR ii.revisado = 0)
+        ORDER BY ii.score DESC
+    """).fetchall()
+    for fila in de_inaturalist:
+        # iNaturalist manda el score en escala 0-100, no 0-1 como Pl@ntNet: se
+        # normaliza aqui para que el frontend (que asume 0-1, "score*100 + %") no
+        # muestre confianzas como "9960%".
+        score_normalizado = fila["score"] / 100 if fila["score"] is not None else None
+        cola.append({
+            "foto_id": fila["foto_id"],
+            "origen": "inaturalist",
+            "categoria": "inaturalist_" + (fila["grupo"] or "otro"),
+            "sugerencias": [{
+                "especie_id": None,
+                "nombre_cientifico": fila["nombre_sugerido"],
+                "familia": None, "genero": None,
+                "score": score_normalizado,
+            }],
+            "grupo_token": None,
+        })
+
     # Quitar de la cola visible las fotos que ahorita no se pueden ver (no estan en el
     # espejo local y la red de ITESO no responde): de nada sirve mandar a revisar una
     # sugerencia si no se puede ver la foto. No se pierden ni se tocan en la base, solo
@@ -468,6 +514,7 @@ def api_decision(d: Decision):
             "INSERT INTO identificaciones_revisadas (foto_id, especie_sugerida, score, decision, revisor) VALUES (?,?,?,?,?)",
             (d.foto_id, d.nombre_cientifico, None, "rechazada", revisor),
         )
+        c.execute("UPDATE inaturalist_intentos SET revisado=1 WHERE foto_id=?", (d.foto_id,))
         c.commit()
         c.close()
         return {"ok": True, "propagadas": 0}
@@ -489,6 +536,7 @@ def api_decision(d: Decision):
         "INSERT INTO identificaciones_revisadas (foto_id, especie_sugerida, score, decision, revisor) VALUES (?,?,?,?,?)",
         (d.foto_id, d.nombre_cientifico, None, "confirmada", revisor),
     )
+    c.execute("UPDATE inaturalist_intentos SET revisado=1 WHERE foto_id=?", (d.foto_id,))
 
     propagadas = 0
     for otro_id in d.aplicar_a_grupo:

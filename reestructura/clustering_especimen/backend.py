@@ -12,6 +12,12 @@ prediccion en una foto no debe bloquear que el ojo humano la agrupe bien. Por es
 "mover/crear grupo" nunca valida genero ni especie, solo trabaja con foto_id y
 grupo_id sueltos.
 
+Incluye tambien las fotos en limbo (generos completos mandados a revision de experto,
+estado='pendiente_revision', especie_id NULL): su "genero" para el agrupamiento sale
+de la ultima especie sugerida antes del rechazo (identificaciones_revisadas), no de
+especies.nombre_cientifico. Se marcan con "limbo": true para no confundirlas con una
+especie ya confirmada.
+
 Uso: python backend.py, luego abrir http://localhost:8043
 """
 
@@ -48,6 +54,9 @@ def con():
 _c_inicial = sqlite3.connect(RUTA_BD)
 _c_inicial.execute("""CREATE TABLE IF NOT EXISTS especimen_grupos_confirmados (
     foto_id INTEGER PRIMARY KEY, grupo_id INTEGER, revisor TEXT,
+    fecha TEXT DEFAULT CURRENT_TIMESTAMP)""")
+_c_inicial.execute("""CREATE TABLE IF NOT EXISTS especimen_generos_revisados (
+    genero TEXT PRIMARY KEY, revisor TEXT,
     fecha TEXT DEFAULT CURRENT_TIMESTAMP)""")
 _c_inicial.commit()
 _c_inicial.close()
@@ -122,26 +131,68 @@ def api_generos():
         SELECT genero, COUNT(*) AS total
         FROM especimen_embeddings GROUP BY genero HAVING total >= 2 ORDER BY genero
     """).fetchall()
+    revisados = {r["genero"] for r in c.execute("SELECT genero FROM especimen_generos_revisados").fetchall()}
     generos = []
     for fila in filas:
         pendientes = c.execute("""
             SELECT COUNT(*) FROM especimen_embeddings e
             WHERE e.genero = ? AND e.foto_id NOT IN (SELECT foto_id FROM especimen_grupos_confirmados)
         """, (fila["genero"],)).fetchone()[0]
-        generos.append({"genero": fila["genero"], "total": fila["total"], "pendientes": pendientes})
+        generos.append({
+            "genero": fila["genero"],
+            "total": fila["total"],
+            "pendientes": pendientes,
+            "revisado": fila["genero"] in revisados,
+        })
     c.close()
     return {"generos": generos}
 
 
+@app.post("/api/genero/{genero}/revisado")
+def api_marcar_revisado(genero: str):
+    c = con()
+    c.execute(
+        "INSERT OR REPLACE INTO especimen_generos_revisados (genero, revisor) VALUES (?,?)",
+        (genero, "Lambda Heredia"),
+    )
+    c.commit()
+    c.close()
+    return {"ok": True}
+
+
+@app.delete("/api/genero/{genero}/revisado")
+def api_quitar_revisado(genero: str):
+    c = con()
+    c.execute("DELETE FROM especimen_generos_revisados WHERE genero=?", (genero,))
+    c.commit()
+    c.close()
+    return {"ok": True}
+
+
 def info_foto(c, foto_id):
     fila = c.execute("""
-        SELECT f.id AS foto_id, f.ruta_actual, e.nombre_cientifico
+        SELECT f.id AS foto_id, f.ruta_actual, f.estado, e.nombre_cientifico
         FROM fotos f LEFT JOIN especies e ON e.id = f.especie_id WHERE f.id = ?
     """, (foto_id,)).fetchone()
+    especie = fila["nombre_cientifico"] if fila else None
+    limbo = False
+    if fila and especie is None and fila["estado"] == "pendiente_revision":
+        # Fotos en limbo (genero mandado a revision de experto): especie_id quedo en
+        # NULL, pero se muestra la ultima especie sugerida antes del rechazo como
+        # referencia, marcada como limbo para no confundirla con una especie confirmada.
+        sugerida = c.execute("""
+            SELECT especie_sugerida FROM identificaciones_revisadas
+            WHERE foto_id=? AND decision='rechazada' AND especie_sugerida IS NOT NULL
+            ORDER BY fecha DESC LIMIT 1
+        """, (foto_id,)).fetchone()
+        if sugerida:
+            especie = sugerida["especie_sugerida"]
+            limbo = True
     disponible = resolver_ruta_legible(fila["ruta_actual"]) is not None if fila else False
     return {
         "foto_id": foto_id,
-        "especie": fila["nombre_cientifico"] if fila else None,
+        "especie": especie,
+        "limbo": limbo,
         "disponible": disponible,
     }
 
@@ -180,9 +231,14 @@ def api_genero(genero: str):
         else:
             sueltas.append(fotos[0])
 
+    revisado = c.execute(
+        "SELECT 1 FROM especimen_generos_revisados WHERE genero=?", (genero,)
+    ).fetchone() is not None
+
     c.close()
     return {
         "genero": genero,
+        "revisado": revisado,
         "grupos_confirmados": [
             {"grupo_id": gid, "fotos": fotos} for gid, fotos in sorted(grupos_confirmados.items())
         ],

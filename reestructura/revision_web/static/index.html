@@ -113,8 +113,14 @@ function pistaDesdeBreadcrumb(breadcrumb) {
   return null;
 }
 
+var ETIQUETA_CONFIANZA_POR_ORIGEN = {
+  plantnet: "Confianza Pl@ntNet: ",
+  inaturalist: "Confianza iNaturalist: ",
+  resolucion_nombres: "Confianza: ",
+};
+
 function Sugerencia(props) {
-  var s = props.s, onElegir = props.onElegir, onRechazar = props.onRechazar, enviando = props.enviando, fotoIdActual = props.fotoIdActual;
+  var s = props.s, onElegir = props.onElegir, onRechazar = props.onRechazar, enviando = props.enviando, fotoIdActual = props.fotoIdActual, origen = props.origen;
   var refsState = useState(null); var referencias = refsState[0], setReferencias = refsState[1];
 
   useEffect(function () {
@@ -130,7 +136,8 @@ function Sugerencia(props) {
   var metaPartes = [];
   if (s.familia) metaPartes.push("Familia: " + s.familia);
   if (s.genero) metaPartes.push("Género: " + s.genero);
-  metaPartes.push(s.score != null ? "Confianza Pl@ntNet: " + Math.round(s.score * 100) + "%" : "Reconstruido del nombre de archivo");
+  var etiquetaConfianza = ETIQUETA_CONFIANZA_POR_ORIGEN[origen] || "Confianza: ";
+  metaPartes.push(s.score != null ? etiquetaConfianza + Math.round(s.score * 100) + "%" : "Reconstruido del nombre de archivo");
 
   var botonesHeader = [
     h("button", {
@@ -246,6 +253,13 @@ function Item(props) {
     posible_cientifico: "Nombre reconstruido del archivo",
     ambiguo: "Nombre ambiguo, elige una",
     codigo_especimen: "Mismo individuo, sin sugerencia",
+    inaturalist_ave: "iNaturalist · Ave",
+    inaturalist_insecto: "iNaturalist · Insecto",
+    inaturalist_mamifero: "iNaturalist · Mamífero",
+    inaturalist_hongo: "iNaturalist · Hongo",
+    inaturalist_anfibio_reptil: "iNaturalist · Anfibio/Reptil",
+    inaturalist_planta: "iNaturalist · Planta",
+    inaturalist_planta_limbo: "iNaturalist · Planta (ya en limbo)",
   };
 
   var columnaDerecha = [];
@@ -274,7 +288,7 @@ function Item(props) {
     columnaDerecha.push(h(Sugerencia, {
       key: "sug" + i, s: s, onElegir: confirmarSugerencia,
       onRechazar: mostrarRechazar ? rechazar : null,
-      enviando: enviando, fotoIdActual: item.foto_id,
+      enviando: enviando, fotoIdActual: item.foto_id, origen: item.origen,
     }));
   });
 

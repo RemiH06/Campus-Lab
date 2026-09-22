@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Buscar foto</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{ --azul:#004270; --texto:#2C343A; --texto-suave:#656d7e; --fondo:#f2f2f5; --borde:#dde1e6; --amarillo:#a67c00; }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Segoe UI",Roboto,Arial,sans-serif;background:var(--fondo);color:var(--texto);}
+  header{background:var(--azul);color:#f6f8fa;padding:14px 24px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+  header h1{font-size:1.1rem;margin:0;white-space:nowrap;}
+  header input{padding:6px 10px;border-radius:6px;border:none;font-size:.9rem;width:110px;}
+  header button{padding:6px 14px;border-radius:6px;border:none;background:#fff;color:var(--azul);font-weight:600;cursor:pointer;}
+  main{max-width:1000px;margin:0 auto;padding:20px;}
+  .destacada{background:#fff;border:2px solid var(--azul);border-radius:12px;padding:16px;text-align:center;margin-bottom:24px;}
+  .destacada img{max-width:100%;max-height:50vh;border-radius:8px;background:#eee;display:block;margin:0 auto 10px;}
+  .tira{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+  .foto-card{width:130px;text-align:center;font-size:.75rem;color:var(--texto-suave);border-radius:8px;padding:6px;}
+  .foto-card.actual{background:#dce6f1;font-weight:600;}
+  .foto-card img{width:130px;height:130px;object-fit:cover;border-radius:6px;background:#e0e0e0;display:block;margin-bottom:4px;}
+  .foto-card .limbo{color:var(--amarillo);font-weight:600;}
+  .foto-card a{color:inherit;text-decoration:none;display:block;}
+  .foto-card a:hover .foto-id{text-decoration:underline;}
+  .vacio,.cargando{text-align:center;padding:60px 20px;color:var(--texto-suave);}
+  .meta{font-size:.85rem;color:var(--texto-suave);}
+</style>
+</head>
+<body>
+<header>
+  <h1>Buscar foto por número</h1>
+  <input type="number" id="inputBusqueda" placeholder="id de foto">
+  <button id="btnBuscar">Buscar</button>
+  <span style="color:#cfe3f2;font-size:.85rem;">(o agrega ?id=3662 a la URL)</span>
+</header>
+<main>
+  <div id="contenido"><div class="cargando">Escribe un número de foto arriba.</div></div>
+</main>
+<script>
+"use strict";
+
+function badgeEspecie(foto) {
+  if (foto.limbo) return foto.especie ? foto.especie + " (limbo)" : "(limbo, sin sugerencia)";
+  return foto.especie ? foto.especie : "(sin especie)";
+}
+
+function fotoCardHtml(foto, esActual) {
+  var contenido =
+    '<img src="/api/foto/' + foto.foto_id + '/imagen" alt="Foto ' + foto.foto_id + '">' +
+    '<span class="foto-id">#' + foto.foto_id + "</span>" +
+    '<span class="' + (foto.limbo ? "limbo" : "") + '">' + badgeEspecie(foto) + "</span>" +
+    (foto.decision_animal ? '<span>(' + foto.decision_animal + ")</span>" : "") +
+    (!foto.disponible ? "<span>sin red/espejo</span>" : "");
+  return (
+    '<div class="foto-card' + (esActual ? " actual" : "") + '">' +
+      (esActual ? contenido : '<a href="?id=' + foto.foto_id + '">' + contenido + "</a>") +
+    "</div>"
+  );
+}
+
+function buscar(id) {
+  document.getElementById("contenido").innerHTML = '<div class="cargando">Buscando…</div>';
+  fetch("/api/foto/" + id + "/contexto?rango=10")
+    .then(function (r) {
+      if (!r.ok) throw new Error("no encontrada");
+      return r.json();
+    })
+    .then(function (data) {
+      var cont = document.getElementById("contenido");
+      var obj = data.objetivo;
+      var html =
+        '<div class="destacada">' +
+          '<img src="/api/foto/' + obj.foto_id + '/imagen" alt="Foto ' + obj.foto_id + '">' +
+          "<h2>Foto #" + obj.foto_id + "</h2>" +
+          '<div class="meta">Estado: ' + obj.estado + " · Especie: " + badgeEspecie(obj) +
+          (obj.decision_animal ? " · Revisor: " + obj.decision_animal : "") +
+          (!obj.disponible ? " · sin red/espejo local" : "") +
+          "</div>" +
+        "</div>" +
+        "<h3>Vecinas (mismo id ± 10)</h3>" +
+        '<div class="tira">' +
+          data.vecinos.map(function (f) { return fotoCardHtml(f, f.foto_id === obj.foto_id); }).join("") +
+        "</div>";
+      cont.innerHTML = html;
+    })
+    .catch(function () {
+      document.getElementById("contenido").innerHTML = '<div class="vacio">No se encontró la foto #' + id + ".</div>";
+    });
+}
+
+document.getElementById("btnBuscar").onclick = function () {
+  var id = parseInt(document.getElementById("inputBusqueda").value, 10);
+  if (id) {
+    var url = new URL(window.location);
+    url.searchParams.set("id", id);
+    window.history.replaceState({}, "", url);
+    buscar(id);
+  }
+};
+document.getElementById("inputBusqueda").addEventListener("keydown", function (e) {
+  if (e.key === "Enter") document.getElementById("btnBuscar").click();
+});
+
+var idInicial = new URL(window.location).searchParams.get("id");
+if (idInicial) {
+  document.getElementById("inputBusqueda").value = idInicial;
+  buscar(parseInt(idInicial, 10));
+}
+</script>
+</body>
+</html>

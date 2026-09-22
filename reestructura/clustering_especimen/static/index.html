@@ -11,20 +11,29 @@
   header{background:var(--azul);color:#f6f8fa;padding:14px 24px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
   header h1{font-size:1.1rem;margin:0;white-space:nowrap;}
   header select{padding:6px 10px;border-radius:6px;border:none;font-size:.9rem;}
+  .tabs{display:flex;gap:4px;background:#00335c;border-radius:8px;padding:3px;}
+  .tabs button{padding:6px 12px;border-radius:6px;border:none;background:transparent;color:#cfe3f2;font-size:.82rem;cursor:pointer;}
+  .tabs button.activa{background:#fff;color:var(--azul);font-weight:600;}
   main{max-width:1000px;margin:0 auto;padding:20px 20px 90px;}
   section{margin-bottom:26px;}
   section h2{font-size:.95rem;color:var(--texto-suave);border-bottom:1px solid var(--borde);padding-bottom:6px;}
+  .cabecera-genero{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+  .cabecera-genero h2{border:none;margin:0;font-size:1.1rem;color:var(--texto);}
   .grupo{background:#fff;border:1px solid var(--borde);border-radius:10px;padding:12px;margin-bottom:12px;}
   .grupo-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:.85rem;color:var(--texto-suave);}
   .tira{display:flex;gap:8px;flex-wrap:wrap;}
   .foto-card{position:relative;width:110px;text-align:center;font-size:.72rem;color:var(--texto-suave);}
-  .foto-card img{width:110px;height:110px;object-fit:cover;border-radius:6px;background:#e0e0e0;display:block;}
-  .foto-card input[type=checkbox]{position:absolute;top:4px;left:4px;width:18px;height:18px;}
+  .foto-card img{width:110px;height:110px;object-fit:cover;border-radius:6px;background:#e0e0e0;display:block;border:3px solid transparent;}
+  .foto-card.seleccionable img{cursor:pointer;}
+  .foto-card.seleccionada img{border-color:var(--verde);}
+  .foto-card input[type=checkbox]{position:absolute;top:4px;left:4px;width:18px;height:18px;pointer-events:none;}
   .foto-card .quitar{position:absolute;top:4px;right:4px;background:#fff;border:1px solid var(--borde);border-radius:50%;width:20px;height:20px;line-height:18px;cursor:pointer;font-size:.75rem;}
   .foto-card .especie{display:block;margin-top:3px;}
+  .foto-card .limbo{display:block;color:var(--amarillo);font-weight:600;}
   .btn{padding:8px 14px;border-radius:8px;border:none;font-size:.85rem;font-weight:600;cursor:pointer;background:var(--verde);color:#fff;}
   .btn:disabled{opacity:.4;cursor:default;}
   .btn-secundario{background:#e0e0e0;color:#333;}
+  .btn-revisado{background:var(--amarillo);color:#fff;}
   .vacio{color:var(--texto-suave);font-size:.85rem;padding:10px 0;}
   .barra-flotante{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--borde);padding:10px 20px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;}
   .barra-flotante select{padding:6px 10px;border-radius:6px;border:1px solid var(--borde);}
@@ -36,7 +45,13 @@
 <body>
 <header>
   <h1>Clustering por espécimen</h1>
+  <div class="tabs">
+    <button id="tabPendientes" class="activa">Pendientes</button>
+    <button id="tabRevisados">Revisados</button>
+  </div>
   <select id="selectorGenero"><option>Cargando géneros…</option></select>
+  <span id="contadorGeneros" style="margin-left:auto;font-size:.85rem;color:#cfe3f2;white-space:nowrap;"></span>
+  <span id="contadorFotos" style="font-size:.85rem;color:#cfe3f2;white-space:nowrap;"></span>
 </header>
 <main>
   <div class="manual">
@@ -61,21 +76,29 @@
 
 var seleccionadas = new Set();
 var datosGeneroActual = null;
+var todosLosGeneros = [];
+var pestanaActual = "pendientes";
 
 function badgeEspecie(foto) {
+  if (foto.limbo) return foto.especie ? foto.especie + " (limbo)" : "(limbo, sin sugerencia)";
   return foto.especie ? foto.especie : "(sin especie)";
 }
 
 function fotoCardHtml(foto, quitable) {
+  // Todas las tarjetas son seleccionables (para fusionar grupos hace falta poder
+  // seleccionar fotos que ya estan en un grupo confirmado, no solo propuestas/sueltas).
+  // Las de un grupo confirmado ademas conservan su boton de quitar individual.
+  var seleccionada = seleccionadas.has(foto.foto_id);
   var chip = quitable
     ? '<button class="quitar" data-quitar="' + foto.foto_id + '" title="Quitar del grupo">✕</button>'
-    : '<input type="checkbox" data-check="' + foto.foto_id + '" ' + (seleccionadas.has(foto.foto_id) ? "checked" : "") + '>';
+    : '<input type="checkbox" data-check="' + foto.foto_id + '" ' + (seleccionada ? "checked" : "") + '>';
+  var claseLimbo = foto.limbo ? ' class="limbo"' : ' class="especie"';
   return (
-    '<div class="foto-card">' +
+    '<div class="foto-card seleccionable' + (seleccionada ? " seleccionada" : "") + '" data-card="' + foto.foto_id + '">' +
       chip +
       '<img src="/api/foto/' + foto.foto_id + '/imagen" alt="Foto ' + foto.foto_id + '">' +
       '<span>#' + foto.foto_id + '</span>' +
-      '<span class="especie">' + badgeEspecie(foto) + '</span>' +
+      '<span' + claseLimbo + '>' + badgeEspecie(foto) + '</span>' +
     '</div>'
   );
 }
@@ -99,11 +122,40 @@ function actualizarBarra() {
   selectorDestino.innerHTML = opciones;
 }
 
+function marcarCardSeleccionada(fotoId) {
+  var card = document.querySelector('[data-card="' + fotoId + '"]');
+  if (card) {
+    card.classList.toggle("seleccionada", seleccionadas.has(fotoId));
+    var chk = card.querySelector("input[type=checkbox]");
+    if (chk) chk.checked = seleccionadas.has(fotoId);
+  }
+}
+
+function alternarSeleccion(fotoId) {
+  if (seleccionadas.has(fotoId)) seleccionadas.delete(fotoId); else seleccionadas.add(fotoId);
+  marcarCardSeleccionada(fotoId);
+  actualizarBarra();
+}
+
+function seleccionarVarias(fotoIds) {
+  fotoIds.forEach(function (fotoId) {
+    seleccionadas.add(fotoId);
+    marcarCardSeleccionada(fotoId);
+  });
+  actualizarBarra();
+}
+
 function pintarGenero(data) {
   datosGeneroActual = data;
   seleccionadas.clear();
   var cont = document.getElementById("contenido");
   var html = "";
+
+  html +=
+    '<div class="cabecera-genero"><h2>' + data.genero + "</h2>" +
+    '<button class="btn ' + (data.revisado ? "btn-revisado" : "btn-secundario") + '" id="btnRevisado">' +
+    (data.revisado ? "✓ Género revisado (quitar marca)" : "Marcar género como revisado") +
+    "</button></div>";
 
   html += "<section><h2>Grupos confirmados</h2>";
   if (data.grupos_confirmados.length === 0) {
@@ -111,7 +163,8 @@ function pintarGenero(data) {
   } else {
     data.grupos_confirmados.forEach(function (g) {
       html +=
-        '<div class="grupo"><div class="grupo-header">Grupo #' + g.grupo_id + " · " + g.fotos.length + ' foto(s)</div>' +
+        '<div class="grupo"><div class="grupo-header"><span>Grupo #' + g.grupo_id + " · " + g.fotos.length + ' foto(s)</span>' +
+        '<button class="btn btn-secundario" data-seleccionar-confirmado="' + g.grupo_id + '">Seleccionar todo</button></div>' +
         '<div class="tira">' + g.fotos.map(function (f) { return fotoCardHtml(f, true); }).join("") + "</div></div>";
     });
   }
@@ -124,7 +177,10 @@ function pintarGenero(data) {
     data.propuestas.forEach(function (p, idx) {
       html +=
         '<div class="grupo"><div class="grupo-header"><span>Propuesta ' + (idx + 1) + " · " + p.fotos.length + ' foto(s)</span>' +
-        '<button class="btn" data-confirmar-propuesta="' + idx + '">Confirmar como grupo</button></div>' +
+        '<span>' +
+        '<button class="btn btn-secundario" data-seleccionar-propuesta="' + idx + '">Seleccionar todo</button> ' +
+        '<button class="btn" data-confirmar-propuesta="' + idx + '">Confirmar como grupo</button>' +
+        "</span></div>" +
         '<div class="tira">' + p.fotos.map(function (f) { return fotoCardHtml(f, false); }).join("") + "</div></div>";
     });
   }
@@ -140,11 +196,9 @@ function pintarGenero(data) {
 
   cont.innerHTML = html;
 
-  cont.querySelectorAll("[data-check]").forEach(function (chk) {
-    chk.onchange = function () {
-      var id = parseInt(chk.dataset.check, 10);
-      if (chk.checked) seleccionadas.add(id); else seleccionadas.delete(id);
-      actualizarBarra();
+  cont.querySelectorAll(".foto-card.seleccionable").forEach(function (card) {
+    card.querySelector("img").onclick = function () {
+      alternarSeleccion(parseInt(card.dataset.card, 10));
     };
   });
   cont.querySelectorAll("[data-quitar]").forEach(function (btn) {
@@ -164,16 +218,125 @@ function pintarGenero(data) {
       }).then(function () { cargarGenero(data.genero); });
     };
   });
+  cont.querySelectorAll("[data-seleccionar-propuesta]").forEach(function (btn) {
+    btn.onclick = function () {
+      var idx = parseInt(btn.dataset.seleccionarPropuesta, 10);
+      seleccionarVarias(data.propuestas[idx].fotos.map(function (f) { return f.foto_id; }));
+    };
+  });
+  cont.querySelectorAll("[data-seleccionar-confirmado]").forEach(function (btn) {
+    btn.onclick = function () {
+      var gid = parseInt(btn.dataset.seleccionarConfirmado, 10);
+      var grupo = data.grupos_confirmados.filter(function (g) { return g.grupo_id === gid; })[0];
+      if (grupo) seleccionarVarias(grupo.fotos.map(function (f) { return f.foto_id; }));
+    };
+  });
+  document.getElementById("btnRevisado").onclick = function () {
+    var metodo = data.revisado ? "DELETE" : "POST";
+    fetch("/api/genero/" + encodeURIComponent(data.genero) + "/revisado", { method: metodo })
+      .then(function () { return fetch("/api/generos"); })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        todosLosGeneros = d.generos;
+        // Refresca el dropdown filtrado por la pestana activa (no solo el detalle):
+        // si se acaba de marcar como revisado estando en la pestana Pendientes, este
+        // genero debe desaparecer de la lista de inmediato, no hasta recargar.
+        pintarSelectorGeneros();
+      });
+  };
 
   actualizarBarra();
 }
 
+var cacheGeneroSiguiente = null;  // { genero, datos } precargado en segundo plano
+
+function siguienteGeneroAlfabetico(genero) {
+  var filtrados = todosLosGeneros.filter(function (g) {
+    return pestanaActual === "revisados" ? g.revisado : !g.revisado;
+  });
+  var idx = filtrados.findIndex(function (g) { return g.genero === genero; });
+  if (idx === -1 || idx + 1 >= filtrados.length) return null;
+  return filtrados[idx + 1].genero;
+}
+
+function precargarSiguienteGenero(generoActual) {
+  var siguiente = siguienteGeneroAlfabetico(generoActual);
+  if (!siguiente) {
+    cacheGeneroSiguiente = null;
+    return;
+  }
+  fetch("/api/genero/" + encodeURIComponent(siguiente))
+    .then(function (r) { return r.json(); })
+    .then(function (datos) { cacheGeneroSiguiente = { genero: siguiente, datos: datos }; })
+    .catch(function () { cacheGeneroSiguiente = null; });
+}
+
 function cargarGenero(genero) {
+  if (cacheGeneroSiguiente && cacheGeneroSiguiente.genero === genero) {
+    var datos = cacheGeneroSiguiente.datos;
+    cacheGeneroSiguiente = null;
+    pintarGenero(datos);
+    precargarSiguienteGenero(genero);
+    return;
+  }
   document.getElementById("contenido").innerHTML = '<div class="cargando">Cargando…</div>';
   fetch("/api/genero/" + encodeURIComponent(genero))
     .then(function (r) { return r.json(); })
-    .then(pintarGenero);
+    .then(function (datos) {
+      pintarGenero(datos);
+      precargarSiguienteGenero(genero);
+    });
 }
+
+function actualizarContadorGeneros() {
+  var revisados = todosLosGeneros.filter(function (g) { return g.revisado; }).length;
+  var pendientes = todosLosGeneros.length - revisados;
+  document.getElementById("contadorGeneros").textContent =
+    revisados + " géneros revisados · " + pendientes + " pendientes (" + todosLosGeneros.length + " en total)";
+
+  var totalFotos = 0;
+  var fotosPendientes = 0;
+  todosLosGeneros.forEach(function (g) {
+    totalFotos += g.total;
+    fotosPendientes += g.pendientes;
+  });
+  var fotosAgrupadas = totalFotos - fotosPendientes;
+  document.getElementById("contadorFotos").textContent =
+    fotosAgrupadas + " fotos agrupadas · " + fotosPendientes + " sin agrupar (" + totalFotos + " en total)";
+}
+
+function pintarSelectorGeneros() {
+  actualizarContadorGeneros();
+  var sel = document.getElementById("selectorGenero");
+  var filtrados = todosLosGeneros.filter(function (g) {
+    return pestanaActual === "revisados" ? g.revisado : !g.revisado;
+  });
+  if (filtrados.length === 0) {
+    sel.innerHTML = '<option value="">(ninguno en esta vista)</option>';
+    document.getElementById("contenido").innerHTML =
+      '<div class="vacio">No hay géneros ' + (pestanaActual === "revisados" ? "revisados" : "pendientes") + " todavía.</div>";
+    return;
+  }
+  sel.innerHTML = filtrados
+    .map(function (g) {
+      return '<option value="' + g.genero + '">' + g.genero + " (" + g.pendientes + " pendientes / " + g.total + ")</option>";
+    })
+    .join("");
+  cargarGenero(filtrados[0].genero);
+}
+
+document.getElementById("tabPendientes").onclick = function () {
+  pestanaActual = "pendientes";
+  document.getElementById("tabPendientes").classList.add("activa");
+  document.getElementById("tabRevisados").classList.remove("activa");
+  pintarSelectorGeneros();
+};
+document.getElementById("tabRevisados").onclick = function () {
+  pestanaActual = "revisados";
+  document.getElementById("tabRevisados").classList.add("activa");
+  document.getElementById("tabPendientes").classList.remove("activa");
+  pintarSelectorGeneros();
+};
 
 document.getElementById("btnConfirmarSeleccion").onclick = function () {
   if (seleccionadas.size === 0) return;
@@ -207,17 +370,15 @@ document.getElementById("btnMoverManual").onclick = function () {
   });
 };
 
+document.getElementById("selectorGenero").onchange = function () {
+  cargarGenero(document.getElementById("selectorGenero").value);
+};
+
 fetch("/api/generos")
   .then(function (r) { return r.json(); })
   .then(function (data) {
-    var sel = document.getElementById("selectorGenero");
-    sel.innerHTML = data.generos
-      .map(function (g) {
-        return '<option value="' + g.genero + '">' + g.genero + " (" + g.pendientes + " pendientes / " + g.total + ")</option>";
-      })
-      .join("");
-    sel.onchange = function () { cargarGenero(sel.value); };
-    if (data.generos.length > 0) cargarGenero(data.generos[0].genero);
+    todosLosGeneros = data.generos;
+    pintarSelectorGeneros();
   });
 </script>
 </body>

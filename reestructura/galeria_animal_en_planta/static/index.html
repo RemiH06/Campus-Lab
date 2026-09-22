@@ -52,6 +52,9 @@ var itemsGlobal = [];
 var cola = [];
 var enviando = false;
 var historial = [];
+var precargadas = [];  // referencias a Image() vivas, para que el navegador no descarte
+// la descarga a medio camino; se limita el tamano para no acumular memoria en una
+// sesion larga de miles de fotos
 
 var OPCIONES = [
   { d: "ave", etiqueta: "🐦 Ave", tecla: "1" },
@@ -111,6 +114,17 @@ function pintarItemActual() {
     pintarItemActual();
   };
   cont.querySelector(".deshacer").onclick = deshacerUltima;
+
+  precargarSiguientes();
+}
+
+function precargarSiguientes() {
+  cola.slice(1, 9).forEach(function (item) {
+    var img = new Image();
+    img.src = "/api/foto/" + item.foto_id + "/imagen";
+    precargadas.push(img);
+  });
+  if (precargadas.length > 20) precargadas.splice(0, precargadas.length - 20);
 }
 
 function enviarDecision(item, decision) {
