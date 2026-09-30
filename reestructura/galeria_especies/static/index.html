@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Catálogo por especie / género / grupo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{ --azul:#004270; --texto:#2C343A; --texto-suave:#656d7e; --fondo:#f2f2f5; --borde:#dde1e6; }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Segoe UI",Roboto,Arial,sans-serif;background:var(--fondo);color:var(--texto);}
+  header{background:var(--azul);color:#f6f8fa;padding:14px 24px;display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;}
+  header h1{font-size:1.1rem;margin:0 14px 0 0;white-space:nowrap;align-self:center;}
+  header label{font-size:.8rem;color:#cfe3f2;display:flex;flex-direction:column;gap:2px;}
+  header select, header input{padding:6px 8px;border-radius:6px;border:none;font-size:.9rem;}
+  header input[type=number]{width:80px;}
+  main{max-width:1400px;margin:0 auto;padding:20px;}
+  .resumen{color:var(--texto-suave);margin-bottom:14px;font-size:.9rem;display:flex;align-items:center;gap:10px;}
+  .btnVolver{padding:6px 14px;border-radius:6px;border:1px solid var(--azul);background:#fff;color:var(--azul);font-weight:600;cursor:pointer;}
+
+  .catalogo{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;}
+  .carpeta{background:#fff;border:1px solid var(--borde);border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .1s;}
+  .carpeta:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.1);}
+  .carpeta .portada{width:100%;height:260px;object-fit:cover;background:#e0e0e0;display:block;}
+  .carpeta .titulo{padding:10px 12px 2px;font-weight:600;font-size:.95rem;}
+  .carpeta .sub{padding:0 12px 10px;font-size:.8rem;color:var(--texto-suave);}
+
+  .galeria{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
+  .foto-card{background:#fff;border:1px solid var(--borde);border-radius:10px;overflow:hidden;cursor:pointer;}
+  .foto-card img{width:100%;height:220px;object-fit:cover;background:#e0e0e0;display:block;}
+  .foto-card .meta{padding:8px 10px;font-size:.8rem;color:var(--texto-suave);display:flex;justify-content:space-between;}
+
+  .vacio,.cargando{text-align:center;padding:60px 20px;color:var(--texto-suave);}
+  #lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:10;align-items:center;justify-content:center;flex-direction:column;gap:10px;}
+  #lightbox.abierto{display:flex;}
+  #lightbox img{max-width:92vw;max-height:82vh;border-radius:6px;}
+  #lightbox .info{color:#f2f2f5;font-size:.9rem;}
+  #lightbox .cerrar{position:absolute;top:16px;right:24px;color:#fff;font-size:1.8rem;cursor:pointer;background:none;border:none;}
+</style>
+</head>
+<body>
+<header>
+  <h1>Catálogo Campus Lab</h1>
+  <label>Ver por
+    <select id="tipo">
+      <option value="especie">Especie</option>
+      <option value="genero">Género</option>
+      <option value="grupo">Grupo de espécimen</option>
+    </select>
+  </label>
+  <label>Categoría
+    <select id="categoria">
+      <option value="">Todas</option>
+      <option value="planta">Planta</option>
+      <option value="ave">Ave</option>
+      <option value="insecto">Insecto</option>
+      <option value="otro">Otro (mamífero/anfibio/hongo)</option>
+      <option value="artistico">Artístico (sin sujeto)</option>
+    </select>
+  </label>
+  <label>Ancho mín. (px)
+    <input type="number" id="anchoMin" min="0" placeholder="0">
+  </label>
+  <label>Alto mín. (px)
+    <input type="number" id="altoMin" min="0" placeholder="0">
+  </label>
+</header>
+<main>
+  <div class="resumen" id="resumen"></div>
+  <div id="contenido"><div class="cargando">Cargando catálogo…</div></div>
+</main>
+<div id="lightbox">
+  <button class="cerrar" id="btnCerrar">&times;</button>
+  <img id="lightboxImg" alt="">
+  <div class="info" id="lightboxInfo"></div>
+</div>
+<script>
+"use strict";
+
+var vista = "catalogo"; // "catalogo" | "galeria"
+var grupoActual = null; // {valor, etiqueta, referencia}
+
+var selectTipo = document.getElementById("tipo");
+var selectCategoria = document.getElementById("categoria");
+var inputAnchoMin = document.getElementById("anchoMin");
+var inputAltoMin = document.getElementById("altoMin");
+
+function filtrosURL() {
+  var p = new URLSearchParams();
+  p.set("tipo", selectTipo.value);
+  if (selectCategoria.value) p.set("categoria", selectCategoria.value);
+  if (inputAnchoMin.value) p.set("ancho_min", inputAnchoMin.value);
+  if (inputAltoMin.value) p.set("alto_min", inputAltoMin.value);
+  return p;
+}
+
+function formatoTam(f) {
+  if (!f.ancho || !f.alto) return "tamaño desconocido";
+  return f.ancho + " × " + f.alto + " px";
+}
+
+function abrirLightbox(f) {
+  document.getElementById("lightboxImg").src = "/api/foto/" + f.foto_id + "/imagen?max=1600";
+  document.getElementById("lightboxInfo").textContent = "Foto #" + f.foto_id + " · " + formatoTam(f);
+  document.getElementById("lightbox").classList.add("abierto");
+}
+document.getElementById("btnCerrar").onclick = function () {
+  document.getElementById("lightbox").classList.remove("abierto");
+};
+document.getElementById("lightbox").addEventListener("click", function (e) {
+  if (e.target.id === "lightbox") e.currentTarget.classList.remove("abierto");
+});
+
+function cargarCatalogo() {
+  vista = "catalogo";
+  grupoActual = null;
+  var cont = document.getElementById("contenido");
+  cont.innerHTML = '<div class="cargando">Cargando catálogo…</div>';
+  document.getElementById("resumen").innerHTML = "";
+
+  fetch("/api/catalogo?" + filtrosURL().toString())
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      document.getElementById("resumen").textContent = data.carpetas.length + " carpeta(s).";
+      if (data.carpetas.length === 0) {
+        cont.innerHTML = '<div class="vacio">Nada cumple ese filtro.</div>';
+        return;
+      }
+      cont.innerHTML = '<div class="catalogo">' + data.carpetas.map(function (c) {
+        var titulo = c.referencia && String(c.referencia) !== String(c.etiqueta)
+          ? "Grupo " + c.etiqueta + " — " + c.referencia
+          : c.etiqueta;
+        return (
+          '<div class="carpeta" data-valor="' + c.valor + '" data-etiqueta="' + titulo + '">' +
+            '<img class="portada" src="/api/foto/' + c.portada + '/imagen?max=500" loading="lazy" alt="' + titulo + '" onerror="this.style.display=\'none\'">' +
+            '<div class="titulo">' + titulo + "</div>" +
+            '<div class="sub">' + c.total + " foto(s)</div>" +
+          "</div>"
+        );
+      }).join("") + "</div>";
+      Array.prototype.forEach.call(cont.querySelectorAll(".carpeta"), function (card, i) {
+        card.onclick = function () { abrirGaleria(data.carpetas[i], card.dataset.etiqueta); };
+      });
+    });
+}
+
+function abrirGaleria(carpeta, titulo) {
+  vista = "galeria";
+  grupoActual = carpeta;
+  var cont = document.getElementById("contenido");
+  cont.innerHTML = '<div class="cargando">Cargando…</div>';
+
+  var params = filtrosURL();
+  params.set("valor", carpeta.valor);
+  fetch("/api/galeria?" + params.toString())
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      document.getElementById("resumen").innerHTML =
+        '<button class="btnVolver" id="btnVolver">&larr; Volver al catálogo</button>' +
+        '<span>' + titulo + " · " + data.total + " foto(s)</span>";
+      document.getElementById("btnVolver").onclick = cargarCatalogo;
+      if (data.total === 0) {
+        cont.innerHTML = '<div class="vacio">Sin fotos que cumplan el filtro.</div>';
+        return;
+      }
+      cont.innerHTML = '<div class="galeria">' + data.fotos.map(function (f) {
+        return (
+          '<div class="foto-card" data-foto="' + f.foto_id + '">' +
+            '<img src="/api/foto/' + f.foto_id + '/imagen?max=500" loading="lazy" alt="Foto ' + f.foto_id + '">' +
+            '<div class="meta"><span>#' + f.foto_id + "</span><span>" + formatoTam(f) + "</span></div>" +
+          "</div>"
+        );
+      }).join("") + "</div>";
+      Array.prototype.forEach.call(cont.querySelectorAll(".foto-card"), function (card, i) {
+        card.onclick = function () { abrirLightbox(data.fotos[i]); };
+      });
+    });
+}
+
+function refrescar() {
+  if (vista === "galeria" && grupoActual) {
+    abrirGaleria(grupoActual, grupoActual.etiqueta);
+  } else {
+    cargarCatalogo();
+  }
+}
+
+selectTipo.onchange = cargarCatalogo;
+selectCategoria.onchange = refrescar;
+inputAnchoMin.onchange = refrescar;
+inputAltoMin.onchange = refrescar;
+
+cargarCatalogo();
+</script>
+</body>
+</html>

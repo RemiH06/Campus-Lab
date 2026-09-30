@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Confirmar grupos de espécimen</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{ --azul:#004270; --texto:#2C343A; --texto-suave:#656d7e; --fondo:#f2f2f5; --borde:#dde1e6; --verde:#2e7d32; --rojo:#b3261e; }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Segoe UI",Roboto,Arial,sans-serif;background:var(--fondo);color:var(--texto);}
+  header{background:var(--azul);color:#f6f8fa;padding:14px 24px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;}
+  header h1{font-size:1.1rem;margin:0;}
+  header .contador{font-size:.9rem;color:#cfe3f2;}
+  main{max-width:1100px;margin:0 auto;padding:20px;}
+  .galeria{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px;}
+  .foto-card{background:#fff;border:1px solid var(--borde);border-radius:8px;overflow:hidden;}
+  .foto-card img{width:100%;height:140px;object-fit:cover;background:#e0e0e0;display:block;}
+  .foto-card .meta{padding:5px 7px;font-size:.72rem;color:var(--texto-suave);}
+  .candidatos{background:#fff;border:1px solid var(--borde);border-radius:10px;padding:16px;margin-bottom:16px;}
+  .candidato{display:flex;justify-content:space-between;align-items:center;padding:10px 6px;border-bottom:1px solid var(--borde);}
+  .candidato:last-child{border-bottom:none;}
+  .candidato .info{font-size:.95rem;}
+  .candidato .info b{font-size:1.05rem;}
+  .candidato button{padding:7px 16px;border-radius:6px;border:none;background:var(--verde);color:#fff;font-weight:600;cursor:pointer;}
+  .acciones{display:flex;gap:10px;justify-content:space-between;align-items:center;}
+  .acciones .izq{display:flex;gap:10px;}
+  #btnRechazar{padding:9px 18px;border-radius:6px;border:1px solid var(--rojo);background:#fff;color:var(--rojo);font-weight:600;cursor:pointer;}
+  #btnSaltar{padding:9px 18px;border-radius:6px;border:1px solid var(--borde);background:#fff;color:var(--texto-suave);font-weight:600;cursor:pointer;}
+  .manual{display:flex;gap:8px;align-items:center;}
+  .manual input{padding:8px;border-radius:6px;border:1px solid var(--borde);flex:1;}
+  .manual button{padding:8px 14px;border-radius:6px;border:none;background:var(--azul);color:#fff;font-weight:600;cursor:pointer;}
+  .vacio,.cargando{text-align:center;padding:80px 20px;color:var(--texto-suave);}
+  .titulo-grupo{font-size:1.3rem;font-weight:700;margin-bottom:4px;}
+  .sub-grupo{color:var(--texto-suave);margin-bottom:16px;}
+</style>
+</head>
+<body>
+<header>
+  <h1>Confirmar grupos de espécimen</h1>
+  <span class="contador" id="contador"></span>
+</header>
+<main id="main"><div class="cargando">Cargando…</div></main>
+<script>
+"use strict";
+
+var cola = [];
+var indiceActual = 0;
+
+function actualizarContador() {
+  document.getElementById("contador").textContent = (cola.length - indiceActual) + " grupo(s) pendientes";
+}
+
+function cargarLista() {
+  fetch("/api/grupos")
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      cola = data.grupos;
+      indiceActual = 0;
+      actualizarContador();
+      mostrarActual();
+    });
+}
+
+function mostrarActual() {
+  if (indiceActual >= cola.length) {
+    document.getElementById("main").innerHTML = '<div class="vacio">No quedan grupos pendientes. 🎉</div>';
+    return;
+  }
+  var resumen = cola[indiceActual];
+  cargarGrupo(resumen.grupo_id);
+}
+
+function formatoCandidato(c) {
+  return '<i>' + c.nombre + '</i> — ' + c.score + '% (' + c.n_fotos + ' foto' + (c.n_fotos > 1 ? "s" : "") + ')';
+}
+
+function cargarGrupo(grupoId) {
+  document.getElementById("main").innerHTML = '<div class="cargando">Cargando…</div>';
+  fetch("/api/grupo/" + grupoId)
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      var main = document.getElementById("main");
+      var html =
+        '<div class="titulo-grupo">Grupo ' + data.grupo_id + '</div>' +
+        '<div class="sub-grupo">' + data.fotos.length + ' foto(s)</div>' +
+        '<div class="galeria">' +
+        data.fotos.map(function (f) {
+          var etiqueta = f.mejor_sugerencia ? f.mejor_sugerencia.nombre + " (" + Math.round(f.mejor_sugerencia.score) + "%)" : "sin sugerencia";
+          return (
+            '<div class="foto-card">' +
+              '<img src="/api/foto/' + f.foto_id + '/imagen" loading="lazy" alt="Foto ' + f.foto_id + '" onerror="this.style.display=\'none\'">' +
+              '<div class="meta">#' + f.foto_id + ' · ' + etiqueta + (!f.disponible ? " · sin red/espejo" : "") + '</div>' +
+            '</div>'
+          );
+        }).join("") +
+        '</div>' +
+        '<div class="candidatos">' +
+        (data.candidatos.length === 0
+          ? '<div class="sub-grupo">Sin ninguna sugerencia automática para este grupo.</div>'
+          : data.candidatos.map(function (c) {
+              return (
+                '<div class="candidato">' +
+                  '<span class="info">' + formatoCandidato(c) + '</span>' +
+                  '<button data-confirmar="' + c.nombre + '">Confirmar grupo como esta</button>' +
+                '</div>'
+              );
+            }).join("")) +
+        '</div>' +
+        '<div class="acciones">' +
+          '<div class="izq">' +
+            '<button id="btnRechazar">Mandar grupo a limbo</button>' +
+            '<button id="btnSaltar">Saltar por ahora</button>' +
+          '</div>' +
+          '<div class="manual">' +
+            '<input type="text" id="inputManual" placeholder="Nombre científico manual…">' +
+            '<button id="btnManual">Confirmar</button>' +
+          '</div>' +
+        '</div>';
+      main.innerHTML = html;
+
+      Array.prototype.forEach.call(main.querySelectorAll("[data-confirmar]"), function (btn) {
+        btn.onclick = function () { enviarDecision(grupoId, "confirmar", btn.dataset.confirmar); };
+      });
+      document.getElementById("btnRechazar").onclick = function () {
+        var top = data.candidatos.length ? data.candidatos[0].nombre : null;
+        enviarDecision(grupoId, "rechazar", top);
+      };
+      document.getElementById("btnSaltar").onclick = function () {
+        indiceActual++;
+        actualizarContador();
+        mostrarActual();
+      };
+      document.getElementById("btnManual").onclick = function () {
+        var nombre = document.getElementById("inputManual").value.trim();
+        if (nombre) enviarDecision(grupoId, "confirmar", nombre);
+      };
+    });
+}
+
+function enviarDecision(grupoId, accion, nombreCientifico) {
+  fetch("/api/grupo/" + grupoId + "/decision", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ accion: accion, nombre_cientifico: nombreCientifico }),
+  })
+    .then(function (r) { return r.json(); })
+    .then(function () {
+      indiceActual++;
+      actualizarContador();
+      mostrarActual();
+    });
+}
+
+cargarLista();
+</script>
+</body>
+</html>

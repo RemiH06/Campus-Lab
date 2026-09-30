@@ -232,8 +232,14 @@ function pintarGenero(data) {
     };
   });
   document.getElementById("btnRevisado").onclick = function () {
+    var marcandoComoRevisado = !data.revisado;
     var metodo = data.revisado ? "DELETE" : "POST";
-    fetch("/api/genero/" + encodeURIComponent(data.genero) + "/revisado", { method: metodo })
+    var generoActual = data.genero;
+    // Solo brinca solo al marcar (no al desmarcar): calculado ANTES de refrescar la
+    // lista, porque una vez marcado este genero sale de "pendientes" y el siguiente
+    // pasa a ocupar su lugar de todas formas.
+    var siguiente = marcandoComoRevisado ? siguienteGeneroAlfabetico(generoActual) : null;
+    fetch("/api/genero/" + encodeURIComponent(generoActual) + "/revisado", { method: metodo })
       .then(function () { return fetch("/api/generos"); })
       .then(function (r) { return r.json(); })
       .then(function (d) {
@@ -242,6 +248,10 @@ function pintarGenero(data) {
         // si se acaba de marcar como revisado estando en la pestana Pendientes, este
         // genero debe desaparecer de la lista de inmediato, no hasta recargar.
         pintarSelectorGeneros();
+        if (siguiente) {
+          document.getElementById("selectorGenero").value = siguiente;
+          cargarGenero(siguiente);
+        }
       });
   };
 

@@ -527,6 +527,8 @@ def api_decision(d: Decision):
         raise HTTPException(400, "falta nombre_cientifico o especie_id")
 
     especie_id = resolver_o_crear_especie(c, d.nombre_cientifico, d.especie_id)
+    nombre_confirmado = c.execute("SELECT nombre_cientifico FROM especies WHERE id=?", (especie_id,)).fetchone()[0]
+    genero_confirmado = nombre_confirmado.split(" ")[0]
     c.execute("UPDATE fotos SET estado='usable', especie_id=? WHERE id=?", (especie_id, d.foto_id))
     c.execute(
         "UPDATE especies SET fuente_validacion=? WHERE id=? AND fuente_validacion IS NULL",
@@ -537,6 +539,10 @@ def api_decision(d: Decision):
         (d.foto_id, d.nombre_cientifico, None, "confirmada", revisor),
     )
     c.execute("UPDATE inaturalist_intentos SET revisado=1 WHERE foto_id=?", (d.foto_id,))
+    # Si esta foto ya tenia embedding calculado con un genero provisional (limbo/iNaturalist),
+    # sincronizarlo con la especie recien confirmada. Sin esto el genero se queda obsoleto y
+    # 8043 agrupa/muestra la foto bajo un genero que ya no corresponde (bug real, 25-sep).
+    c.execute("UPDATE especimen_embeddings SET genero=? WHERE foto_id=?", (genero_confirmado, d.foto_id))
 
     propagadas = 0
     for otro_id in d.aplicar_a_grupo:
@@ -545,6 +551,7 @@ def api_decision(d: Decision):
             "INSERT INTO identificaciones_revisadas (foto_id, especie_sugerida, score, decision, revisor) VALUES (?,?,?,?,?)",
             (otro_id, d.nombre_cientifico, None, "confirmada (propagada de grupo)", revisor),
         )
+        c.execute("UPDATE especimen_embeddings SET genero=? WHERE foto_id=?", (genero_confirmado, otro_id))
         propagadas += 1
 
     c.commit()
