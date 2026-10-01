@@ -106,6 +106,20 @@ CATEGORIA_SQL = {
     "insecto": "r.decision = 'insecto'",
     "otro": "r.decision IN ('mamifero','anfibio_reptil','hongo')",
     "artistico": "r.decision = 'sin_sujeto'",
+    # Para revisar con Hugo de Alba (1-oct). Una foto es orquidea si su genero cae en
+    # Orchidaceae por cualquiera de tres vias: el genero con el que se agrupo, la especie
+    # confirmada, o el nombre escrito en el archivo original (carpetas de Hugo).
+    "orquidea": """f.id IN (
+        SELECT em.foto_id FROM especimen_embeddings em
+        JOIN genero_taxonomia t ON t.genero = em.genero WHERE t.familia = 'Orchidaceae'
+        UNION
+        SELECT f2.id FROM fotos f2 JOIN especies e2 ON e2.id = f2.especie_id
+        JOIN genero_taxonomia t ON t.genero = SUBSTR(e2.nombre_cientifico, 1, INSTR(e2.nombre_cientifico || ' ', ' ') - 1)
+        WHERE t.familia = 'Orchidaceae'
+        UNION
+        SELECT p.foto_id FROM pistas_nombre_archivo p
+        JOIN genero_taxonomia t ON t.genero = SUBSTR(p.nombre_cientifico, 1, INSTR(p.nombre_cientifico || ' ', ' ') - 1)
+        WHERE t.familia = 'Orchidaceae')""",
 }
 
 

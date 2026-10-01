@@ -34,4 +34,42 @@ Usar la exportación de Liferay en cuanto la entregue la OSI (si la entrega). Te
 
 ## Semana 4
 
+**Tareas y aprendizajes**
+
+Se terminó y movió a producción el revisor web de especies (puerto 8040), con propagación por grupo de espécimen. Se resolvió la cola de Pl@ntNet por lotes y se corrigieron nombres comunes mal resueltos a nombre científico. Aprendizaje costoso: cualquier re-resolución automática debe excluir fotos ya rechazadas a mano, o un rechazo se revierte solo (pasó con 19 fotos reales, revertidas).
+
+**Compromisos para la siguiente semana**
+
+Construir la identificación por visión (BioCLIP/iNaturalist) para lo que Pl@ntNet no cubre (animales), y una herramienta de revisión humana para todo el catálogo, no solo plantas. Empezar a explorar agrupar fotos del mismo espécimen dentro de un género para reducir revisión foto por foto.
+
+## Semana 5
+
+**Tareas y aprendizajes**
+
+Se construyó el pipeline de identificación con la API de visión de iNaturalist (con manejo de límite de peticiones y refresco de token) y la herramienta de revisión ave/insecto/mamífero/hongo/anfibio_reptil/planta (puerto 8042) para todo el catálogo. Se descubrieron y excluyeron 167 archivos no-imagen (RAW/video/documentos) colados en el escaneo original, y 18 fotos genuinamente corruptas (0 bytes). Se construyó el agrupamiento por espécimen dentro de un género (puerto 8043).
+
+**Compromisos para la siguiente semana**
+
+Decidir y ejecutar la estrategia de agrupar primero y confirmar por grupo completo después, en vez de foto por foto. Extender el agrupamiento para cubrir también las fotos de animales identificadas por iNaturalist, no solo plantas. Construir un buscador de foto individual por número para casos puntuales.
+
+## Semana 6
+
+**Tareas y aprendizajes**
+
+Se adoptó agrupar antes de confirmar, con preconfirmado automático por umbral de similitud. Se construyó el buscador de foto por ID (8044) y un barrido de duplicados exactos en todo el catálogo (3,588 fotos), que reveló el patrón de "doble sujeto" (ave y planta en la misma escena, cada una con su propia fila). Se armó un catálogo navegable por especie/género/grupo con filtro de tamaño (8045) y un reporte de duplicados de SharePoint con links reales para Maya.
+
+**Compromisos para la siguiente semana**
+
+Seguir agrupando géneros pendientes en el puerto 8043, revisando de paso los casos de conflicto (2+ especies en un mismo grupo) y las etiquetas de género que quedan desincronizadas al confirmar una especie por otra vía.
+
+## Semana 7
+
 *En curso.*
+
+**Tareas y aprendizajes**
+
+Se corrigió un bug: el género para agrupar no se sincronizaba al confirmar una especie por otra vía, pareciendo "géneros confundibles" sin serlo. Se construyó un chequeo de plausibilidad geográfica contra GBIF para identificaciones imposibles en México, con casos corregidos (aves de otros continentes, abejas mal separadas). Se construyó una herramienta para confirmar o limbo un grupo completo (8046), con clasificación por orden/familia para especialistas. Se ubicó la lista canónica de orquídeas.
+
+**Compromisos para la siguiente semana**
+
+Terminar de revisar los grupos pendientes con el nuevo confirmador grupal, resolver los géneros que siguen sin candidato geográfico claro, retomar aparte el tema de orquídeas/suculentas (su propio catálogo canónico) y colibríes (géneros casi indistinguibles a simple vista), y empezar el rastreo de autoría para las fotos de especies que no están en ningún catálogo oficial.

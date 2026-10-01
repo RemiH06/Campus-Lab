@@ -55,6 +55,7 @@
       <option value="insecto">Insecto</option>
       <option value="otro">Otro (mamífero/anfibio/hongo)</option>
       <option value="artistico">Artístico (sin sujeto)</option>
+      <option value="orquidea">Orquídeas</option>
     </select>
   </label>
   <label>Ancho mín. (px)
@@ -188,6 +189,11 @@ selectTipo.onchange = cargarCatalogo;
 selectCategoria.onchange = refrescar;
 inputAnchoMin.onchange = refrescar;
 inputAltoMin.onchange = refrescar;
+
+// Permite abrir con filtros ya puestos, ej. /?tipo=genero&categoria=orquidea
+var inicial = new URLSearchParams(location.search);
+if (inicial.get("tipo")) selectTipo.value = inicial.get("tipo");
+if (inicial.get("categoria")) selectCategoria.value = inicial.get("categoria");
 
 cargarCatalogo();
 </script>
