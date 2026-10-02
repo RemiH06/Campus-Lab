@@ -64,12 +64,10 @@ Seguir agrupando géneros pendientes en el puerto 8043, revisando de paso los ca
 
 ## Semana 7
 
-*En curso.*
-
 **Tareas y aprendizajes**
 
-Se corrigió un bug: el género para agrupar no se sincronizaba al confirmar una especie por otra vía, pareciendo "géneros confundibles" sin serlo. Se construyó un chequeo de plausibilidad geográfica contra GBIF para identificaciones imposibles en México, con casos corregidos (aves de otros continentes, abejas mal separadas). Se construyó una herramienta para confirmar o limbo un grupo completo (8046), con clasificación por orden/familia para especialistas. Se ubicó la lista canónica de orquídeas.
+Se corrigió que el género no se sincronizaba al confirmar especie por otra vía. Se construyó un chequeo geográfico contra GBIF que validó casi todas las decisiones previas. Se construyó el confirmador de grupo completo (8046), con limbo por orden/familia y panel de especies similares. Pistas en el nombre de archivo y por OCR permitieron confirmar cientos de fotos. Se retomó el inventario de árboles: se encontró el mapa ArcGIS existente y se georreferenció el Jardín Contemplativo.
 
 **Compromisos para la siguiente semana**
 
-Terminar de revisar los grupos pendientes con el nuevo confirmador grupal, resolver los géneros que siguen sin candidato geográfico claro, retomar aparte el tema de orquídeas/suculentas (su propio catálogo canónico) y colibríes (géneros casi indistinguibles a simple vista), y empezar el rastreo de autoría para las fotos de especies que no están en ningún catálogo oficial.
+Confirmar los grupos de espécimen pendientes que no sean orquídeas ni suculentas (esos se revisan aparte, con ayuda de Hugo de Alba). Enviar el correo a Miriam Andrade para identificación de suculentas. Reunir y capturar a mano las placas metálicas sueltas de árboles antes de seguir con el inventario maestro.
