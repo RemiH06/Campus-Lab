@@ -26,8 +26,8 @@ from fastapi.staticfiles import StaticFiles
 from PIL import Image, ImageOps
 from pydantic import BaseModel
 
-RUTA_BD = Path(__file__).parent / "../../experimentos/bd/campuslab_volumen.db"
-RUTA_CONFIG = Path(__file__).parent / "../notebooks/config_local.json"
+RUTA_BD = Path(__file__).parent / "../../../experimentos/bd/campuslab_volumen.db"
+RUTA_CONFIG = Path(__file__).parent / "../../notebooks/config_local.json"
 
 app = FastAPI()
 
@@ -141,11 +141,15 @@ def grupos_sin_confirmar(c, excluir_orquideas_suculentas=True):
 
 
 @app.get("/api/grupos")
-def api_grupos(tipo: str = "todos"):
+def api_grupos(tipo: str = "todos", grupos: str = ""):
     c = con()
-    grupos = grupos_sin_confirmar(c)
+    grupos_abiertos = grupos_sin_confirmar(c)
+    if grupos:
+        # Filtro opcional por IDs (ej. ?grupos=5,112,114): permite revisar un subconjunto a mano
+        ids = {int(x) for x in grupos.split(",") if x.strip().isdigit()}
+        grupos_abiertos = {g: f for g, f in grupos_abiertos.items() if g in ids}
     resultado = []
-    for gid, fids in grupos.items():
+    for gid, fids in grupos_abiertos.items():
         estados = {r["estado"] for r in c.execute(
             "SELECT estado FROM fotos WHERE id IN ({})".format(",".join("?" * len(fids))), fids
         ).fetchall()}

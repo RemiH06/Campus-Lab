@@ -29,3 +29,5 @@ web/Pre/Arboretum/*
 
 web/Pre/JardinSuculentas/*
 !web/Pre/JardinSuculentas/*.html
+
+__pycache__/

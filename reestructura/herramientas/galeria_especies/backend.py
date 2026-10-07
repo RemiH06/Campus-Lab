@@ -1,10 +1,10 @@
 """
 Galeria de solo lectura para apreciar fotos en buen tamano, agrupadas por especie,
-genero o grupo de especimen (el mismo grupo_id que arma reestructura/clustering_especimen).
+genero o grupo de especimen (el mismo grupo_id que arma reestructura/herramientas/clustering_especimen).
 No confirma ni cambia nada en la base de datos, es puramente de consulta.
 
-Usa reestructura/galeria_especies/../notebooks/config_local.json para el espejo local
-offline, mismo patron que las demas herramientas de revision.
+Usa reestructura/notebooks/config_local.json (compartido entre todas las herramientas)
+para el espejo local offline, mismo patron que las demas herramientas de revision.
 
 Filtro por tamano de imagen: depende de la tabla fotos_dimensiones (ancho/alto en
 pixeles), calculada aparte por el script de scratchpad calcular_dimensiones.py
@@ -25,8 +25,8 @@ from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 from PIL import Image, ImageOps
 
-RUTA_BD = Path(__file__).parent / "../../experimentos/bd/campuslab_volumen.db"
-RUTA_CONFIG = Path(__file__).parent / "../notebooks/config_local.json"
+RUTA_BD = Path(__file__).parent / "../../../experimentos/bd/campuslab_volumen.db"
+RUTA_CONFIG = Path(__file__).parent / "../../notebooks/config_local.json"
 
 app = FastAPI()
 

@@ -74,7 +74,10 @@ function actualizarContador() {
 
 function cargarLista() {
   document.getElementById("main").innerHTML = '<div class="cargando">Cargando…</div>';
-  fetch("/api/grupos?tipo=" + tipoActual)
+  // ?grupos=5,112,... en la URL limita la cola a esos grupos (sin tocar decisiones)
+  var filtroGrupos = new URLSearchParams(location.search).get("grupos") || "";
+  var query = "/api/grupos?tipo=" + tipoActual + (filtroGrupos ? "&grupos=" + encodeURIComponent(filtroGrupos) : "");
+  fetch(query)
     .then(function (r) { return r.json(); })
     .then(function (data) {
       cola = data.grupos;

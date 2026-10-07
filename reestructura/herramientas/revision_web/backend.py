@@ -34,8 +34,8 @@ from fastapi.staticfiles import StaticFiles
 from PIL import Image, ImageOps
 from pydantic import BaseModel
 
-RUTA_BD = Path(__file__).parent / "../../experimentos/bd/campuslab_volumen.db"
-RUTA_CONFIG = Path(__file__).parent / "../notebooks/config_local.json"
+RUTA_BD = Path(__file__).parent / "../../../experimentos/bd/campuslab_volumen.db"
+RUTA_CONFIG = Path(__file__).parent / "../../notebooks/config_local.json"
 
 app = FastAPI(title="Revisor Campus Lab")
 
