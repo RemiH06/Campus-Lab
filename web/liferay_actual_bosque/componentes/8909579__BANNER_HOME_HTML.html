@@ -1,0 +1,43 @@
+ <style type="text/css">/* Eliminar márgenes y rellenos del body */
+
+		body{
+		
+			margin: 0px;
+			padding:0px;
+		}
+
+        /* Aseguramos que las imágenes sean responsivas */
+        .img-banner {
+            width: 100%;
+            height: auto;
+            display: block; /* Elimina el espacio debajo de la imagen */
+        }
+		.banner-content {
+			 margin-bottom: 0rem; !important
+   			 margin-top: 0;
+}
+
+        /* Escondemos la imagen móvil en escritorio y viceversa */
+        .img-escritorio {
+            display: block;
+        }
+
+        .img-movil {
+            display: none;
+        }
+
+        /* En pantallas pequeñas (móviles), mostramos la imagen móvil y escondemos la de escritorio */
+        @media (max-width: 768px) {
+            .img-escritorio {
+                display: none;
+            }
+
+            .img-movil {
+                display: block;
+            }
+			
+		.banner-content {
+			margin-bottom: 0rem; !important
+   			 margin-top: 0;
+}
+</style> <!-- Imagen para Escritorio --> <section> <div class="banner-content"><a href="https://premioadabyron.ibero.mx/convocatoria/" id="banner_carreras"><img alt="Imagen Escritorio" class="img-escritorio img-banner" src="https://www.iteso.mx/documents/d/iteso/26b-banner-ada-byron-2560x200px"></a></div> </section> <!-- Imagen para Móvil --> <section> <div class="banner-content"><a href="https://premioadabyron.ibero.mx/convocatoria/" id="banner_carreras"><img alt="Imagen Móvil" class="img-movil img-banner" src="https://www.iteso.mx/documents/d/iteso/26a-banner-ada-byron-2560x450px "></a></div> </section> 

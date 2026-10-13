@@ -1,0 +1,392 @@
+{
+ "https://bosque.iteso.mx": {
+  "titulo_pagina": "inicio",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "1971302",
+    "titulo": "BANNER_EN_CONSTRUCCION_CTA",
+    "archivo": "componentes/1971302__BANNER_EN_CONSTRUCCION_CTA.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "789459",
+    "titulo": "Footer Bottom",
+    "archivo": "componentes/789459__Footer_Bottom.html"
+   }
+  ]
+ },
+ "https://bosque.iteso.mx/aranza": {
+  "titulo_pagina": "Aranza",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "16546149",
+    "titulo": "PAJAROS_CAMPUSLAB_GALERIA",
+    "archivo": "componentes/16546149__PAJAROS_CAMPUSLAB_GALERIA.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "789459",
+    "titulo": "Footer Bottom",
+    "archivo": "componentes/789459__Footer_Bottom.html"
+   }
+  ]
+ },
+ "https://bosque.iteso.mx/en": {
+  "titulo_pagina": "inicio",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "1971302",
+    "titulo": "BANNER_EN_CONSTRUCCION_CTA",
+    "archivo": "componentes/1971302__BANNER_EN_CONSTRUCCION_CTA.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "789459",
+    "titulo": "Footer Bottom en",
+    "archivo": "componentes/789459__Footer_Bottom_en.html"
+   }
+  ]
+ },
+ "https://bosque.iteso.mx/en/aranza": {
+  "titulo_pagina": "Aranza",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "16546149",
+    "titulo": "PAJAROS_CAMPUSLAB_GALERIA",
+    "archivo": "componentes/16546149__PAJAROS_CAMPUSLAB_GALERIA.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "789459",
+    "titulo": "Footer Bottom en",
+    "archivo": "componentes/789459__Footer_Bottom_en.html"
+   }
+  ]
+ },
+ "https://bosque.iteso.mx/en/santiago": {
+  "titulo_pagina": "santiago",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "16546136",
+    "titulo": "TITULO_GALERIA",
+    "archivo": "componentes/16546136__TITULO_GALERIA.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "789459",
+    "titulo": "Footer Bottom en",
+    "archivo": "componentes/789459__Footer_Bottom_en.html"
+   }
+  ]
+ },
+ "https://bosque.iteso.mx/en/search": {
+  "titulo_pagina": "search",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "769673",
+    "titulo": "Google Results",
+    "archivo": "componentes/769673__Google_Results.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "789459",
+    "titulo": "Footer Bottom en",
+    "archivo": "componentes/789459__Footer_Bottom_en.html"
+   }
+  ]
+ },
+ "https://bosque.iteso.mx/en/web/general": {
+  "titulo_pagina": "Contenido no encontrado",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "413542",
+    "titulo": "Detalle BN6",
+    "archivo": "componentes/413542__Detalle_BN6.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "789459",
+    "titulo": "Footer Bottom en",
+    "archivo": "componentes/789459__Footer_Bottom_en.html"
+   }
+  ]
+ },
+ "https://bosque.iteso.mx/iteso.mx": {
+  "titulo_pagina": "ITESO",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "15890999",
+    "titulo": "PLAYER_RADIO_HOME_HTML_",
+    "archivo": "componentes/15890999__PLAYER_RADIO_HOME_HTML.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "8909579",
+    "titulo": "BANNER_HOME_HTML",
+    "archivo": "componentes/8909579__BANNER_HOME_HTML.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "254830",
+    "titulo": "PROGRAMAS_ACADEMICOS_HOME_INSTITUCIONAL_BC4",
+    "archivo": "componentes/254830__PROGRAMAS_ACADEMICOS_HOME_INSTITUCIONAL_BC4.html"
+   },
+   {
+    "orden": 5,
+    "article_id": "7278056",
+    "titulo": "NOTICIAS_PRINCIPALES_HOME_BN1",
+    "archivo": "componentes/7278056__NOTICIAS_PRINCIPALES_HOME_BN1.html"
+   },
+   {
+    "orden": 6,
+    "article_id": "1178796",
+    "titulo": "NOTA_INVESTIGACION_HOME",
+    "archivo": "componentes/1178796__NOTA_INVESTIGACION_HOME.html"
+   },
+   {
+    "orden": 7,
+    "article_id": "18239869",
+    "titulo": "BANNER_RADIO_ITESO_HTML",
+    "archivo": "componentes/18239869__BANNER_RADIO_ITESO_HTML.html"
+   },
+   {
+    "orden": 8,
+    "article_id": "317572",
+    "titulo": "ACTIVIDADES_HOME_INSTITUCIONAL_BC6",
+    "archivo": "componentes/317572__ACTIVIDADES_HOME_INSTITUCIONAL_BC6.html"
+   },
+   {
+    "orden": 9,
+    "article_id": "4054500",
+    "titulo": "PUBLICACIONES_BANNER_BC7P",
+    "archivo": "componentes/4054500__PUBLICACIONES_BANNER_BC7P.html"
+   },
+   {
+    "orden": 10,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 11,
+    "article_id": "789459",
+    "titulo": "Footer Bottom",
+    "archivo": "componentes/789459__Footer_Bottom.html"
+   }
+  ]
+ },
+ "https://bosque.iteso.mx/santiago": {
+  "titulo_pagina": "santiago",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "16546136",
+    "titulo": "TITULO_GALERIA",
+    "archivo": "componentes/16546136__TITULO_GALERIA.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "789459",
+    "titulo": "Footer Bottom",
+    "archivo": "componentes/789459__Footer_Bottom.html"
+   }
+  ]
+ },
+ "https://bosque.iteso.mx/search": {
+  "titulo_pagina": "search",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "769673",
+    "titulo": "Google Results",
+    "archivo": "componentes/769673__Google_Results.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "789459",
+    "titulo": "Footer Bottom",
+    "archivo": "componentes/789459__Footer_Bottom.html"
+   }
+  ]
+ },
+ "https://bosque.iteso.mx/web/general": {
+  "titulo_pagina": "Contenido no encontrado",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "413542",
+    "titulo": "Detalle BN6",
+    "archivo": "componentes/413542__Detalle_BN6.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "789459",
+    "titulo": "Footer Bottom",
+    "archivo": "componentes/789459__Footer_Bottom.html"
+   }
+  ]
+ },
+ "https://bosque.iteso.mx/web/general/detalle": {
+  "titulo_pagina": "Contenido no encontrado",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "413542",
+    "titulo": "Detalle BN6",
+    "archivo": "componentes/413542__Detalle_BN6.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "789459",
+    "titulo": "Footer Bottom",
+    "archivo": "componentes/789459__Footer_Bottom.html"
+   }
+  ]
+ }
+}

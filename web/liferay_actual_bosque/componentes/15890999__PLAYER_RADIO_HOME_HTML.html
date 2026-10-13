@@ -1,0 +1,290 @@
+ <div class="rp-wrapper"> <div class="rp-player"><!-- Logo --> <div class="rp-logo"><a href="https://www.iteso.mx/web/radio" id="click_home_radio" rel="noopener noreferrer" target="_blank"><img alt="Logo" src="https://www.iteso.mx/documents/5394089/0/ITESO_LOGO_PLAYER_HOME_RADIO.png/26e95d4f-954f-cd7a-2aa8-777f5b1cb03d?t=1755645464352" /> </a></div> <!-- Vinilo --> <div class="rp-vinyl-container"><img alt="Vinilo" class="rp-vinyl" src="https://www.iteso.mx/documents/5394089/0/ITESO_VINIL_RADIO.png/157c089c-cae3-0e8a-6a52-7682846dd260?t=1755645469968" /> <img alt="Brazo" class="rp-hands" src="https://www.iteso.mx/documents/5394089/0/ITESO_MANOS_RADIO.png/a15a848d-edcf-ff96-1e1a-b857e0ffb9a0?t=1755645469719" /> <img alt="Play/Pause" class="rp-play-icon" src="https://www.iteso.mx/documents/5394089/0/ITESO_PLAY_RADIO.png/c19c310a-e981-c5fd-88db-364e0eb99d03?t=1755645469524" id="click_play_home_iteso"/></div> <!-- Info --><!-- <div class="rp-info-line"> <div class="rp-track-title"><span class="marquee-text" id="rp-marquee"> <b id="rp-artist">Cargando...</b> / <span id="rp-title"></span> </span></div> </div> --><!-- Volumen --> <div class="rp-volume-wrapper"> <div class="rp-volume-control"><img alt="Volumen" class="rp-volume-icon" src="https://www.iteso.mx/documents/5394089/0/ITESO_VOLUMEN_RADIO.png/3a5d1bd1-a257-4914-4196-4d217156b0df?t=1755645469287" /> <input class="rp-volume-slider" max="1" min="0" step="0.01" type="range" value="1" /></div> </div> </div> <!-- AUDIO oculto --> <audio crossorigin="anonymous" id="rp-radio" preload="none"> </audio> </div> <style type="text/css">/* ==== Player Base ==== */
+  .rp-wrapper {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    z-index: 999999 !important;
+    width: auto;
+    max-width: 425px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+	border-radius: 15px;
+	overflow: hidden;
+  }
+  .rp-player {
+    display: flex;
+    align-items: center;
+    background-color: #2200ff;
+    padding: 10px 15px 10px 0px;
+    color: white;
+    font-family: "proxima-nova", sans-serif;
+    height: 70px;
+  }
+  .rp-logo img {
+    height: 70px;
+    margin-right: 0px;
+  }
+  .rp-vinyl-container {
+    position: relative;
+    width: 80px;
+    height: 47px;
+    flex-shrink: 0;
+  }
+  .rp-vinyl {
+    position: absolute;
+    top: -9px;
+    left: 7px;
+    width: 80%;
+    height: auto;
+    z-index: 1;
+  }
+  .rp-vinyl.rp-rotate {
+    animation: rp-spin 3s linear infinite;
+  }
+  .rp-hands {
+    position: absolute;
+    top: -30%;
+    left: 0%;
+    width: 100%;
+    height: auto;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .rp-play-icon {
+    position: absolute;
+    top: 50%;
+    left: 48%;
+    transform: translate(-50%, -50%);
+    width: 26px;
+    height: 26px;
+    z-index: 3;
+    cursor: pointer;
+  }
+  @keyframes rp-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .rp-info-text {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    font-size: 14px;
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+  .rp-label {
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .rp-track-title {
+    --track-width: 110px;
+    /* cámbialo si quieres más espacio */
+    width: var(--track-width);
+    font-size: 14px;
+    line-height: 1.3;
+    overflow: hidden;
+    /* clave: recorta lo que se sale */
+    white-space: nowrap;
+    display: block;
+    flex-shrink: 0;
+    font-weight: normal;
+    position: relative;
+    margin-right: 12px;
+    /* separa del volumen */
+    min-height: 1em;
+  }
+  .rp-track-title .marquee-text {
+    position: absolute;
+    left: 100%;
+    /* arranca justo fuera del borde derecho */
+    top: 0;
+    display: inline-block;
+    white-space: nowrap;
+    will-change: transform;
+    animation: rp-marquee 8s linear infinite;
+  }
+  @keyframes rp-marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(calc(-100% - var(--track-width)));
+    }
+  }
+  .rp-volume-wrapper {
+    margin-left: auto;
+  }
+  .rp-volume-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+  }
+  .rp-volume-icon {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+  .rp-volume-slider {
+    width: 66px;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    background: #ffffff;
+    border-radius: 2px;
+    outline: none;
+  }
+  .rp-volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    background: #ffcc00;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+  }
+  /* ==== Responsive Móvil ==== */
+  @media (max-width: 600px) {
+    .rp-wrapper {
+      bottom: 15px !important;
+      right: 15px !important;
+      max-width: 90%;
+	  border-radius: 12px;
+    }
+    .rp-player {
+      flex-wrap: nowrap;
+      padding: 0px 10px 0px 0px;
+      height: auto;
+    }
+    .rp-logo img {
+      height: 85px;
+    }
+    .rp-vinyl-container {
+      width: 95px;
+      height: 55px;
+    }
+    .rp-play-icon {
+      width: 29px;
+      height: 29px;
+    }
+    .rp-info-text {
+      font-size: 12px;
+      padding-left: 3px;
+    }
+    .rp-label {
+      font-size: 14px;
+    }
+    .rp-track-title {
+      font-size: 14px;
+    }
+    .rp-volume-wrapper {
+      display: none;
+    }
+  }
+</style> <script>
+  (function () {
+    const STREAM_URL = "https://noasrv.caster.fm:10044/live";
+    const radio = document.getElementById("rp-radio");
+    const playBtn = document.querySelector(".rp-play-icon");
+    const vinyl = document.querySelector(".rp-vinyl");
+    const volumeIcon = document.querySelector(".rp-volume-icon");
+    const volumeSlider = document.querySelector(".rp-volume-slider");
+
+    if (!radio || !playBtn) return;
+
+    // ¿ Configuración inicial segura
+    radio.setAttribute("playsinline", "");
+    radio.preload = "none";
+    radio.volume = 1;
+
+    let isMuted = false;
+    let lastVolume = Number(volumeSlider?.value || 1);
+    let isLoading = false;
+
+    const playIconUrl = "https://www.iteso.mx/documents/5394089/0/ITESO_PLAY_RADIO.png/c19c310a-e981-c5fd-88db-364e0eb99d03?t=1755645469524";
+    const pauseIconUrl = "https://www.iteso.mx/documents/5394089/0/ITESO_PAUSA_RADIO.png/dc0a281f-103d-6236-0eda-ad09ce248283?t=1755645468879";
+    const volumeIconUrl = "https://www.iteso.mx/documents/5394089/0/ITESO_VOLUMEN_RADIO.png/3a5d1bd1-a257-4914-4196-4d217156b0df?t=1755645469287";
+    const muteIconUrl = "https://www.iteso.mx/documents/5394089/0/ITESO_MUTE_RADIO.png/d664f01d-b87a-d15f-7de3-666f5bd91722?t=1755645469090";
+
+    // --- Sincroniza UI ---
+    function syncUI() {
+      if (!radio.paused && !radio.ended) {
+        playBtn.src = pauseIconUrl;
+        vinyl.classList.add("rp-rotate");
+      } else {
+        playBtn.src = playIconUrl;
+        vinyl.classList.remove("rp-rotate");
+      }
+    }
+
+    // --- Play/Pause (siempre reconecta en vivo) ---
+    playBtn.addEventListener("click", async () => {
+      if (isLoading) return;
+      isLoading = true;
+
+      try {
+        if (!radio.paused && !radio.ended) {
+          // ¿ Si está reproduciendo, pausamos
+          radio.pause();
+        } else {
+          // ¿ Siempre reseteamos la fuente para forzar conexión nueva (en vivo)
+          radio.src = STREAM_URL + "?live=" + Date.now();
+          radio.load();
+          await radio.play();
+        }
+      } catch (err) {
+        console.error("Error al intentar reproducir:", err);
+        ;
+      } finally {
+        syncUI();
+        setTimeout(() => (isLoading = false), 200);
+      }
+    });
+
+    // --- Volumen ---
+    if (volumeSlider) {
+      volumeSlider.addEventListener("input", () => {
+        radio.volume = Number(volumeSlider.value);
+        if (radio.volume === 0) {
+          volumeIcon.src = muteIconUrl;
+          isMuted = true;
+        } else {
+          volumeIcon.src = volumeIconUrl;
+          isMuted = false;
+          lastVolume = radio.volume;
+        }
+      });
+    }
+
+    if (volumeIcon) {
+      volumeIcon.addEventListener("click", () => {
+        if (isMuted) {
+          radio.volume = lastVolume;
+          volumeSlider.value = lastVolume;
+          volumeIcon.src = volumeIconUrl;
+          isMuted = false;
+        } else {
+          lastVolume = radio.volume;
+          radio.volume = 0;
+          volumeSlider.value = 0;
+          volumeIcon.src = muteIconUrl;
+          isMuted = true;
+        }
+      });
+    }
+
+    // --- Eventos de carga para sincronizar la interfaz ---
+    radio.addEventListener('play', syncUI);
+    radio.addEventListener('pause', syncUI);
+    radio.addEventListener('ended', syncUI);
+  })();
+</script> 

@@ -1,0 +1,161 @@
+ <div class="container-fluid pl-0 pr-0"> <div id="carrusel-v1-hmye" class="carousel slide" data-ride="carousel"> <ol class="carousel-indicators"> <!-- Se establecen los indicadores mediante JQuery --> <li class="active" data-target="#carrusel-v1-hmye" data-slide-to="0"></li> <li data-target="#carrusel-v1-hmye" data-slide-to="1"></li> </ol> <div class="carousel-inner"> <!--seccion donde inician repetibles--> <div class="carousel-item active" data-interval="5000" style="background-image:linear-gradient(to right, rgba(3, 10, 35, 0.42) 50%, rgba(53, 58, 77, 0) 54%), url('/documents/1633049/1814014/Imagen guia aves silvestres (1).jpg/03f402b4-59f7-f4b7-82f3-7a01aa32c43c');"> <!--div class="sombra-bc1 h-100"--> <div class="carousel-caption d-none d-md-block" style="display: inline-flex !important; align-items: baseline;"> <span class="circle-bc1" style="color: #fff;"></span> <ul style="padding-left:40px;"> <li>Flores silvestres de La Primavera</li> </ul> </div> <a href="/web/general/detalle?group_id=1811074"></a> </div> <div class="carousel-item" data-interval="5000" style="background-image:linear-gradient(to right, rgba(3, 10, 35, 0.42) 50%, rgba(53, 58, 77, 0) 54%), url('/documents/1633049/7433354/ITESO_PORTADA_AVES.jpg/df203727-1922-c9ac-7fe6-9ea8dd2bd05c');"> <!--div class="sombra-bc1 h-100"--> <div class="carousel-caption d-none d-md-block" style="display: inline-flex !important; align-items: baseline;"> <span class="circle-bc1" style="color: #fff;"></span> <ul style="padding-left:40px;"> <li>Guía de avistamiento: Aves de Casa</li> </ul> </div> <a href="https://campuslab.iteso.mx/web/general/detalle?group_id=8456891"></a> </div> </div> </div> </div> <style type="text/css">
+	.sombra-bc1 {
+		background-image: linear-gradient(to right, rgba(3, 10, 35, 0.42) 56%, rgba(53, 58, 77, 0) 94%);
+	}
+	
+	@media(min-width: 300px) and (max-width: 768px){
+		.sombra-bc1{
+			width: 100%;
+		}
+	}
+	
+	@media(min-width: 769px) {
+		.sombra-bc1{
+			width: 50%;
+		}
+	}
+	
+	@media(min-width:1000px) {
+		#carrusel-v1-hmye .carousel-indicators {
+			margin-bottom:7rem !important;
+		}
+	}
+	
+	.circle-bc1 {
+		font-size: 32px;
+	}
+	
+	#carrusel-v1-hmye a{
+		height: 100%;
+		width: 100%;
+		display: block;
+	}
+	
+	#carrusel-v1-hmye img{
+	   width:100%; 
+	}
+	
+	#carrusel-v1-hmye .carousel-item {
+		height: 750px;
+	}
+	
+	.caption>article>ul>li {
+		list-style: none;
+	}
+	
+	.hash-tag {
+		text-decoration: none;
+		display:inline-block;
+		padding-top: 10px;
+	}
+	
+	.hash-tag:hover {
+		text-decoration: none;
+	}
+	
+	.caption>article>li {
+		list-style: none;
+	}
+	
+	#carrusel-v1-hmye .carousel-caption ul li:first-child { }
+	
+	.hash-tag>li {
+		list-style: none !important;
+	}
+
+	.carousel-indicators {
+		right: unset !important;
+		bottom: 0 !important;
+		left: 0 !important;
+		padding-left: 7.5% !important;
+		margin-right: 0 !important;
+		margin-left: 0 !important;
+	}
+	
+	.carousel-indicators li {
+		width: 10px;
+		height: 10px;
+		border-radius:50%;
+	}
+	
+	#carrusel-v1-hmye .carousel-item {
+		background-position: 80% 0;
+		background-size: cover;
+		background-repeat: no-repeat;
+	}
+	
+	@media (min-width:300px) and (max-width:768px) {
+		/* #carrusel-v1-hmye .carousel-caption {
+			font-size: 3em;
+			bottom: 7% !important;
+			width: 100% !important;
+			height: 300px !important;
+			padding-right: 7.5%;
+		} */
+		.circle-bc1 {
+			font-size: 24px;
+		}
+	}
+	
+	#carrusel-v1-hmye .carousel-caption {
+		background-color: transparent !important;
+		padding-left: 7.5% !important;
+		border-radius: 0 !important;
+		left: 0;
+		right: 0;
+		width: 646px;
+		height: 361px;
+		font-family: 'Degular-Semibold';
+		font-size: 3.5em;
+		font-weight: 600;
+		font-stretch: normal;
+		font-style: normal;
+		line-height: 1.2;
+		letter-spacing: normal;
+		text-align: left;
+		color: #fff;
+		bottom: 177px;
+	}
+	
+	#carrusel-v1-hmye .carousel-caption ul li {
+		list-style: none;
+		display: -webkit-box;
+		-webkit-line-clamp: 4;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	
+	@media (max-width: 575px) {
+		#carrusel-v1-hmye .carousel-item {
+			height: 300px;
+		}
+	}
+	
+	@media (max-width: 768px){
+		#carrusel-v1-hmye .carousel-caption {
+			bottom: 7%;
+			width: 100%;
+			padding-right: 7.5%;
+			height: auto;
+		}
+	}
+	
+	@media(min-width:300px) and (max-width:768px){
+		#carrusel-v1-hmye .carousel-caption {
+			font-size: 1.9em;
+		}
+	}
+	
+	@media(min-width:500px) and (max-width:768px){
+		#carrusel-v1-hmye .carousel-caption{
+			width:70%;
+		}
+	}
+</style> <script type="text/javascript">
+	$( document ).ready(function() {
+		$('#carrusel-v1-hmye').carousel({
+			interval: 2000
+		});
+	});
+</script> 

@@ -1,0 +1,936 @@
+{
+ "https://campuslab.iteso.mx": {
+  "titulo_pagina": "inicio",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "8413796",
+    "titulo": "GALERIA_1_CL",
+    "archivo": "componentes/8413796__GALERIA_1_CL.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "8454076",
+    "titulo": "BC4_CARRUSEL_TARJETAS",
+    "archivo": "componentes/8454076__BC4_CARRUSEL_TARJETAS.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "8455687",
+    "titulo": "GALERIA_2_CL",
+    "archivo": "componentes/8455687__GALERIA_2_CL.html"
+   },
+   {
+    "orden": 5,
+    "article_id": "1796866",
+    "titulo": "CL_AGENDA_BC6",
+    "archivo": "componentes/1796866__CL_AGENDA_BC6.html"
+   },
+   {
+    "orden": 6,
+    "article_id": "1813188",
+    "titulo": "CL_CONTACTO_CONTACTO",
+    "archivo": "componentes/1813188__CL_CONTACTO_CONTACTO.html"
+   },
+   {
+    "orden": 7,
+    "article_id": "1796959",
+    "titulo": "CL__DESTACADO_CAMPUSLAB_CTA3",
+    "archivo": "componentes/1796959__CL__DESTACADO_CAMPUSLAB_CTA3.html"
+   },
+   {
+    "orden": 8,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 9,
+    "article_id": "789459",
+    "titulo": "Footer Bottom",
+    "archivo": "componentes/789459__Footer_Bottom.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/arboles": {
+  "titulo_pagina": "CL_ARBOLES_ITESO",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "789459",
+    "titulo": "Footer Bottom",
+    "archivo": "componentes/789459__Footer_Bottom.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/arboles_casa": {
+  "titulo_pagina": "ARBOLES_CASA",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "7667536",
+    "titulo": "TITULO_ARBOLES",
+    "archivo": "componentes/7667536__TITULO_ARBOLES.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "7667552",
+    "titulo": "HTML_MAPA",
+    "archivo": "componentes/7667552__HTML_MAPA.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 5,
+    "article_id": "789459",
+    "titulo": "Footer Bottom",
+    "archivo": "componentes/789459__Footer_Bottom.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/arboretum": {
+  "titulo_pagina": "arboretum",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "22626683",
+    "titulo": "CL_ARBORETUM_ORIENTE_BTXTARJETAS",
+    "archivo": "componentes/22626683__CL_ARBORETUM_ORIENTE_BTXTARJETAS.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "22691094",
+    "titulo": "CL_ARBORETUM_SUR_BTXTARJETAS",
+    "archivo": "componentes/22691094__CL_ARBORETUM_SUR_BTXTARJETAS.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 5,
+    "article_id": "789459",
+    "titulo": "Footer Bottom",
+    "archivo": "componentes/789459__Footer_Bottom.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/aves-iteso": {
+  "titulo_pagina": "Aves de casa",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "7328276",
+    "titulo": "TITULO_LISTADO_HTML",
+    "archivo": "componentes/7328276__TITULO_LISTADO_HTML.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "5157578",
+    "titulo": "AVES_CONTENIDO_HTML",
+    "archivo": "componentes/5157578__AVES_CONTENIDO_HTML.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 5,
+    "article_id": "789459",
+    "titulo": "Footer Bottom",
+    "archivo": "componentes/789459__Footer_Bottom.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/biodiversidad-iteso": {
+  "titulo_pagina": "Biodiversidad ITESO",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "1796594",
+    "titulo": "CL_BIODIVERSIDAD_CAMPUS_BTX9",
+    "archivo": "componentes/1796594__CL_BIODIVERSIDAD_CAMPUS_BTX9.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "1810040",
+    "titulo": "BIODIVERSIDAD_ITESO_INTRO_CTA",
+    "archivo": "componentes/1810040__BIODIVERSIDAD_ITESO_INTRO_CTA.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "20060835",
+    "titulo": "CL_ARBOLES_AVES_ORQUIDEAS_BTX",
+    "archivo": "componentes/20060835__CL_ARBOLES_AVES_ORQUIDEAS_BTX.html"
+   },
+   {
+    "orden": 5,
+    "article_id": "20061252",
+    "titulo": "CL_AGUA_FLORES_BTX",
+    "archivo": "componentes/20061252__CL_AGUA_FLORES_BTX.html"
+   },
+   {
+    "orden": 6,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 7,
+    "article_id": "789459",
+    "titulo": "Footer Bottom",
+    "archivo": "componentes/789459__Footer_Bottom.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/cl_aves_iteso": {
+  "titulo_pagina": "CL_AVES_ITESO",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "7328276",
+    "titulo": "TITULO_LISTADO_HTML",
+    "archivo": "componentes/7328276__TITULO_LISTADO_HTML.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "5157578",
+    "titulo": "AVES_CONTENIDO_HTML",
+    "archivo": "componentes/5157578__AVES_CONTENIDO_HTML.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 5,
+    "article_id": "789459",
+    "titulo": "Footer Bottom",
+    "archivo": "componentes/789459__Footer_Bottom.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/en": {
+  "titulo_pagina": "inicio",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "8413796",
+    "titulo": "GALERIA_1_CL",
+    "archivo": "componentes/8413796__GALERIA_1_CL.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "8454076",
+    "titulo": "BC4_CARRUSEL_TARJETAS",
+    "archivo": "componentes/8454076__BC4_CARRUSEL_TARJETAS.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "8455687",
+    "titulo": "GALERIA_2_CL",
+    "archivo": "componentes/8455687__GALERIA_2_CL.html"
+   },
+   {
+    "orden": 5,
+    "article_id": "1796866",
+    "titulo": "CL_AGENDA_BC6",
+    "archivo": "componentes/1796866__CL_AGENDA_BC6.html"
+   },
+   {
+    "orden": 6,
+    "article_id": "1813188",
+    "titulo": "CL_CONTACTO_CONTACTO",
+    "archivo": "componentes/1813188__CL_CONTACTO_CONTACTO.html"
+   },
+   {
+    "orden": 7,
+    "article_id": "1796959",
+    "titulo": "CL__DESTACADO_CAMPUSLAB_CTA3",
+    "archivo": "componentes/1796959__CL__DESTACADO_CAMPUSLAB_CTA3.html"
+   },
+   {
+    "orden": 8,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 9,
+    "article_id": "789459",
+    "titulo": "Footer Bottom en",
+    "archivo": "componentes/789459__Footer_Bottom_en.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/en/arboles": {
+  "titulo_pagina": "CL_ARBOLES_ITESO",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "789459",
+    "titulo": "Footer Bottom en",
+    "archivo": "componentes/789459__Footer_Bottom_en.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/en/arboles_casa": {
+  "titulo_pagina": "ARBOLES_CASA",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "7667536",
+    "titulo": "TITULO_ARBOLES",
+    "archivo": "componentes/7667536__TITULO_ARBOLES.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "7667552",
+    "titulo": "HTML_MAPA",
+    "archivo": "componentes/7667552__HTML_MAPA.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 5,
+    "article_id": "789459",
+    "titulo": "Footer Bottom en",
+    "archivo": "componentes/789459__Footer_Bottom_en.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/en/arboretum": {
+  "titulo_pagina": "arboretum",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "22626683",
+    "titulo": "CL_ARBORETUM_ORIENTE_BTXTARJETAS",
+    "archivo": "componentes/22626683__CL_ARBORETUM_ORIENTE_BTXTARJETAS.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "22691094",
+    "titulo": "CL_ARBORETUM_SUR_BTXTARJETAS",
+    "archivo": "componentes/22691094__CL_ARBORETUM_SUR_BTXTARJETAS.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 5,
+    "article_id": "789459",
+    "titulo": "Footer Bottom en",
+    "archivo": "componentes/789459__Footer_Bottom_en.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/en/aves-iteso": {
+  "titulo_pagina": "Aves de casa",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "7328276",
+    "titulo": "TITULO_LISTADO_HTML",
+    "archivo": "componentes/7328276__TITULO_LISTADO_HTML.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "5157578",
+    "titulo": "AVES_CONTENIDO_HTML",
+    "archivo": "componentes/5157578__AVES_CONTENIDO_HTML.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 5,
+    "article_id": "789459",
+    "titulo": "Footer Bottom en",
+    "archivo": "componentes/789459__Footer_Bottom_en.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/en/biodiversidad-iteso": {
+  "titulo_pagina": "Biodiversidad ITESO",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "1796594",
+    "titulo": "CL_BIODIVERSIDAD_CAMPUS_BTX9",
+    "archivo": "componentes/1796594__CL_BIODIVERSIDAD_CAMPUS_BTX9.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "1810040",
+    "titulo": "BIODIVERSIDAD_ITESO_INTRO_CTA",
+    "archivo": "componentes/1810040__BIODIVERSIDAD_ITESO_INTRO_CTA.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "20060835",
+    "titulo": "CL_ARBOLES_AVES_ORQUIDEAS_BTX",
+    "archivo": "componentes/20060835__CL_ARBOLES_AVES_ORQUIDEAS_BTX.html"
+   },
+   {
+    "orden": 5,
+    "article_id": "20061252",
+    "titulo": "CL_AGUA_FLORES_BTX",
+    "archivo": "componentes/20061252__CL_AGUA_FLORES_BTX.html"
+   },
+   {
+    "orden": 6,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 7,
+    "article_id": "789459",
+    "titulo": "Footer Bottom en",
+    "archivo": "componentes/789459__Footer_Bottom_en.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/en/cl_aves_iteso": {
+  "titulo_pagina": "CL_AVES_ITESO",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "7328276",
+    "titulo": "TITULO_LISTADO_HTML",
+    "archivo": "componentes/7328276__TITULO_LISTADO_HTML.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "5157578",
+    "titulo": "AVES_CONTENIDO_HTML",
+    "archivo": "componentes/5157578__AVES_CONTENIDO_HTML.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 5,
+    "article_id": "789459",
+    "titulo": "Footer Bottom en",
+    "archivo": "componentes/789459__Footer_Bottom_en.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/en/experiencias-en-el-campus": {
+  "titulo_pagina": "Experiencias en el campus",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "1796437",
+    "titulo": "EXPERIENCIAS_CAMPUS_BTX9",
+    "archivo": "componentes/1796437__EXPERIENCIAS_CAMPUS_BTX9.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "1803727",
+    "titulo": "CL_EXPERIENCIAS_CAMPUS_CITA_BTX9",
+    "archivo": "componentes/1803727__CL_EXPERIENCIAS_CAMPUS_CITA_BTX9.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "1809659",
+    "titulo": "EXPERIENCIAS_EN_CAMPUS_INTRO_CTA",
+    "archivo": "componentes/1809659__EXPERIENCIAS_EN_CAMPUS_INTRO_CTA.html"
+   },
+   {
+    "orden": 5,
+    "article_id": "1796553",
+    "titulo": "EXPERIENCIAS_CAMPUSLAB_BTX_TARJETAS",
+    "archivo": "componentes/1796553__EXPERIENCIAS_CAMPUSLAB_BTX_TARJETAS.html"
+   },
+   {
+    "orden": 6,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 7,
+    "article_id": "789459",
+    "titulo": "Footer Bottom en",
+    "archivo": "componentes/789459__Footer_Bottom_en.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/en/jardinsuculentas": {
+  "titulo_pagina": "jardinsuculentas",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "2945478",
+    "titulo": "CL_JARDIN_SUCULENTAS_BTXTARJETAS",
+    "archivo": "componentes/2945478__CL_JARDIN_SUCULENTAS_BTXTARJETAS.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "789459",
+    "titulo": "Footer Bottom en",
+    "archivo": "componentes/789459__Footer_Bottom_en.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/en/orquideas-de-casa": {
+  "titulo_pagina": "ORQUIDEAS DE CASA",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "19982844",
+    "titulo": "CL_ORQUIDEAS_TITULO_HTML",
+    "archivo": "componentes/19982844__CL_ORQUIDEAS_TITULO_HTML.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "19984432",
+    "titulo": "CL_ORQUIDEAS_CONTENIDO_HTML",
+    "archivo": "componentes/19984432__CL_ORQUIDEAS_CONTENIDO_HTML.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 5,
+    "article_id": "789459",
+    "titulo": "Footer Bottom en",
+    "archivo": "componentes/789459__Footer_Bottom_en.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/en/search": {
+  "titulo_pagina": "search",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "769673",
+    "titulo": "Google Results",
+    "archivo": "componentes/769673__Google_Results.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "789459",
+    "titulo": "Footer Bottom en",
+    "archivo": "componentes/789459__Footer_Bottom_en.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/en/web/general": {
+  "titulo_pagina": "Contenido no encontrado",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "413542",
+    "titulo": "Detalle BN6",
+    "archivo": "componentes/413542__Detalle_BN6.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "789459",
+    "titulo": "Footer Bottom en",
+    "archivo": "componentes/789459__Footer_Bottom_en.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/en/web/general/detalle": {
+  "titulo_pagina": "Contenido no encontrado",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "413542",
+    "titulo": "Detalle BN6",
+    "archivo": "componentes/413542__Detalle_BN6.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "789459",
+    "titulo": "Footer Bottom en",
+    "archivo": "componentes/789459__Footer_Bottom_en.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/experiencias-en-el-campus": {
+  "titulo_pagina": "Experiencias en el campus",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "1796437",
+    "titulo": "EXPERIENCIAS_CAMPUS_BTX9",
+    "archivo": "componentes/1796437__EXPERIENCIAS_CAMPUS_BTX9.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "1803727",
+    "titulo": "CL_EXPERIENCIAS_CAMPUS_CITA_BTX9",
+    "archivo": "componentes/1803727__CL_EXPERIENCIAS_CAMPUS_CITA_BTX9.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "1809659",
+    "titulo": "EXPERIENCIAS_EN_CAMPUS_INTRO_CTA",
+    "archivo": "componentes/1809659__EXPERIENCIAS_EN_CAMPUS_INTRO_CTA.html"
+   },
+   {
+    "orden": 5,
+    "article_id": "1796553",
+    "titulo": "EXPERIENCIAS_CAMPUSLAB_BTX_TARJETAS",
+    "archivo": "componentes/1796553__EXPERIENCIAS_CAMPUSLAB_BTX_TARJETAS.html"
+   },
+   {
+    "orden": 6,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 7,
+    "article_id": "789459",
+    "titulo": "Footer Bottom",
+    "archivo": "componentes/789459__Footer_Bottom.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/jardinsuculentas": {
+  "titulo_pagina": "jardinsuculentas",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "2945478",
+    "titulo": "CL_JARDIN_SUCULENTAS_BTXTARJETAS",
+    "archivo": "componentes/2945478__CL_JARDIN_SUCULENTAS_BTXTARJETAS.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "789459",
+    "titulo": "Footer Bottom",
+    "archivo": "componentes/789459__Footer_Bottom.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/orquideas-de-casa": {
+  "titulo_pagina": "ORQUIDEAS DE CASA",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "19982844",
+    "titulo": "CL_ORQUIDEAS_TITULO_HTML",
+    "archivo": "componentes/19982844__CL_ORQUIDEAS_TITULO_HTML.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "19984432",
+    "titulo": "CL_ORQUIDEAS_CONTENIDO_HTML",
+    "archivo": "componentes/19984432__CL_ORQUIDEAS_CONTENIDO_HTML.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 5,
+    "article_id": "789459",
+    "titulo": "Footer Bottom",
+    "archivo": "componentes/789459__Footer_Bottom.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/search": {
+  "titulo_pagina": "search",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "769673",
+    "titulo": "Google Results",
+    "archivo": "componentes/769673__Google_Results.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "789459",
+    "titulo": "Footer Bottom",
+    "archivo": "componentes/789459__Footer_Bottom.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/web/general": {
+  "titulo_pagina": "Contenido no encontrado",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "413542",
+    "titulo": "Detalle BN6",
+    "archivo": "componentes/413542__Detalle_BN6.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "789459",
+    "titulo": "Footer Bottom",
+    "archivo": "componentes/789459__Footer_Bottom.html"
+   }
+  ]
+ },
+ "https://campuslab.iteso.mx/web/general/detalle": {
+  "titulo_pagina": "Contenido no encontrado",
+  "componentes": [
+   {
+    "orden": 1,
+    "article_id": "351492",
+    "titulo": "Navegación",
+    "archivo": "componentes/351492__Navegacion.html"
+   },
+   {
+    "orden": 2,
+    "article_id": "413542",
+    "titulo": "Detalle BN6",
+    "archivo": "componentes/413542__Detalle_BN6.html"
+   },
+   {
+    "orden": 3,
+    "article_id": "788792",
+    "titulo": "Footer-Top",
+    "archivo": "componentes/788792__Footer-Top.html"
+   },
+   {
+    "orden": 4,
+    "article_id": "789459",
+    "titulo": "Footer Bottom",
+    "archivo": "componentes/789459__Footer_Bottom.html"
+   }
+  ]
+ }
+}

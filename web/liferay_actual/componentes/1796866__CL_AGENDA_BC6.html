@@ -1,0 +1,363 @@
+ <div id="main-bc6" class="container-fluid pl-0 pr-0"> <div class="container-it" style="padding-top: 5.6%; padding-bottom: 5.6%;"> <div class="row no-gutters bc6"> <div class="row no-gutters w-100 row-title-bc6"> <div class="col-12"> <h1 class="title-bc6"><i class="fas fa-circle"></i>Actividades</h1> </div> </div> <div class="row no-gutters w-100"> <div class="col-12"> <div class="row no-gutters justify-content-center"> <div class="col-10"> <div id="bc6" class="carousel owl-carousel"> </div> </div> </div> </div> </div> <div class="row no-gutters justify-content-center mt-lg-5 mb-lg-5 w-100"> <div class="col-lg-10 col-md-12 mt-lg-0 mt-md-5"> <div class="row no-gutters justify-content-end"> <div class="col-lg-auto col-md-12"> <a class="btnmas" href=""> <i class="fal fa-plus-circle pr-3"></i> <p>Inicio</p> </a> </div> </div> </div> </div> </div> </div> </div> <script>
+    $( document ).ready(function() {
+
+  Liferay.Service(
+  '/itesoagenda.evento/Get-published-by-category',
+  {
+    noMaximoEventos: 10,
+    idsCategoria: [806,892,906,1901]
+  },
+  function(obj) {
+    var resJson = JSON.parse(obj)
+    //console.log(resJson);
+    getEvents(resJson);
+    //utilizar resJson de a cuerdo a lo que se requiera
+  }
+);
+  function getEvents(datos){
+    //console.log('data getEvents');
+    //console.log(datos);
+    var lastEvents = datos;
+if(lastEvents.length != 0){
+    var sizeEventos = lastEvents.length;
+    for (var i = 0; i <lastEvents.length ; i++) {
+        $('#bc6').append(
+    '<div id="bc6-item-'+i+'"  class="item-bc6">'+
+        '<div class="row no-gutters align-items-center pt-3 pb-3">'+
+            '<div class="row no-gutters align-items-center pt-3 pb-3 pl-3 pr-3 w-100">'+
+                '<div class="col-6 text-left">'+
+                    '<span class="fecha-bc6">'+lastEvents[i].fecha+'</span>'+
+                '</div>'+
+                '<div class="col-6 text-right">'+
+                    '<span class="hora-bc6">'+lastEvents[i].hora+'</span>'+
+                '</div>'+
+            '</div>'+
+        '<div class="row no-gutters w-100">'+
+            '<a class="w-100 h-100" href="'+lastEvents[i].urlEvento+'"target="_blank">'+
+            '<div class="col-12 img-bc6"style="background-image:url('+lastEvents[i].urlImagen+')">'+
+            '</div>'+
+            '</a>'+
+        '</div>'+
+        '<div class="row no-gutters w-100 pl-3 pr-3 pt-3 pb-3">'+
+            '<div class="col-12 text-left">'+
+                '<h1 class="title-item-bc6">'+lastEvents[i].lugar+'</h1>'+
+            '</div>'+
+            '<div class="col-12">'+
+                '<span class="desc-item-bc6">'+lastEvents[i].nombreEvento+'</span>'+
+            '</div>'+
+        '</div>'+
+    '</div>'
+                );
+    }
+    pintaItemsBc6();
+}  
+  }
+
+function pintaItemsBc6(){
+    //console.log("pintaItemsBc6");
+  $("#bc6").owlCarousel({
+    margin: 20,
+    loop: true,
+    autoplay: true,
+    autoplayTimeout: 5000,
+    autoplayHoverPause: true,
+    dots: true,
+    startPosition  : 0,
+    navText: ['<i class="fal fa-chevron-circle-left"></i>','<i class="fal fa-chevron-circle-right"></i>'],
+    responsive: {
+      0:{
+        items:1,
+        nav: false
+      },
+      767:{
+        items:2,
+        nav: false
+      },
+      1201:{
+        nav: true,
+        items:3
+      }
+    }
+  });
+}
+});
+</script> <style type="text/css">
+    .bc6{
+    position: relative; 
+    /*height: 100vh;*/
+    /*width: 100%;*/
+    display: flex;
+    }
+    .bc6:before {    
+      content: "";
+      background-image:linear-gradient(rgba(0,66,112,0.3),rgba(0,66,112,0.3)), url('/documents/71762/1329519/ITESO_AGENDA_GENERAL.jpg/c41eb079-4eea-9253-69b5-a15cd3143ad1?t=1718141715630');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      bottom: 0px;
+      left: 0px;
+      
+      
+}
+.item-bc6{
+    background-color: #42b4e3;
+}
+
+.fecha-bc6 {
+    font-family: 'Degular-Bold';
+  font-size: 1.4em;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.39;
+  letter-spacing: 0.25px;
+  text-align: left;
+  color: #fff;
+}
+.hora-bc6 {
+  font-family: 'Degular-Bold';
+  font-size: 1.4em;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.39;
+  letter-spacing: 0.25px;
+  text-align: left;
+  color: #004270;
+}
+.title-bc6 i{
+    padding-right: 40px;
+    font-size: 32px;
+}
+.title-bc6 {
+  font-family: 'Degular-Bold';
+  font-size: 2.5em;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.3;
+  letter-spacing: 1.1px;
+  text-align: left;
+  color: #fff;
+  /*text-transform: uppercase;*/
+}
+.title-item-bc6 {
+  font-family: Degular-Bold;
+  font-size: 1.6em;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.3;
+  letter-spacing: 0.25px;
+  text-align: left;
+  color: #fff;
+}
+.desc-item-bc6 {
+  font-family: 'Degular-Bold';
+  font-size: 1.6em;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.13;
+  letter-spacing: 0.25px;
+  text-align: left;
+  color: #000;
+}
+#bc6 .owl-dots {
+    text-align: center !important;
+    -webkit-tap-highlight-color: transparent;
+    margin-top: 10px;
+}
+#bc6 .owl-dot {
+    height: 10px;
+    width: 10px;
+    margin: 0 5px;
+    outline: 0;
+    border-radius: 50%;
+    transition: all .3s ease;
+}
+#bc6 .owl-dots {
+    text-align: center !important;
+    -webkit-tap-highlight-color: transparent;
+    margin-top: 10px;
+}
+#bc6 .owl-dot:focus {
+    outline:none !important;
+}
+#bc6 button.owl-dot {
+    background-color: gray !important;
+}
+
+#bc6 .owl-prev, #bc6 .owl-next {
+    color: #42b4e3 !important;
+    /*font-size:40px !important;*/
+}
+#bc6 .owl-prev i, #bc6 .owl-next i {
+    font-size:40px;
+}
+#bc6 .owl-next:focus, .owl-prev:focus {
+    outline: unset !important;
+}
+@media(max-width:991px){
+    #bc6 .owl-dots{
+        margin-top:93px;
+        margin-bottom:30px;
+    }
+}
+@media (min-width: 992px){
+    /*.item-bc6{
+        height: 470px;
+    }*/
+    #bc6 .owl-dots{
+        margin-top:48px;
+    }
+
+#bc6 .owl-prev {
+    position: absolute;
+    top: 50%;
+    margin-left: -8%;
+    display: block !important;
+}
+#bc6 .owl-next {
+    position: absolute;
+    top: 50%;
+    right: -8%;
+    display: block !important;
+}
+}
+@media(min-width:1920px){
+  /*.item-bc6 {
+      height:auto
+  } */ 
+}
+@media(min-width:300px) and (max-width:991.5px){
+
+.title-bc6{
+    font-size: 2em
+}
+
+.title-bc6 i{
+    font-size: 24px;
+    padding-right: 20px;
+   
+}
+    
+}
+#bc6 .owl-dots{
+    margin-top: 90px;
+    margin-bottom: 30px;
+}
+}
+@media(min-width: 375px) and (max-width: 768px){
+    .fecha-bc6{
+        font-size: 1.1em;
+    }
+    .hora-bc6{
+        font-size: 1.1em;
+    }
+}
+    .title-item-bc6{
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    }
+
+
+@media(min-width:300px) and (max-width:766.5px){
+    
+    .img-bc6 {
+        height: 209px;
+    }
+    .item-bc6 {
+        height:450px; 
+    }
+    .desc-item-bc6 {
+     display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;  
+    }
+}
+@media(min-width:767px) and (max-width:1023.5px){
+        .img-bc6 {
+        height: 182px;
+    }
+    .item-bc6 {
+        height:450px; 
+    }
+    .desc-item-bc6 {
+     display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;  
+    }
+}
+@media(min-width:1024px){
+    .img-bc6 {
+        height: 212px;
+    }
+    .item-bc6 {
+        height:480px; 
+    }
+    .desc-item-bc6 {
+     display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;  
+    }
+    
+}
+@media(min-width:1920px){
+    .img-bc6 {
+        height: 282px;
+    }
+    .item-bc6{
+        height:510px;
+    }
+    .fecha-bc6{
+        font-size: 1.5em;
+    }
+    .hora-bc6{
+        font-size: 1.5em;
+    }
+}
+.img-bc6 {
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+#bc6 button.owl-dot.active {
+    background-color: #fff !important;
+}
+.row-title-bc6{
+    padding-left: 2.5em;
+    padding-top: 5.3em;
+    /*padding-bottom: 9em;*/
+}
+.item-bc6:hover {
+    transform: translate(0, -10%);
+    transition-duration: 500ms;
+}
+@media (min-width: 300px) and (max-width: 766.5px){
+    #main-bc6 #bc6 .owl-stage {
+        padding-top: 6em;
+    } 
+}
+@media(min-width:767px) and (max-width: 1023.5px){
+    #main-bc6 #bc6 .owl-stage {
+        padding-top: 4.5em;
+    } 
+}
+@media(min-width: 1024px){
+    #main-bc6 #bc6 .owl-stage {
+        padding-top: 9em;
+    }
+}
+</style> </div> 

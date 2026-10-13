@@ -1,0 +1,201 @@
+{
+ "351492": {
+  "archivo": "componentes/351492__Navegacion.html",
+  "titulo": "Navegación",
+  "resource_pk": "43429",
+  "tamano_html": 27343,
+  "iframes": [],
+  "paginas": [
+   "https://bosque.iteso.mx",
+   "https://bosque.iteso.mx/aranza",
+   "https://bosque.iteso.mx/en",
+   "https://bosque.iteso.mx/en/aranza",
+   "https://bosque.iteso.mx/en/santiago",
+   "https://bosque.iteso.mx/en/search",
+   "https://bosque.iteso.mx/en/web/general",
+   "https://bosque.iteso.mx/iteso.mx",
+   "https://bosque.iteso.mx/santiago",
+   "https://bosque.iteso.mx/search",
+   "https://bosque.iteso.mx/web/general",
+   "https://bosque.iteso.mx/web/general/detalle"
+  ]
+ },
+ "1971302": {
+  "archivo": "componentes/1971302__BANNER_EN_CONSTRUCCION_CTA.html",
+  "titulo": "BANNER_EN_CONSTRUCCION_CTA",
+  "resource_pk": "1971304",
+  "tamano_html": 2179,
+  "iframes": [],
+  "paginas": [
+   "https://bosque.iteso.mx",
+   "https://bosque.iteso.mx/en"
+  ]
+ },
+ "788792": {
+  "archivo": "componentes/788792__Footer-Top.html",
+  "titulo": "Footer-Top",
+  "resource_pk": "788794",
+  "tamano_html": 14370,
+  "iframes": [],
+  "paginas": [
+   "https://bosque.iteso.mx",
+   "https://bosque.iteso.mx/aranza",
+   "https://bosque.iteso.mx/en",
+   "https://bosque.iteso.mx/en/aranza",
+   "https://bosque.iteso.mx/en/santiago",
+   "https://bosque.iteso.mx/en/search",
+   "https://bosque.iteso.mx/en/web/general",
+   "https://bosque.iteso.mx/iteso.mx",
+   "https://bosque.iteso.mx/santiago",
+   "https://bosque.iteso.mx/search",
+   "https://bosque.iteso.mx/web/general",
+   "https://bosque.iteso.mx/web/general/detalle"
+  ]
+ },
+ "789459": {
+  "archivo": "componentes/789459__Footer_Bottom.html",
+  "titulo": "Footer Bottom",
+  "resource_pk": "789461",
+  "tamano_html": 22065,
+  "iframes": [],
+  "paginas": [
+   "https://bosque.iteso.mx",
+   "https://bosque.iteso.mx/aranza",
+   "https://bosque.iteso.mx/en",
+   "https://bosque.iteso.mx/en/aranza",
+   "https://bosque.iteso.mx/en/santiago",
+   "https://bosque.iteso.mx/en/search",
+   "https://bosque.iteso.mx/en/web/general",
+   "https://bosque.iteso.mx/iteso.mx",
+   "https://bosque.iteso.mx/santiago",
+   "https://bosque.iteso.mx/search",
+   "https://bosque.iteso.mx/web/general",
+   "https://bosque.iteso.mx/web/general/detalle"
+  ]
+ },
+ "16546149": {
+  "archivo": "componentes/16546149__PAJAROS_CAMPUSLAB_GALERIA.html",
+  "titulo": "PAJAROS_CAMPUSLAB_GALERIA",
+  "resource_pk": "16546151",
+  "tamano_html": 7519,
+  "iframes": [],
+  "paginas": [
+   "https://bosque.iteso.mx/aranza",
+   "https://bosque.iteso.mx/en/aranza"
+  ]
+ },
+ "16546136": {
+  "archivo": "componentes/16546136__TITULO_GALERIA.html",
+  "titulo": "TITULO_GALERIA",
+  "resource_pk": "16546138",
+  "tamano_html": 6755,
+  "iframes": [],
+  "paginas": [
+   "https://bosque.iteso.mx/en/santiago",
+   "https://bosque.iteso.mx/santiago"
+  ]
+ },
+ "769673": {
+  "archivo": "componentes/769673__Google_Results.html",
+  "titulo": "Google Results",
+  "resource_pk": "769675",
+  "tamano_html": 5902,
+  "iframes": [],
+  "paginas": [
+   "https://bosque.iteso.mx/en/search",
+   "https://bosque.iteso.mx/search"
+  ]
+ },
+ "413542": {
+  "archivo": "componentes/413542__Detalle_BN6.html",
+  "titulo": "Detalle BN6",
+  "resource_pk": "43209",
+  "tamano_html": 8797,
+  "iframes": [],
+  "paginas": [
+   "https://bosque.iteso.mx/en/web/general",
+   "https://bosque.iteso.mx/web/general",
+   "https://bosque.iteso.mx/web/general/detalle"
+  ]
+ },
+ "15890999": {
+  "archivo": "componentes/15890999__PLAYER_RADIO_HOME_HTML.html",
+  "titulo": "PLAYER_RADIO_HOME_HTML_",
+  "resource_pk": "15891001",
+  "tamano_html": 8725,
+  "iframes": [],
+  "paginas": [
+   "https://bosque.iteso.mx/iteso.mx"
+  ]
+ },
+ "8909579": {
+  "archivo": "componentes/8909579__BANNER_HOME_HTML.html",
+  "titulo": "BANNER_HOME_HTML",
+  "resource_pk": "8909581",
+  "tamano_html": 1586,
+  "iframes": [],
+  "paginas": [
+   "https://bosque.iteso.mx/iteso.mx"
+  ]
+ },
+ "254830": {
+  "archivo": "componentes/254830__PROGRAMAS_ACADEMICOS_HOME_INSTITUCIONAL_BC4.html",
+  "titulo": "PROGRAMAS_ACADEMICOS_HOME_INSTITUCIONAL_BC4",
+  "resource_pk": "254832",
+  "tamano_html": 21464,
+  "iframes": [],
+  "paginas": [
+   "https://bosque.iteso.mx/iteso.mx"
+  ]
+ },
+ "7278056": {
+  "archivo": "componentes/7278056__NOTICIAS_PRINCIPALES_HOME_BN1.html",
+  "titulo": "NOTICIAS_PRINCIPALES_HOME_BN1",
+  "resource_pk": "7278058",
+  "tamano_html": 9494,
+  "iframes": [],
+  "paginas": [
+   "https://bosque.iteso.mx/iteso.mx"
+  ]
+ },
+ "1178796": {
+  "archivo": "componentes/1178796__NOTA_INVESTIGACION_HOME.html",
+  "titulo": "NOTA_INVESTIGACION_HOME",
+  "resource_pk": "1178798",
+  "tamano_html": 4046,
+  "iframes": [],
+  "paginas": [
+   "https://bosque.iteso.mx/iteso.mx"
+  ]
+ },
+ "18239869": {
+  "archivo": "componentes/18239869__BANNER_RADIO_ITESO_HTML.html",
+  "titulo": "BANNER_RADIO_ITESO_HTML",
+  "resource_pk": "18239871",
+  "tamano_html": 1647,
+  "iframes": [],
+  "paginas": [
+   "https://bosque.iteso.mx/iteso.mx"
+  ]
+ },
+ "317572": {
+  "archivo": "componentes/317572__ACTIVIDADES_HOME_INSTITUCIONAL_BC6.html",
+  "titulo": "ACTIVIDADES_HOME_INSTITUCIONAL_BC6",
+  "resource_pk": "317574",
+  "tamano_html": 9222,
+  "iframes": [],
+  "paginas": [
+   "https://bosque.iteso.mx/iteso.mx"
+  ]
+ },
+ "4054500": {
+  "archivo": "componentes/4054500__PUBLICACIONES_BANNER_BC7P.html",
+  "titulo": "PUBLICACIONES_BANNER_BC7P",
+  "resource_pk": "4054502",
+  "tamano_html": 12825,
+  "iframes": [],
+  "paginas": [
+   "https://bosque.iteso.mx/iteso.mx"
+  ]
+ }
+}

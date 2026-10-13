@@ -1,0 +1,390 @@
+{
+ "351492": {
+  "archivo": "componentes/351492__Navegacion.html",
+  "titulo": "Navegación",
+  "resource_pk": "43429",
+  "tamano_html": 27349,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx",
+   "https://campuslab.iteso.mx/arboles",
+   "https://campuslab.iteso.mx/arboles_casa",
+   "https://campuslab.iteso.mx/arboretum",
+   "https://campuslab.iteso.mx/aves-iteso",
+   "https://campuslab.iteso.mx/biodiversidad-iteso",
+   "https://campuslab.iteso.mx/cl_aves_iteso",
+   "https://campuslab.iteso.mx/en",
+   "https://campuslab.iteso.mx/en/arboles",
+   "https://campuslab.iteso.mx/en/arboles_casa",
+   "https://campuslab.iteso.mx/en/arboretum",
+   "https://campuslab.iteso.mx/en/aves-iteso",
+   "https://campuslab.iteso.mx/en/biodiversidad-iteso",
+   "https://campuslab.iteso.mx/en/cl_aves_iteso",
+   "https://campuslab.iteso.mx/en/experiencias-en-el-campus",
+   "https://campuslab.iteso.mx/en/jardinsuculentas",
+   "https://campuslab.iteso.mx/en/orquideas-de-casa",
+   "https://campuslab.iteso.mx/en/search",
+   "https://campuslab.iteso.mx/en/web/general",
+   "https://campuslab.iteso.mx/en/web/general/detalle",
+   "https://campuslab.iteso.mx/experiencias-en-el-campus",
+   "https://campuslab.iteso.mx/jardinsuculentas",
+   "https://campuslab.iteso.mx/orquideas-de-casa",
+   "https://campuslab.iteso.mx/search",
+   "https://campuslab.iteso.mx/web/general",
+   "https://campuslab.iteso.mx/web/general/detalle"
+  ]
+ },
+ "8413796": {
+  "archivo": "componentes/8413796__GALERIA_1_CL.html",
+  "titulo": "GALERIA_1_CL",
+  "resource_pk": "8413798",
+  "tamano_html": 5177,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx",
+   "https://campuslab.iteso.mx/en"
+  ]
+ },
+ "8454076": {
+  "archivo": "componentes/8454076__BC4_CARRUSEL_TARJETAS.html",
+  "titulo": "BC4_CARRUSEL_TARJETAS",
+  "resource_pk": "8454078",
+  "tamano_html": 21530,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx",
+   "https://campuslab.iteso.mx/en"
+  ]
+ },
+ "8455687": {
+  "archivo": "componentes/8455687__GALERIA_2_CL.html",
+  "titulo": "GALERIA_2_CL",
+  "resource_pk": "8455689",
+  "tamano_html": 4578,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx",
+   "https://campuslab.iteso.mx/en"
+  ]
+ },
+ "1796866": {
+  "archivo": "componentes/1796866__CL_AGENDA_BC6.html",
+  "titulo": "CL_AGENDA_BC6",
+  "resource_pk": "1796868",
+  "tamano_html": 8706,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx",
+   "https://campuslab.iteso.mx/en"
+  ]
+ },
+ "1813188": {
+  "archivo": "componentes/1813188__CL_CONTACTO_CONTACTO.html",
+  "titulo": "CL_CONTACTO_CONTACTO",
+  "resource_pk": "1813190",
+  "tamano_html": 1,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx",
+   "https://campuslab.iteso.mx/en"
+  ]
+ },
+ "1796959": {
+  "archivo": "componentes/1796959__CL__DESTACADO_CAMPUSLAB_CTA3.html",
+  "titulo": "CL__DESTACADO_CAMPUSLAB_CTA3",
+  "resource_pk": "1796961",
+  "tamano_html": 3516,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx",
+   "https://campuslab.iteso.mx/en"
+  ]
+ },
+ "788792": {
+  "archivo": "componentes/788792__Footer-Top.html",
+  "titulo": "Footer-Top",
+  "resource_pk": "788794",
+  "tamano_html": 14370,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx",
+   "https://campuslab.iteso.mx/arboles",
+   "https://campuslab.iteso.mx/arboles_casa",
+   "https://campuslab.iteso.mx/arboretum",
+   "https://campuslab.iteso.mx/aves-iteso",
+   "https://campuslab.iteso.mx/biodiversidad-iteso",
+   "https://campuslab.iteso.mx/cl_aves_iteso",
+   "https://campuslab.iteso.mx/en",
+   "https://campuslab.iteso.mx/en/arboles",
+   "https://campuslab.iteso.mx/en/arboles_casa",
+   "https://campuslab.iteso.mx/en/arboretum",
+   "https://campuslab.iteso.mx/en/aves-iteso",
+   "https://campuslab.iteso.mx/en/biodiversidad-iteso",
+   "https://campuslab.iteso.mx/en/cl_aves_iteso",
+   "https://campuslab.iteso.mx/en/experiencias-en-el-campus",
+   "https://campuslab.iteso.mx/en/jardinsuculentas",
+   "https://campuslab.iteso.mx/en/orquideas-de-casa",
+   "https://campuslab.iteso.mx/en/search",
+   "https://campuslab.iteso.mx/en/web/general",
+   "https://campuslab.iteso.mx/en/web/general/detalle",
+   "https://campuslab.iteso.mx/experiencias-en-el-campus",
+   "https://campuslab.iteso.mx/jardinsuculentas",
+   "https://campuslab.iteso.mx/orquideas-de-casa",
+   "https://campuslab.iteso.mx/search",
+   "https://campuslab.iteso.mx/web/general",
+   "https://campuslab.iteso.mx/web/general/detalle"
+  ]
+ },
+ "789459": {
+  "archivo": "componentes/789459__Footer_Bottom.html",
+  "titulo": "Footer Bottom",
+  "resource_pk": "789461",
+  "tamano_html": 22065,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx",
+   "https://campuslab.iteso.mx/arboles",
+   "https://campuslab.iteso.mx/arboles_casa",
+   "https://campuslab.iteso.mx/arboretum",
+   "https://campuslab.iteso.mx/aves-iteso",
+   "https://campuslab.iteso.mx/biodiversidad-iteso",
+   "https://campuslab.iteso.mx/cl_aves_iteso",
+   "https://campuslab.iteso.mx/en",
+   "https://campuslab.iteso.mx/en/arboles",
+   "https://campuslab.iteso.mx/en/arboles_casa",
+   "https://campuslab.iteso.mx/en/arboretum",
+   "https://campuslab.iteso.mx/en/aves-iteso",
+   "https://campuslab.iteso.mx/en/biodiversidad-iteso",
+   "https://campuslab.iteso.mx/en/cl_aves_iteso",
+   "https://campuslab.iteso.mx/en/experiencias-en-el-campus",
+   "https://campuslab.iteso.mx/en/jardinsuculentas",
+   "https://campuslab.iteso.mx/en/orquideas-de-casa",
+   "https://campuslab.iteso.mx/en/search",
+   "https://campuslab.iteso.mx/en/web/general",
+   "https://campuslab.iteso.mx/en/web/general/detalle",
+   "https://campuslab.iteso.mx/experiencias-en-el-campus",
+   "https://campuslab.iteso.mx/jardinsuculentas",
+   "https://campuslab.iteso.mx/orquideas-de-casa",
+   "https://campuslab.iteso.mx/search",
+   "https://campuslab.iteso.mx/web/general",
+   "https://campuslab.iteso.mx/web/general/detalle"
+  ]
+ },
+ "7667536": {
+  "archivo": "componentes/7667536__TITULO_ARBOLES.html",
+  "titulo": "TITULO_ARBOLES",
+  "resource_pk": "7667538",
+  "tamano_html": 785,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx/arboles_casa",
+   "https://campuslab.iteso.mx/en/arboles_casa"
+  ]
+ },
+ "7667552": {
+  "archivo": "componentes/7667552__HTML_MAPA.html",
+  "titulo": "HTML_MAPA",
+  "resource_pk": "7667554",
+  "tamano_html": 502,
+  "iframes": [
+   "//universidaditeso.maps.arcgis.com/apps/Embed/index.html?webmap=4429b80203d6432b8ccb7cfc022d043e&amp;extent=-103.4207,20.6035,-103.4089,20.6105&amp;zoom=true&amp;previewImage=false&amp;scale=true&amp;legend=true&amp;disable_scroll=true&amp;theme=light"
+  ],
+  "paginas": [
+   "https://campuslab.iteso.mx/arboles_casa",
+   "https://campuslab.iteso.mx/en/arboles_casa"
+  ]
+ },
+ "22626683": {
+  "archivo": "componentes/22626683__CL_ARBORETUM_ORIENTE_BTXTARJETAS.html",
+  "titulo": "CL_ARBORETUM_ORIENTE_BTXTARJETAS",
+  "resource_pk": "22626685",
+  "tamano_html": 10537,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx/arboretum",
+   "https://campuslab.iteso.mx/en/arboretum"
+  ]
+ },
+ "22691094": {
+  "archivo": "componentes/22691094__CL_ARBORETUM_SUR_BTXTARJETAS.html",
+  "titulo": "CL_ARBORETUM_SUR_BTXTARJETAS",
+  "resource_pk": "22691096",
+  "tamano_html": 10533,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx/arboretum",
+   "https://campuslab.iteso.mx/en/arboretum"
+  ]
+ },
+ "7328276": {
+  "archivo": "componentes/7328276__TITULO_LISTADO_HTML.html",
+  "titulo": "TITULO_LISTADO_HTML",
+  "resource_pk": "7328278",
+  "tamano_html": 781,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx/aves-iteso",
+   "https://campuslab.iteso.mx/cl_aves_iteso",
+   "https://campuslab.iteso.mx/en/aves-iteso",
+   "https://campuslab.iteso.mx/en/cl_aves_iteso"
+  ]
+ },
+ "5157578": {
+  "archivo": "componentes/5157578__AVES_CONTENIDO_HTML.html",
+  "titulo": "AVES_CONTENIDO_HTML",
+  "resource_pk": "5157580",
+  "tamano_html": 229954,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx/aves-iteso",
+   "https://campuslab.iteso.mx/cl_aves_iteso",
+   "https://campuslab.iteso.mx/en/aves-iteso",
+   "https://campuslab.iteso.mx/en/cl_aves_iteso"
+  ]
+ },
+ "1796594": {
+  "archivo": "componentes/1796594__CL_BIODIVERSIDAD_CAMPUS_BTX9.html",
+  "titulo": "CL_BIODIVERSIDAD_CAMPUS_BTX9",
+  "resource_pk": "1796596",
+  "tamano_html": 3620,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx/biodiversidad-iteso",
+   "https://campuslab.iteso.mx/en/biodiversidad-iteso"
+  ]
+ },
+ "1810040": {
+  "archivo": "componentes/1810040__BIODIVERSIDAD_ITESO_INTRO_CTA.html",
+  "titulo": "BIODIVERSIDAD_ITESO_INTRO_CTA",
+  "resource_pk": "1810042",
+  "tamano_html": 2205,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx/biodiversidad-iteso",
+   "https://campuslab.iteso.mx/en/biodiversidad-iteso"
+  ]
+ },
+ "20060835": {
+  "archivo": "componentes/20060835__CL_ARBOLES_AVES_ORQUIDEAS_BTX.html",
+  "titulo": "CL_ARBOLES_AVES_ORQUIDEAS_BTX",
+  "resource_pk": "20060837",
+  "tamano_html": 12960,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx/biodiversidad-iteso",
+   "https://campuslab.iteso.mx/en/biodiversidad-iteso"
+  ]
+ },
+ "20061252": {
+  "archivo": "componentes/20061252__CL_AGUA_FLORES_BTX.html",
+  "titulo": "CL_AGUA_FLORES_BTX",
+  "resource_pk": "20061254",
+  "tamano_html": 10682,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx/biodiversidad-iteso",
+   "https://campuslab.iteso.mx/en/biodiversidad-iteso"
+  ]
+ },
+ "1796437": {
+  "archivo": "componentes/1796437__EXPERIENCIAS_CAMPUS_BTX9.html",
+  "titulo": "EXPERIENCIAS_CAMPUS_BTX9",
+  "resource_pk": "1796439",
+  "tamano_html": 3369,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx/en/experiencias-en-el-campus",
+   "https://campuslab.iteso.mx/experiencias-en-el-campus"
+  ]
+ },
+ "1803727": {
+  "archivo": "componentes/1803727__CL_EXPERIENCIAS_CAMPUS_CITA_BTX9.html",
+  "titulo": "CL_EXPERIENCIAS_CAMPUS_CITA_BTX9",
+  "resource_pk": "1803729",
+  "tamano_html": 3625,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx/en/experiencias-en-el-campus",
+   "https://campuslab.iteso.mx/experiencias-en-el-campus"
+  ]
+ },
+ "1809659": {
+  "archivo": "componentes/1809659__EXPERIENCIAS_EN_CAMPUS_INTRO_CTA.html",
+  "titulo": "EXPERIENCIAS_EN_CAMPUS_INTRO_CTA",
+  "resource_pk": "1809661",
+  "tamano_html": 2228,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx/en/experiencias-en-el-campus",
+   "https://campuslab.iteso.mx/experiencias-en-el-campus"
+  ]
+ },
+ "1796553": {
+  "archivo": "componentes/1796553__EXPERIENCIAS_CAMPUSLAB_BTX_TARJETAS.html",
+  "titulo": "EXPERIENCIAS_CAMPUSLAB_BTX_TARJETAS",
+  "resource_pk": "1796555",
+  "tamano_html": 10995,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx/en/experiencias-en-el-campus",
+   "https://campuslab.iteso.mx/experiencias-en-el-campus"
+  ]
+ },
+ "2945478": {
+  "archivo": "componentes/2945478__CL_JARDIN_SUCULENTAS_BTXTARJETAS.html",
+  "titulo": "CL_JARDIN_SUCULENTAS_BTXTARJETAS",
+  "resource_pk": "2945480",
+  "tamano_html": 10854,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx/en/jardinsuculentas",
+   "https://campuslab.iteso.mx/jardinsuculentas"
+  ]
+ },
+ "19982844": {
+  "archivo": "componentes/19982844__CL_ORQUIDEAS_TITULO_HTML.html",
+  "titulo": "CL_ORQUIDEAS_TITULO_HTML",
+  "resource_pk": "19982846",
+  "tamano_html": 940,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx/en/orquideas-de-casa",
+   "https://campuslab.iteso.mx/orquideas-de-casa"
+  ]
+ },
+ "19984432": {
+  "archivo": "componentes/19984432__CL_ORQUIDEAS_CONTENIDO_HTML.html",
+  "titulo": "CL_ORQUIDEAS_CONTENIDO_HTML",
+  "resource_pk": "19984434",
+  "tamano_html": 111522,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx/en/orquideas-de-casa",
+   "https://campuslab.iteso.mx/orquideas-de-casa"
+  ]
+ },
+ "769673": {
+  "archivo": "componentes/769673__Google_Results.html",
+  "titulo": "Google Results",
+  "resource_pk": "769675",
+  "tamano_html": 5902,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx/en/search",
+   "https://campuslab.iteso.mx/search"
+  ]
+ },
+ "413542": {
+  "archivo": "componentes/413542__Detalle_BN6.html",
+  "titulo": "Detalle BN6",
+  "resource_pk": "43209",
+  "tamano_html": 8800,
+  "iframes": [],
+  "paginas": [
+   "https://campuslab.iteso.mx/en/web/general",
+   "https://campuslab.iteso.mx/en/web/general/detalle",
+   "https://campuslab.iteso.mx/web/general",
+   "https://campuslab.iteso.mx/web/general/detalle"
+  ]
+ }
+}
