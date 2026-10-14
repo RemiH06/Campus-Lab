@@ -54,8 +54,15 @@ LICENCIAS_ABIERTAS = {"cc0", "cc-by", "cc-by-sa"}
 
 def binomio(nombre):
     plano = unicodedata.normalize("NFKD", nombre or "").encode("ascii", "ignore").decode()
-    palabras = re.findall(r"[a-z]+", plano.lower().replace("×", "x"))
+    # "Hibiscus × rosa-sinensis": la marca de híbrido no es parte del binomio
+    # con guion: "rosa-sinensis" cortado en "rosa" se confundía con otras especies
+    palabras = [w for w in re.findall(r"[a-z]+(?:-[a-z]+)*", plano.lower().replace("×", " x ")) if w != "x"]
     return " ".join(palabras[:2]) if len(palabras) >= 2 else ""
+
+
+def binomio_completo(nombre):
+    plano = unicodedata.normalize("NFKD", nombre or "").encode("ascii", "ignore").decode()
+    return [w for w in re.findall(r"[a-z]+(?:-[a-z]+)*", plano.lower()) if w not in ("x", "var", "subsp", "ssp", "f")]
 
 
 def get(ruta):
@@ -177,7 +184,10 @@ def resolver_nombres(c, nombres):
         d = get("/taxa?" + urllib.parse.urlencode({"q": b, "per_page": 10}))
         candidatos = [t for t in d["results"] if t.get("rank") in RANGOS_ESPECIE
                       and binomio(t.get("matched_term")) == b]
-        candidatos.sort(key=lambda t: t["rank"] != "species")
+        # primero el nombre tal cual (sin variedad: "H. rosa-sinensis var. schizopetalus" es otra
+        # especie en iNat), luego especie o híbrido antes que rangos menores
+        candidatos.sort(key=lambda t: (len(binomio_completo(t.get("matched_term"))) > 2,
+                                       t["rank"] not in ("species", "hybrid")))
         t = candidatos[0] if candidatos else None
         guardar_nombre(c, b, nombres[b][0], t, ("sinonimo" if binomio(t["name"]) != b else "exacto") if t else "sin_match")
         if n % 50 == 0:
