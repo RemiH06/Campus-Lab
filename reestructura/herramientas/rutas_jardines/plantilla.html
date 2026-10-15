@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rutas de inventario</title>
+<link rel="preconnect" href="https://fonts.bunny.net">
+<link rel="stylesheet" href="https://fonts.bunny.net/css?family=atkinson-hyperlegible:400,700|ibm-plex-mono:400,500&display=swap">
+<style>
+/* Libreta de levantamiento: complementario dividido desde el verde de la vegetación (140°).
+   Contrastes verificados con la fórmula WCAG 2.x (ver construir.py / README). */
+:root {
+  --papel: #f3f4ec;
+  --papel-2: #e6e9dc;
+  --tinta: #183224;
+  --tinta-2: #45594c;
+  --linea: #c3c9b6;
+  --edificio: #d4d6cb;
+  --camino: #838a75;   /* 3.2:1 sobre papel (gráfico) */
+  --ruta: #7a2d8a;      /* 290° */
+  --esta: #165029;      /* 140°, 8.6:1 */
+  --no-esta: #b3263f;   /* 350°, texto 5.8:1 */
+  --no-esta-mapa: #d7425b; /* 3.9:1; más claro que "está" para no depender del matiz */
+  --otra: #183224;
+  --foco: #7a2d8a;
+  --fuente: "Atkinson Hyperlegible", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--papel); color: var(--tinta); font: 16px/1.45 var(--fuente); }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; }
+h1 { font-size: 1.25rem; margin: 0; }
+h2 { font-size: 1.05rem; margin: 0 0 .5rem; }
+.app { display: grid; grid-template-columns: minmax(0, 1fr); min-height: 100vh; }
+header { padding: 12px 16px; border-bottom: 1px solid var(--linea); display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+header small { color: var(--tinta-2); }
+.panel { padding: 12px 16px 24px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-content: start; min-width: 0; order: 2; }
+/* En celular el mapa va arriba y se queda fijo mientras se recorre la lista */
+.mapa-caja { position: sticky; top: 0; z-index: 2; order: 1; height: 46vh; min-height: 280px; border-bottom: 1px solid var(--linea); background: var(--papel); }
+@media (min-width: 900px) {
+  .app { grid-template-columns: 380px minmax(0, 1fr); grid-template-rows: auto 1fr; height: 100vh; }
+  header { grid-column: 1 / -1; }
+  .panel { order: 1; overflow-y: auto; border-right: 1px solid var(--linea); }
+  .mapa-caja { order: 2; position: relative; height: auto; border: 0; }
+}
+svg#mapa { width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; overflow: hidden; }
+.mapa-caja { overflow: hidden; }
+.zoom { position: absolute; right: 10px; top: 10px; display: grid; gap: 6px; }
+.zoom button, .btn { min-height: 36px; padding: 6px 12px; border: 1px solid var(--tinta-2); background: var(--papel); border-radius: 6px; cursor: pointer; }
+.zoom button { min-width: 40px; }
+.btn.primario { background: var(--tinta); color: var(--papel); border-color: var(--tinta); }
+.btn:hover, .zoom button:hover { background: var(--papel-2); }
+.btn.primario:hover { background: var(--tinta-2); }
+fieldset { border: 1px solid var(--linea); border-radius: 8px; padding: 10px 12px; margin: 0; min-width: 0; }
+legend { padding: 0 4px; font-weight: 700; }
+.campos { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px 12px; }
+.campos label { display: grid; gap: 2px; font-size: .9rem; color: var(--tinta-2); }
+.campos input, .campos select, select { padding: 6px 8px; border: 1px solid var(--tinta-2); border-radius: 6px; background: var(--papel); min-height: 36px; width: 100%; }
+.check { display: flex; gap: 8px; align-items: center; font-size: .95rem; grid-column: 1 / -1; }
+.check input { width: 20px; height: 20px; accent-color: var(--tinta); }
+.jardines { display: grid; gap: 2px; max-height: 300px; overflow-y: auto; }
+.jardin { display: grid; grid-template-columns: 24px 1fr auto; gap: 8px; align-items: center; padding: 6px 4px; border-radius: 6px; cursor: pointer; }
+.jardin:hover { background: var(--papel-2); }
+.jardin input { width: 20px; height: 20px; accent-color: var(--tinta); }
+.jardin .dato { font: .85rem var(--mono); color: var(--tinta-2); text-align: right; }
+.fila-botones { display: flex; gap: 8px; flex-wrap: wrap; }
+.dias { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+.dia { flex: 0 0 auto; text-align: left; border: 1px solid var(--linea); background: var(--papel); border-radius: 8px; padding: 8px 10px; cursor: pointer; min-width: 132px; }
+.dia[aria-pressed="true"] { border-color: var(--ruta); box-shadow: inset 0 0 0 2px var(--ruta); }
+.dia b { display: block; }
+.dia span { font-size: .85rem; color: var(--tinta-2); }
+.resumen { font-size: .95rem; color: var(--tinta-2); margin: 0; }
+ol.lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.arbol { display: grid; grid-template-columns: 2.6em 4.2em 1fr auto; gap: 8px; align-items: baseline; width: 100%; text-align: left; padding: 6px 4px; border: 0; border-radius: 6px; background: none; cursor: pointer; }
+.arbol:hover, .arbol[aria-current="true"] { background: var(--papel-2); }
+.arbol .n { font: .85rem var(--mono); color: var(--tinta-2); }
+.arbol .placa { font: 500 .95rem var(--mono); }
+.arbol i { color: var(--tinta-2); font-size: .9rem; display: block; }
+.chip { font-size: .8rem; padding: 1px 8px; border-radius: 99px; border: 1px solid currentColor; white-space: nowrap; }
+.chip.esta { color: var(--esta); } .chip.no { color: var(--no-esta); } .chip.otra { color: var(--otra); }
+.ficha { position: absolute; left: 10px; right: 10px; bottom: 10px; max-width: 420px; background: var(--papel); border: 1px solid var(--tinta-2); border-radius: 10px; padding: 12px; box-shadow: 0 6px 20px rgb(24 50 36 / .18); }
+.ficha[hidden] { display: none; }
+.ficha .cerrar { position: absolute; right: 6px; top: 6px; }
+.ficha p { margin: 0 0 6px; padding-right: 44px; }
+.ficha .placa { font: 500 1.1rem var(--mono); }
+.ficha .meta { font-size: .85rem; color: var(--tinta-2); }
+.ficha .estados { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+.ficha .estados button[aria-pressed="true"] { background: var(--tinta); color: var(--papel); }
+.ficha input { width: 100%; padding: 6px 8px; border: 1px solid var(--tinta-2); border-radius: 6px; background: var(--papel); min-height: 36px; }
+.leyenda { display: flex; flex-wrap: wrap; gap: 10px 14px; font-size: .85rem; color: var(--tinta-2); margin: 0; padding: 0; list-style: none; }
+.leyenda li { display: flex; gap: 6px; align-items: center; }
+.leyenda svg { width: 14px; height: 14px; }
+.aviso { font-size: .9rem; color: var(--tinta-2); margin: 0; }
+/* Mapa */
+.m-edificio { fill: var(--edificio); stroke: var(--linea); stroke-width: .5; }
+.m-camino { fill: none; stroke: var(--camino); stroke-width: 1.6; vector-effect: non-scaling-stroke; stroke-linecap: round; }
+.m-arbol { fill: var(--papel); stroke: var(--tinta-2); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.m-arbol.sel { stroke: var(--tinta); stroke-width: 1.6; }
+.m-arbol.esta { fill: var(--esta); stroke: var(--esta); }
+.m-arbol.no { fill: var(--no-esta-mapa); stroke: var(--no-esta-mapa); }
+.m-arbol.otra { fill: var(--papel); stroke: var(--ruta); stroke-width: 3; }
+.m-arbol.dia { stroke: var(--ruta); stroke-width: 1.6; }
+.m-ruta { fill: none; stroke: var(--ruta); stroke-width: 3; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; opacity: .85; }
+.m-ruta.ida { stroke-dasharray: 6 5; }
+.m-texto { font-family: var(--fuente); font-weight: 700; font-size: 1em; fill: var(--tinta-2); paint-order: stroke; stroke: var(--papel); stroke-width: var(--trazo, 2.5px); text-anchor: middle; pointer-events: none; }
+.m-jardin { font-family: var(--fuente); font-weight: 700; font-size: 1.3em; fill: var(--tinta); paint-order: stroke; stroke: var(--papel); stroke-width: var(--trazo, 3px); text-anchor: middle; pointer-events: none; }
+.m-inicio { fill: var(--ruta); stroke: var(--papel); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.m-foco { fill: none; stroke: var(--ruta); stroke-width: 2.5; vector-effect: non-scaling-stroke; }
+.m-yo { fill: #2a5fb0; stroke: var(--papel); stroke-width: 2; vector-effect: non-scaling-stroke; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Rutas de inventario de árboles</h1>
+    <small id="sub"></small>
+  </header>
+
+  <div class="panel">
+    <fieldset>
+      <legend>Jornada</legend>
+      <div class="campos">
+        <label style="grid-column:1/-1">Salgo de
+          <select id="inicio"></select>
+        </label>
+        <label>Horas por día <input id="horas" type="number" min="0.5" step="0.5" value="3"></label>
+        <label>Minutos por árbol <input id="min-arbol" type="number" min="0.2" step="0.1" value="1.5"></label>
+        <label>Caminar (m/min) <input id="vel" type="number" min="20" step="5" value="55"></label>
+        <label>Bajar y subir (min) <input id="extra" type="number" min="0" step="1" value="8"></label>
+        <label class="check"><input id="uno-por-dia" type="checkbox" checked> Un jardín por día</label>
+        <label class="check"><input id="auto-orden" type="checkbox" checked> Ordenar jardines por cercanía</label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Jardines</legend>
+      <div class="jardines" id="jardines"></div>
+      <div class="fila-botones" style="margin-top:8px">
+        <button class="btn primario" id="planear">Planear rutas</button>
+        <button class="btn" id="ninguno">Quitar selección</button>
+      </div>
+    </fieldset>
+
+    <section aria-labelledby="t-plan">
+      <h2 id="t-plan">Plan</h2>
+      <p class="resumen" id="resumen">Elige uno o más jardines y planea.</p>
+      <div class="dias" id="dias" role="group" aria-label="Días del plan"></div>
+    </section>
+
+    <section aria-labelledby="t-lista">
+      <h2 id="t-lista">Árboles del día, en orden</h2>
+      <ol class="lista" id="lista"></ol>
+    </section>
+
+    <section aria-labelledby="t-marcas">
+      <h2 id="t-marcas">Marcas de campo</h2>
+      <p class="aviso" id="marcas-info"></p>
+      <div class="fila-botones" style="margin-top:8px">
+        <button class="btn" id="exportar">Descargar CSV de marcas</button>
+      </div>
+      <p class="aviso" style="margin-top:8px">Las marcas se guardan solo en este navegador. Descarga el CSV al terminar cada jornada.</p>
+    </section>
+  </div>
+
+  <div class="mapa-caja">
+    <svg id="mapa" role="img" aria-label="Mapa del campus con caminos, edificios, árboles y la ruta del día">
+      <g id="c-edificios"></g><g id="c-caminos"></g><g id="c-ruta"></g><g id="c-arboles"></g>
+      <g id="c-textos"></g><g id="c-marcas"></g>
+    </svg>
+    <div class="zoom">
+      <button id="z-mas" aria-label="Acercar" title="Acercar">+</button>
+      <button id="z-menos" aria-label="Alejar" title="Alejar">−</button>
+      <button id="z-todo" aria-label="Encuadrar" title="Encuadrar">⤢</button>
+      <button id="z-yo" aria-label="Mi ubicación" title="Mi ubicación">◎</button>
+    </div>
+    <ul class="leyenda" style="position:absolute;left:10px;top:10px;background:var(--papel);padding:6px 8px;border-radius:6px;opacity:.94">
+      <li><svg viewBox="0 0 14 14"><path d="M1 7h12" stroke="var(--ruta)" stroke-width="3"/></svg>Ruta</li>
+      <li><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5" fill="var(--esta)"/></svg>Está</li>
+      <li><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5" fill="var(--no-esta-mapa)"/></svg>No está</li>
+      <li><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="4" fill="var(--papel)" stroke="var(--ruta)" stroke-width="2.5"/></svg>Otra especie</li>
+    </ul>
+    <div class="ficha" id="ficha" hidden role="dialog" aria-labelledby="f-placa">
+      <button class="btn cerrar" id="f-cerrar" aria-label="Cerrar ficha" title="Cerrar">×</button>
+      <p><span class="placa" id="f-placa"></span> · <b id="f-comun"></b></p>
+      <p><i id="f-cien"></i></p>
+      <p class="meta" id="f-meta"></p>
+      <div class="estados" role="group" aria-label="Estado en campo">
+        <button class="btn" data-e="esta">Está</button>
+        <button class="btn" data-e="no">No está</button>
+        <button class="btn" data-e="otra">Otra especie</button>
+        <button class="btn" data-e="">Quitar</button>
+      </div>
+      <label class="meta" for="f-nota">Nota (especie real, estado, placa física…)</label>
+      <input id="f-nota" type="text" autocomplete="off">
+    </div>
+  </div>
+</div>
+
+<script>
+const D = /*__DATOS__*/null;
+const $ = (s) => document.querySelector(s);
+const NS = "http://www.w3.org/2000/svg";
+const guardar = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+const leer = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
+
+// ---------- Grafo y Dijkstra ----------
+const N = D.nodos.length;
+const ady = Array.from({ length: N }, () => []);
+for (const [a, b, w] of D.aristas) { ady[a].push(b, w); ady[b].push(a, w); }
+const nodoArbol = new Set(D.arboles.map((a) => a.nodo));
+
+function dijkstra(src) {
+  const dist = new Float64Array(N).fill(Infinity), prev = new Int32Array(N).fill(-1);
+  const heap = [[0, src]]; dist[src] = 0;
+  const push = (x) => { heap.push(x); let i = heap.length - 1; while (i > 0) { const p = (i - 1) >> 1; if (heap[p][0] <= heap[i][0]) break; [heap[p], heap[i]] = [heap[i], heap[p]]; i = p; } };
+  const pop = () => { const top = heap[0], last = heap.pop(); if (heap.length) { heap[0] = last; let i = 0; for (;;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < heap.length && heap[l][0] < heap[m][0]) m = l; if (r < heap.length && heap[r][0] < heap[m][0]) m = r; if (m === i) break; [heap[m], heap[i]] = [heap[i], heap[m]]; i = m; } } return top; };
+  while (heap.length) {
+    const [d, u] = pop();
+    if (d > dist[u]) continue;
+    const e = ady[u];
+    for (let i = 0; i < e.length; i += 2) { const v = e[i], nd = d + e[i + 1]; if (nd < dist[v]) { dist[v] = nd; prev[v] = u; push([nd, v]); } }
+  }
+  return { dist, prev };
+}
+const cache = new Map();
+const dj = (n) => { if (!cache.has(n)) { if (cache.size > 40) cache.clear(); cache.set(n, dijkstra(n)); } return cache.get(n); };
+function caminoDesde(r, destino) { const s = []; for (let n = destino; n !== -1; n = r.prev[n]) s.push(n); return s.reverse(); }
+const largo = (seq) => { let L = 0; for (let i = 1; i < seq.length; i++) L += Math.hypot(D.nodos[seq[i]][0] - D.nodos[seq[i - 1]][0], D.nodos[seq[i]][1] - D.nodos[seq[i - 1]][1]); return L; };
+
+// ---------- Planeación ----------
+function ordenarJardines(js, inicio) {
+  if (js.length < 2) return js;
+  const rep = js.map((j) => { const r = dj(inicio); return j.arboles.reduce((m, k) => (r.dist[D.arboles[k].nodo] < r.dist[D.arboles[m].nodo] ? k : m), j.arboles[0]); });
+  const pts = [inicio, ...rep.map((k) => D.arboles[k].nodo)];
+  const M = pts.map((p) => { const r = dj(p); return pts.map((q) => r.dist[q]); });
+  let mejor = null, mejorL = Infinity;
+  const idx = js.map((_, i) => i + 1);
+  const costo = (o) => { let L = M[0][o[0]]; for (let i = 1; i < o.length; i++) L += M[o[i - 1]][o[i]]; return L; };
+  if (idx.length <= 8) {
+    const perm = (a, k) => { if (k === a.length) { const L = costo(a); if (L < mejorL) { mejorL = L; mejor = a.slice(); } return; } for (let i = k; i < a.length; i++) { [a[k], a[i]] = [a[i], a[k]]; perm(a, k + 1); [a[k], a[i]] = [a[i], a[k]]; } };
+    perm(idx, 0);
+  } else {
+    mejor = []; const libre = new Set(idx); let cur = 0;
+    while (libre.size) { let b = null; for (const i of libre) if (b === null || M[cur][i] < M[cur][b]) b = i; mejor.push(b); libre.delete(b); cur = b; }
+  }
+  return mejor.map((i) => js[i - 1]);
+}
+
+function planear() {
+  const p = params();
+  let js = D.jardines.filter((j) => p.sel.includes(j.nombre));
+  if (!js.length) return [];
+  if (p.auto) js = ordenarJardines(js, p.inicio);
+  else js = p.sel.map((n) => js.find((j) => j.nombre === n)).filter(Boolean);
+  const casa = dj(p.inicio);
+  const presupuesto = p.horas * 60 - p.extra;
+  const dias = [];
+  let dia = null;
+  const abrir = () => { dia = { jardines: [], arboles: [], tramos: [], metros: 0, min: p.extra, cur: p.inicio }; };
+  const cerrar = () => {
+    const vuelta = caminoDesde(casa, dia.cur).reverse();
+    dia.tramos.push({ seq: vuelta, ida: true });
+    dia.metros += largo(vuelta); dia.min += largo(vuelta) / p.vel;
+    dias.push(dia); dia = null;
+  };
+  for (const j of js) {
+    const n = j.arboles.length;
+    // Tramos del ciclo: j.tramos[i] va de arboles[i] a arboles[i+1]
+    let pos = null, hechos = 0;
+    while (hechos < n) {
+      if (!dia) abrir();
+      else if (p.unoPorDia && dia.jardines.length && dia.jardines[dia.jardines.length - 1] !== j.nombre) { cerrar(); abrir(); }
+      let llegada;
+      if (pos === null) {
+        // Entrada al ciclo: el árbol más cercano a donde estoy
+        const r = dj(dia.cur);
+        let e = 0; for (let i = 1; i < n; i++) if (r.dist[D.arboles[j.arboles[i]].nodo] < r.dist[D.arboles[j.arboles[e]].nodo]) e = i;
+        pos = e; llegada = caminoDesde(r, D.arboles[j.arboles[e]].nodo);
+      } else {
+        llegada = caminoDesde(dj(dia.cur), D.arboles[j.arboles[pos]].nodo);
+      }
+      const k0 = j.arboles[pos];
+      const tLleg = largo(llegada) / p.vel;
+      const tVuelta = casa.dist[D.arboles[k0].nodo] / p.vel;
+      if (dia.arboles.length && dia.min + tLleg + p.minArbol + tVuelta > presupuesto) { cerrar(); continue; }
+      dia.tramos.push({ seq: llegada, ida: true });
+      dia.metros += largo(llegada); dia.min += tLleg + p.minArbol;
+      dia.arboles.push(k0); dia.cur = D.arboles[k0].nodo;
+      if (!dia.jardines.includes(j.nombre)) dia.jardines.push(j.nombre);
+      hechos++;
+      // Seguir el ciclo mientras alcance el tiempo
+      while (hechos < n) {
+        const sig = (pos + 1) % n, k = j.arboles[sig];
+        const tramo = [dia.cur, ...j.tramos[pos]];
+        const t = largo(tramo) / p.vel;
+        if (dia.min + t + p.minArbol + casa.dist[D.arboles[k].nodo] / p.vel > presupuesto) break;
+        dia.tramos.push({ seq: tramo, ida: false });
+        dia.metros += largo(tramo); dia.min += t + p.minArbol;
+        dia.arboles.push(k); dia.cur = D.arboles[k].nodo; pos = sig; hechos++;
+      }
+      if (hechos < n) { pos = (pos + 1) % n; cerrar(); }
+    }
+  }
+  if (dia) cerrar();
+  return dias;
+}
+
+// ---------- Estado e interfaz ----------
+let marcas = leer("inv2026_marcas", {});
+let plan = [], diaSel = 0, arbolSel = null;
+const pref = leer("inv2026_pref", {});
+
+function params() {
+  return {
+    inicio: +$("#inicio").value, horas: +$("#horas").value || 3, minArbol: +$("#min-arbol").value || 1.5,
+    vel: +$("#vel").value || 55, extra: +$("#extra").value || 0,
+    unoPorDia: $("#uno-por-dia").checked, auto: $("#auto-orden").checked,
+    sel: [...document.querySelectorAll(".jardin input:checked")].map((i) => i.value),
+  };
+}
+const fmtMin = (m) => { const h = Math.floor(m / 60), r = Math.round(m % 60); return h ? `${h} h ${r} min` : `${r} min`; };
+const fmtKm = (m) => (m >= 1000 ? `${(m / 1000).toFixed(1)} km` : `${Math.round(m)} m`);
+
+function pintarJardines() {
+  const c = $("#jardines"); c.textContent = "";
+  for (const j of D.jardines) {
+    const lab = document.createElement("label"); lab.className = "jardin";
+    const hechos = j.arboles.filter((k) => marcas[D.arboles[k].placa]?.e).length;
+    lab.innerHTML = `<input type="checkbox" value="${j.nombre}"><span>${j.nombre}</span><span class="dato">${hechos}/${j.arboles.length}</span>`;
+    lab.querySelector("input").checked = (pref.sel || []).includes(j.nombre);
+    c.append(lab);
+  }
+  const tot = Object.values(marcas).filter((m) => m.e).length;
+  $("#marcas-info").textContent = `${tot} de ${D.arboles.length} árboles marcados.`;
+}
+
+function pintarPlan() {
+  const c = $("#dias"); c.textContent = "";
+  if (!plan.length) { $("#resumen").textContent = "Elige uno o más jardines y planea."; $("#lista").textContent = ""; pintarRuta(); return; }
+  const totA = plan.reduce((s, d) => s + d.arboles.length, 0), totM = plan.reduce((s, d) => s + d.metros, 0);
+  $("#resumen").textContent = `${plan.length} ${plan.length === 1 ? "día" : "días"}, ${totA} árboles, ${fmtKm(totM)} caminando.`;
+  plan.forEach((d, i) => {
+    const b = document.createElement("button"); b.className = "dia"; b.setAttribute("aria-pressed", i === diaSel);
+    b.innerHTML = `<b>Día ${i + 1}</b><span>${d.jardines.join(", ")}</span><br><span>${d.arboles.length} árboles · ${fmtKm(d.metros)} · ${fmtMin(d.min)}</span>`;
+    b.onclick = () => { diaSel = i; pintarPlan(); encuadrarDia(); };
+    c.append(b);
+  });
+  pintarLista(); pintarRuta();
+}
+
+function pintarLista() {
+  const ol = $("#lista"); ol.textContent = "";
+  const d = plan[diaSel]; if (!d) return;
+  d.arboles.forEach((k, i) => {
+    const a = D.arboles[k], m = marcas[a.placa];
+    const li = document.createElement("li"); const b = document.createElement("button");
+    b.className = "arbol"; b.dataset.k = k; if (k === arbolSel) b.setAttribute("aria-current", "true");
+    const chip = m?.e ? `<span class="chip ${m.e}">${{ esta: "Está", no: "No está", otra: "Otra" }[m.e]}</span>` : "<span></span>";
+    b.innerHTML = `<span class="n">${i + 1}</span><span class="placa">${a.placa}</span><span>${a.comun}<i>${a.cientifico}</i></span>${chip}`;
+    b.onclick = () => abrirFicha(k, true);
+    li.append(b); ol.append(li);
+  });
+}
+
+// ---------- Mapa ----------
+const svg = $("#mapa");
+const X = (n) => D.nodos[n][0], Y = (n) => -D.nodos[n][1];
+let vb = { x: 0, y: 0, w: 1000, h: 1000 };
+// Círculos y textos con tamaño fijo en pantalla: se reescalan con el zoom
+let escalaPend = false;
+function aplicarVB() {
+  svg.setAttribute("viewBox", `${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
+  if (escalaPend) return; escalaPend = true;
+  requestAnimationFrame(() => {
+    escalaPend = false;
+    const px = vb.w / Math.max(svg.clientWidth, 1);
+    const r = String(Math.max(4.5 * px, 1.2));
+    for (const c of $("#c-arboles").children) c.setAttribute("r", r);
+    $("#c-textos").style.fontSize = 12 * px + "px";
+    $("#c-textos").style.display = px > 3 ? "none" : "";
+    $("#c-textos").querySelectorAll(".m-texto").forEach((t) => (t.style.display = px > 1.2 ? "none" : ""));
+    $("#c-textos").style.setProperty("--trazo", 3 * px + "px");
+    document.querySelectorAll(".m-inicio").forEach((c) => c.setAttribute("r", 8 * px));
+    document.querySelectorAll(".m-foco").forEach((c) => c.setAttribute("r", 11 * px));
+    document.querySelectorAll(".m-yo").forEach((c) => c.setAttribute("r", 7 * px));
+  });
+}
+function encuadrar(xs, ys, pad = 30) {
+  const r = svg.getBoundingClientRect(), asp = r.height / Math.max(r.width, 1) || 1;
+  let x0 = Math.min(...xs) - pad, x1 = Math.max(...xs) + pad, y0 = Math.min(...ys) - pad, y1 = Math.max(...ys) + pad;
+  let w = x1 - x0, h = y1 - y0;
+  if (h / w > asp) { const nw = h / asp; x0 -= (nw - w) / 2; w = nw; } else { const nh = w * asp; y0 -= (nh - h) / 2; h = nh; }
+  vb = { x: x0, y: y0, w, h }; aplicarVB();
+}
+const todo = () => encuadrar(D.arboles.map((a) => X(a.nodo)), D.arboles.map((a) => Y(a.nodo)));
+function encuadrarDia() { const d = plan[diaSel]; if (!d) return; const ns = d.tramos.flatMap((t) => t.seq); encuadrar(ns.map(X), ns.map(Y)); }
+
+function dibujarBase() {
+  const pd = D.edificios.map((pl) => "M" + pl.map(([x, y]) => `${x},${-y}`).join("L") + "Z").join("");
+  $("#c-edificios").innerHTML = `<path class="m-edificio" d="${pd}"/>`;
+  let pc = "";
+  for (const [a, b] of D.aristas) if (!nodoArbol.has(a) && !nodoArbol.has(b)) pc += `M${X(a)},${Y(a)}L${X(b)},${Y(b)}`;
+  $("#c-caminos").innerHTML = `<path class="m-camino" d="${pc}"/>`;
+  const g = $("#c-arboles"); g.textContent = "";
+  D.arboles.forEach((a, k) => { const c = document.createElementNS(NS, "circle"); c.setAttribute("cx", X(a.nodo)); c.setAttribute("cy", Y(a.nodo)); c.setAttribute("r", 2.4); c.dataset.k = k; g.append(c); });
+  let tx = D.etiquetas.map((e) => `<text class="m-texto" x="${e.x}" y="${-e.y}">${e.nombre}</text>`).join("");
+  for (const j of D.jardines) {
+    const xs = j.arboles.map((k) => X(D.arboles[k].nodo)), ys = j.arboles.map((k) => Y(D.arboles[k].nodo));
+    const cx = xs.reduce((s, v) => s + v, 0) / xs.length, cy = ys.reduce((s, v) => s + v, 0) / ys.length;
+    tx += `<text class="m-jardin" x="${cx}" y="${cy}">${j.nombre.replace(/^\d+ - /, "")}</text>`;
+  }
+  $("#c-textos").innerHTML = tx;
+}
+function pintarArboles() {
+  const enDia = new Set(plan[diaSel]?.arboles || []);
+  for (const c of $("#c-arboles").children) {
+    const k = +c.dataset.k, m = marcas[D.arboles[k].placa];
+    c.setAttribute("class", "m-arbol" + (m?.e ? " " + m.e : "") + (enDia.has(k) ? " dia" : ""));
+  }
+}
+function pintarRuta() {
+  const d = plan[diaSel];
+  let h = "";
+  if (d) {
+    for (const t of d.tramos) if (t.seq.length > 1) h += `<path class="m-ruta${t.ida ? " ida" : ""}" d="M${t.seq.map((n) => `${X(n)},${Y(n)}`).join("L")}"/>`;
+    const s = +$("#inicio").value;
+    h += `<circle class="m-inicio" cx="${X(s)}" cy="${Y(s)}" r="5"/>`;
+  }
+  $("#c-ruta").innerHTML = h; pintarArboles(); pintarFoco(); aplicarVB();
+}
+function pintarFoco() {
+  const g = $("#c-marcas"); g.querySelectorAll(".m-foco").forEach((e) => e.remove());
+  if (arbolSel === null) return;
+  const a = D.arboles[arbolSel]; const c = document.createElementNS(NS, "circle");
+  c.setAttribute("class", "m-foco"); c.setAttribute("cx", X(a.nodo)); c.setAttribute("cy", Y(a.nodo)); c.setAttribute("r", 7); g.append(c); aplicarVB();
+}
+
+// Pan y zoom (ratón, rueda, un dedo arrastra, dos dedos pellizcan)
+const aMapa = (cx, cy) => { const r = svg.getBoundingClientRect(); return [vb.x + (cx - r.left) / r.width * vb.w, vb.y + (cy - r.top) / r.height * vb.h]; };
+function zoom(f, cx, cy) {
+  const r = svg.getBoundingClientRect(); if (cx === undefined) { cx = r.left + r.width / 2; cy = r.top + r.height / 2; }
+  const [mx, my] = aMapa(cx, cy); const w = Math.min(Math.max(vb.w * f, 40), 4000), k = w / vb.w;
+  vb = { x: mx - (mx - vb.x) * k, y: my - (my - vb.y) * k, w, h: vb.h * k }; aplicarVB();
+}
+svg.addEventListener("wheel", (e) => { e.preventDefault(); zoom(e.deltaY > 0 ? 1.15 : 1 / 1.15, e.clientX, e.clientY); }, { passive: false });
+const punteros = new Map(); let movido = 0, pinchaD = 0;
+svg.addEventListener("pointerdown", (e) => { svg.setPointerCapture(e.pointerId); punteros.set(e.pointerId, [e.clientX, e.clientY]); movido = 0; if (punteros.size === 2) { const [a, b] = [...punteros.values()]; pinchaD = Math.hypot(a[0] - b[0], a[1] - b[1]); } });
+svg.addEventListener("pointermove", (e) => {
+  if (!punteros.has(e.pointerId)) return;
+  const [px, py] = punteros.get(e.pointerId); punteros.set(e.pointerId, [e.clientX, e.clientY]);
+  if (punteros.size === 1) { const r = svg.getBoundingClientRect(); vb.x -= (e.clientX - px) / r.width * vb.w; vb.y -= (e.clientY - py) / r.height * vb.h; movido += Math.abs(e.clientX - px) + Math.abs(e.clientY - py); aplicarVB(); }
+  else if (punteros.size === 2) { const [a, b] = [...punteros.values()]; const d = Math.hypot(a[0] - b[0], a[1] - b[1]); if (pinchaD) zoom(pinchaD / d, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2); pinchaD = d; movido = 99; }
+});
+const soltar = (e) => {
+  if (punteros.size === 1 && movido < 8) {
+    const [mx, my] = aMapa(e.clientX, e.clientY), r = svg.getBoundingClientRect(), tol = 18 / r.width * vb.w;
+    let mejor = null, md = tol;
+    D.arboles.forEach((a, k) => { const d = Math.hypot(X(a.nodo) - mx, Y(a.nodo) - my); if (d < md) { md = d; mejor = k; } });
+    if (mejor !== null) abrirFicha(mejor, false);
+  }
+  punteros.delete(e.pointerId); if (punteros.size < 2) pinchaD = 0;
+};
+svg.addEventListener("pointerup", soltar); svg.addEventListener("pointercancel", (e) => punteros.delete(e.pointerId));
+$("#z-mas").onclick = () => zoom(1 / 1.5); $("#z-menos").onclick = () => zoom(1.5); $("#z-todo").onclick = () => (plan.length ? encuadrarDia() : todo());
+
+// Ubicación (solo si el navegador la permite)
+let vigia = null;
+$("#z-yo").onclick = () => {
+  if (!navigator.geolocation) return alert("Este navegador no da ubicación.");
+  if (vigia !== null) { navigator.geolocation.clearWatch(vigia); vigia = null; $("#c-marcas").querySelector(".m-yo")?.remove(); return; }
+  vigia = navigator.geolocation.watchPosition((p) => {
+    const o = D.origen, x = (p.coords.longitude - o.lon0) * o.m * o.cosl, y = -(p.coords.latitude - o.lat0) * o.m;
+    let c = $("#c-marcas").querySelector(".m-yo");
+    if (!c) { c = document.createElementNS(NS, "circle"); c.setAttribute("class", "m-yo"); c.setAttribute("r", 4); $("#c-marcas").append(c); vb.x = x - vb.w / 2; vb.y = y - vb.h / 2; aplicarVB(); }
+    c.setAttribute("cx", x); c.setAttribute("cy", y);
+  }, (err) => { alert("No se pudo leer la ubicación: " + err.message); vigia = null; }, { enableHighAccuracy: true });
+};
+
+// ---------- Ficha y marcas ----------
+function abrirFicha(k, centrar) {
+  arbolSel = k; const a = D.arboles[k], m = marcas[a.placa] || {};
+  $("#f-placa").textContent = a.placa; $("#f-comun").textContent = a.comun; $("#f-cien").textContent = a.cientifico;
+  $("#f-cien").textContent = a.cientifico || "Sin nombre científico en el inventario";
+  $("#f-meta").textContent = `${a.jardin} · ${a.fuente}` + (a.obs ? ` · Revisión 2018: ${a.obs}` : "");
+  $("#f-nota").value = m.n || "";
+  document.querySelectorAll(".ficha .estados button").forEach((b) => b.setAttribute("aria-pressed", (m.e || "") === b.dataset.e && !!m.e));
+  $("#ficha").hidden = false;
+  if (centrar) { vb.x = X(a.nodo) - vb.w / 2; vb.y = Y(a.nodo) - vb.h / 2; aplicarVB(); }
+  pintarFoco(); document.querySelectorAll(".arbol").forEach((b) => b.toggleAttribute("aria-current", +b.dataset.k === k));
+}
+function marcar(e) {
+  const a = D.arboles[arbolSel], n = $("#f-nota").value.trim();
+  if (!e && !n) delete marcas[a.placa]; else marcas[a.placa] = { e, n, f: new Date().toISOString() };
+  guardar("inv2026_marcas", marcas); pintarArboles(); pintarLista(); pintarJardines(); abrirFicha(arbolSel, false);
+}
+document.querySelectorAll(".ficha .estados button").forEach((b) => (b.onclick = () => marcar(b.dataset.e)));
+$("#f-nota").addEventListener("change", () => marcar(marcas[D.arboles[arbolSel].placa]?.e || ""));
+$("#f-cerrar").onclick = () => { $("#ficha").hidden = true; arbolSel = null; pintarFoco(); };
+
+$("#exportar").onclick = () => {
+  const esc = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const fil = [["placa", "jardin", "nombre_comun_inventario", "nombre_cientifico_inventario", "estado", "nota", "fecha_marca", "lat", "lon", "fuente"]];
+  for (const a of D.arboles) { const m = marcas[a.placa]; if (m) fil.push([a.placa, a.jardin, a.comun, a.cientifico, { esta: "está", no: "no está", otra: "otra especie" }[m.e] || "", m.n, m.f, a.lat, a.lon, a.fuente]); }
+  const blob = new Blob(["﻿" + fil.map((f) => f.map(esc).join(",")).join("\r\n")], { type: "text/csv" });
+  const u = URL.createObjectURL(blob), l = document.createElement("a");
+  l.href = u; l.download = `marcas_inventario_${new Date().toISOString().slice(0, 10)}.csv`; l.click(); URL.revokeObjectURL(u);
+};
+
+// ---------- Arranque ----------
+const sInicio = $("#inicio");
+for (const b of D.inicios) { const o = document.createElement("option"); o.value = b.nodo; o.textContent = b.nombre; sInicio.append(o); }
+sInicio.value = pref.inicio ?? D.inicios.find((b) => b.nombre === "Edificio V")?.nodo ?? D.inicios[0].nodo;
+for (const id of ["horas", "min-arbol", "vel", "extra"]) if (pref[id] !== undefined) $("#" + id).value = pref[id];
+if (pref.unoPorDia !== undefined) $("#uno-por-dia").checked = pref.unoPorDia;
+if (pref.auto !== undefined) $("#auto-orden").checked = pref.auto;
+$("#sub").textContent = `${D.arboles.length} árboles en ${D.jardines.length} jardines · grafo de ${D.generado}`;
+$("#planear").onclick = () => {
+  const p = params();
+  guardar("inv2026_pref", { inicio: p.inicio, horas: p.horas, "min-arbol": p.minArbol, vel: p.vel, extra: p.extra, unoPorDia: p.unoPorDia, auto: p.auto, sel: p.sel });
+  pref.sel = p.sel;
+  plan = planear(); diaSel = 0; pintarPlan(); plan.length ? encuadrarDia() : todo();
+};
+$("#ninguno").onclick = () => document.querySelectorAll(".jardin input").forEach((i) => (i.checked = false));
+dibujarBase(); pintarJardines(); todo(); pintarRuta();
+window.addEventListener("resize", () => { const r = svg.getBoundingClientRect(); vb.h = vb.w * r.height / Math.max(r.width, 1); aplicarVB(); });
+</script>
+</body>
+</html>
