@@ -1,0 +1,28 @@
+<!-- Prueba del camino B: pegar en un Contenido Web con el botón "Código fuente" del editor.
+     Si Liferay quita el <script>, solo se verá el primer renglón en gris. -->
+<div id="cl-prueba" style="font-family: sans-serif; padding: 1rem; border: 2px dashed #888; border-radius: 8px;">
+  <p id="cl-p0" style="color: #777;">1. HTML visible. Si solo ves este renglón, Liferay quitó el script.</p>
+  <p id="cl-p1"></p>
+  <p id="cl-p2"></p>
+  <p id="cl-p3"></p>
+</div>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  $("cl-p0").textContent = "1. HTML visible.";
+  $("cl-p1").textContent = "2. El script corre. ✔";
+
+  var id = new URLSearchParams(location.search).get("id");
+  $("cl-p2").textContent = "3. Parámetro ?id= recibido: " + (id || "(ninguno; agrega ?id=pseudobombax-ellipticum a la URL)");
+
+  // Pegar aquí la URL que da Documentos y Medios al subir prueba.json
+  var URL_JSON = "https://campuslab.iteso.mx/documents/d/campuslab/prueba";
+  fetch(URL_JSON, { credentials: "same-origin" })
+    .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    .then(function (d) {
+      var e = id && d.especies[id];
+      $("cl-p3").textContent = "4. JSON leído. ✔ " + (e ? e.nombre_cientifico + " (" + e.nombre_comun + ")" : "Claves: " + Object.keys(d.especies).join(", "));
+    })
+    .catch(function (err) { $("cl-p3").textContent = "4. No se pudo leer el JSON: " + err.message; });
+})();
+</script>
