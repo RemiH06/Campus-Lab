@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guía de árboles por jardín</title>
+<link rel="preconnect" href="https://fonts.bunny.net">
+<link rel="stylesheet" href="https://fonts.bunny.net/css?family=atkinson-hyperlegible:400,700|ibm-plex-mono:400,500&display=swap">
+<style>
+/* Misma libreta de levantamiento que rutas_jardines.html (paleta verificada WCAG ahí) */
+:root {
+  --papel: #f3f4ec; --papel-2: #e6e9dc; --tinta: #183224; --tinta-2: #45594c; --linea: #c3c9b6;
+  --ruta: #7a2d8a; --aviso: #b3263f;
+  --fuente: "Atkinson Hyperlegible", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--papel); color: var(--tinta); font: 16px/1.45 var(--fuente); }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--ruta); outline-offset: 2px; }
+header { position: sticky; top: 0; z-index: 2; background: var(--papel); border-bottom: 1px solid var(--linea); padding: 10px 16px; display: grid; gap: 8px; }
+h1 { font-size: 1.2rem; margin: 0; }
+.controles { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+.controles select, .controles input { width: 100%; min-height: 40px; padding: 6px 10px; border: 1px solid var(--tinta-2); border-radius: 6px; background: var(--papel); }
+.resumen { margin: 0; color: var(--tinta-2); font-size: .95rem; }
+main { padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 16px; }
+.especie { border: 1px solid var(--linea); border-radius: 10px; padding: 12px; display: grid; gap: 10px; align-content: start; break-inside: avoid; }
+.especie h2 { font-size: 1.1rem; margin: 0; display: flex; gap: 8px; justify-content: space-between; align-items: baseline; }
+.especie h2 .n { font: 500 .9rem var(--mono); color: var(--tinta-2); white-space: nowrap; }
+.cien { margin: 0; color: var(--tinta-2); }
+.cien i { color: var(--tinta); }
+.fotos { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+figure { margin: 0; display: grid; gap: 2px; }
+figure img, figure .vacio { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 4px; background: var(--papel-2); display: block; }
+figure .vacio { border: 1px dashed var(--tinta-2); display: grid; place-items: center; font-size: .75rem; color: var(--tinta-2); }
+figcaption { font-size: .78rem; color: var(--tinta-2); text-align: center; }
+figure button { padding: 0; border: 0; background: none; cursor: zoom-in; border-radius: 4px; }
+dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 10px; font-size: .92rem; }
+dt { font-weight: 700; } dd { margin: 0; }
+.sin-dato { font-size: .92rem; color: var(--tinta-2); margin: 0; }
+details summary { cursor: pointer; font-weight: 700; padding: 4px 0; }
+.placas { display: flex; flex-wrap: wrap; gap: 4px 6px; margin: 6px 0 0; padding: 0; list-style: none; font: .9rem var(--mono); }
+.placas li { padding: 1px 6px; border: 1px solid var(--linea); border-radius: 4px; }
+.placas li.aviso { border-color: var(--aviso); color: var(--aviso); }
+.avisos { margin: 6px 0 0; padding-left: 18px; font-size: .88rem; color: var(--aviso); }
+a { color: var(--ruta); }
+.pie { grid-column: 1 / -1; color: var(--tinta-2); font-size: .9rem; }
+dialog { border: 0; padding: 0; background: var(--papel); border-radius: 10px; max-width: min(92vw, 520px); }
+dialog::backdrop { background: rgb(24 50 36 / .6); }
+dialog img { width: 100%; display: block; }
+dialog p { margin: 8px 12px; color: var(--tinta-2); font-size: .9rem; }
+dialog button { margin: 0 12px 12px; min-height: 36px; padding: 6px 12px; border: 1px solid var(--tinta-2); background: var(--papel); border-radius: 6px; }
+@media print {
+  header { position: static; }
+  .controles input { display: none; }
+  main { grid-template-columns: 1fr 1fr; gap: 8px; padding: 0; }
+  details { display: block; } details > summary { display: none; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Guía de árboles por jardín</h1>
+  <div class="controles">
+    <label><span class="sin-dato">Jardín</span><select id="jardin"></select></label>
+    <label><span class="sin-dato">Buscar nombre o placa</span><input id="buscar" type="search" autocomplete="off"></label>
+  </div>
+  <p class="resumen" id="resumen"></p>
+</header>
+<main id="lista"></main>
+<dialog id="grande"><img alt=""><p></p><button>Cerrar</button></dialog>
+
+<script>
+const D = /*__DATOS__*/null;
+const $ = (s) => document.querySelector(s);
+const ETQ = { arbol_completo: "Completo", tronco: "Tronco", hoja: "Hoja", flor: "Flor", fruto: "Fruto" };
+const RASGO = { altura: "Altura", tronco: "Tronco", copa: "Copa", ramas: "Ramas", hojas: "Hojas", flores: "Flores", frutos: "Frutos" };
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const sinAcentos = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
+const sel = $("#jardin");
+D.jardines.forEach((j, i) => { const o = document.createElement("option"); o.value = i; o.textContent = `${j.nombre} (${j.n})`; sel.append(o); });
+try { const g = localStorage.getItem("guia_jardin"); if (g !== null && D.jardines[g]) sel.value = g; } catch (e) {}
+
+function tarjeta(e) {
+  const fotos = D.fotos[e.llave] || {}, ficha = D.fichas[e.llave];
+  const nombre = e.comunes[0] || ficha?.comun || e.especie;
+  const figs = D.partes.map((p) => fotos[p]
+    ? `<figure><button data-p="${p}" aria-label="Ver foto de ${ETQ[p].toLowerCase()} más grande"><img src="${fotos[p].src}" alt="${esc(nombre)}: ${ETQ[p].toLowerCase()}" loading="lazy"></button><figcaption>${ETQ[p]}</figcaption></figure>`
+    : `<figure><div class="vacio" role="img" aria-label="Sin foto de ${ETQ[p].toLowerCase()}">sin foto</div><figcaption>${ETQ[p]}</figcaption></figure>`).join("");
+  const rasgos = ficha && Object.keys(ficha.rasgos).length
+    ? `<dl>${Object.entries(ficha.rasgos).map(([k, v]) => `<dt>${RASGO[k]}</dt><dd>${esc(v)}</dd>`).join("")}</dl>`
+    : `<p class="sin-dato">Sin ficha de características en el sitio.</p>`;
+  const avisos = e.arboles.filter((a) => a.aviso);
+  const art = document.createElement("article"); art.className = "especie";
+  art.innerHTML = `
+    <h2><span>${esc(nombre)}</span><span class="n">${e.arboles.length} ${e.arboles.length === 1 ? "árbol" : "árboles"}</span></h2>
+    <p class="cien"><i>${esc(e.especie)}</i>${ficha?.familia ? " · " + esc(ficha.familia) : ""}${e.comunes.length > 1 ? "<br>También registrado como: " + esc(e.comunes.slice(1).join(", ")) : ""}</p>
+    <div class="fotos">${figs}</div>
+    ${Object.keys(fotos).length ? "" : `<p class="sin-dato">Sin fotos nuestras de esta especie todavía.</p>`}
+    ${rasgos}
+    ${ficha ? `<p class="sin-dato"><a href="${ficha.url}" target="_blank" rel="noopener">Ficha en campuslab.iteso.mx</a>${ficha.origen ? " · Origen: " + esc(ficha.origen) : ""}</p>` : ""}
+    <details><summary>Placas (${e.arboles.length})${avisos.length ? ` · ${avisos.length} con aviso` : ""}</summary>
+      <ul class="placas">${e.arboles.map((a) => `<li${a.aviso ? ' class="aviso"' : ""}>${esc(a.placa)}</li>`).join("")}</ul>
+      ${avisos.length ? `<ul class="avisos">${avisos.map((a) => `<li>${esc(a.placa)}: ${esc(a.aviso)}</li>`).join("")}</ul>` : ""}
+    </details>`;
+  art.querySelectorAll("figure button").forEach((b) => (b.onclick = () => {
+    const dlg = $("#grande"), f = fotos[b.dataset.p];
+    dlg.querySelector("img").src = f.src; dlg.querySelector("img").alt = `${nombre}: ${ETQ[b.dataset.p].toLowerCase()}`;
+    dlg.querySelector("p").textContent = `${e.especie} · ${ETQ[b.dataset.p]} · foto ${f.foto_id} de la base de Campus Lab`;
+    dlg.showModal();
+  }));
+  return art;
+}
+
+function pintar() {
+  const j = D.jardines[sel.value], q = sinAcentos($("#buscar").value.trim());
+  try { localStorage.setItem("guia_jardin", sel.value); } catch (e) {}
+  const lista = j.especies.filter((e) => !q || sinAcentos([e.especie, ...e.comunes].join(" ")).includes(q) || e.arboles.some((a) => a.placa === q));
+  const conFoto = j.especies.filter((e) => D.fotos[e.llave]).length;
+  $("#resumen").textContent = `${j.n} árboles, ${j.especies.length} especies (${conFoto} con fotos nuestras)` + (q ? ` · ${lista.length} coinciden` : "");
+  const m = $("#lista"); m.textContent = "";
+  lista.forEach((e) => m.append(tarjeta(e)));
+  const pie = document.createElement("p"); pie.className = "pie";
+  pie.textContent = "Fotos: base de Campus Lab (confirmadas y clasificadas por parte). Características: fichas publicadas en campuslab.iteso.mx. Especies y placas: inventario ArcGIS 2014-2018.";
+  m.append(pie);
+}
+sel.onchange = pintar; $("#buscar").oninput = pintar;
+$("#grande button").onclick = () => $("#grande").close();
+pintar();
+</script>
+</body>
+</html>
