@@ -1,0 +1,33 @@
+<!-- Generado por web/camino_b/preparar_para_liferay.py; no editar a mano. -->
+<div class="cl" id="cl">
+  <div class="cl-shell">
+    <header class="cl-top">
+      <div class="cl-brand"><b>&#xc1;rboles del campus</b><span class="cl-muted">Prototipo de plantillas para Campus Lab</span></div>
+      <nav class="cl-tabs" aria-label="Vistas">
+        <button class="cl-btn" type="button" data-vista="coleccion" aria-pressed="true">Colecci&#xf3;n</button>
+        <button class="cl-btn" type="button" data-vista="especie" aria-pressed="false">Especie</button>
+        <button class="cl-btn" type="button" data-vista="lugar" aria-pressed="false">Mapa</button>
+      </nav>
+      <div class="cl-tools">
+        <label class="cl-flor-pick"><span class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Floraci&#xf3;n</span><select id="cl-flor" aria-label="Paleta de floraci&#xf3;n"></select></label>
+        <button class="cl-btn" type="button" id="cl-modo"></button>
+      </div>
+    </header>
+
+    <main id="cl-vista"></main>
+
+    <section class="cl-card sistema" aria-labelledby="sis-t">
+      <h2 id="sis-t">C&#xf3;mo se arma</h2>
+      <div class="sis-grid">
+        <section><h3>Colecci&#xf3;n</h3><p>Para listados, el Itesodex y galer&#xed;as: aves, orqu&#xed;deas, suculentas o los &#xe1;rboles de un jard&#xed;n. Cada especie ocupa tantas casillas como fotos tiene; las que no tienen foto quedan como hueco con su nombre.</p></section>
+        <section><h3>Especie</h3><p>Una sola p&#xe1;gina para todas las fichas (cambia el <code>?id=</code>). Los anillos del tronco son las cinco partes: &#xe1;rbol completo, tronco, hoja, flor y fruto. Un anillo punteado es una foto que falta.</p></section>
+        <section><h3>Mapa</h3><p>Para jardines, el Arboretum y el inventario. Usa las coordenadas reales de ArcGIS. Se busca por n&#xfa;mero de placa y puede marcar d&#xf3;nde hay &#xe1;rboles que todav&#xed;a no tienen foto.</p></section>
+      </div>
+      <p class="cl-muted">Las p&#xe1;ginas de texto (historia del Arboretum, avisos) usan solo la base: tipograf&#xed;a, colores y modo. Todas comparten tres cosas: la tipograf&#xed;a del sitio, el bot&#xf3;n de claro y oscuro, y la paleta de la floraci&#xf3;n del mes. Si no se elige otra, la paleta cambia sola con el calendario:</p>
+      <div class="cal" id="cl-cal" aria-label="Floraci&#xf3;n por mes"></div>
+      <p class="cl-muted">Calendario aproximado; conviene confirmarlo con jardiner&#xed;a. Datos: inventario ArcGIS 2014-2018, fichas del sitio y fotos confirmadas de Campus Lab. Las fotos son miniaturas.</p>
+    </section>
+  </div>
+</div>
+
+<div id="cl-datos" hidden></div>

@@ -1,0 +1,17 @@
+{
+  "fieldSets": [
+    {
+      "fields": [
+        {
+          "name": "datos",
+          "label": "URL del JSON de datos",
+          "type": "text",
+          "typeOptions": {
+            "placeholder": "/documents/d/campuslab/prototipo-componentes"
+          },
+          "defaultValue": "/documents/d/campuslab/prototipo-componentes"
+        }
+      ]
+    }
+  ]
+}
