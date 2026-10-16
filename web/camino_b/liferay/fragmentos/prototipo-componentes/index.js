@@ -19,7 +19,7 @@ window.CL_PROTO = function () {
   (function () {
     var b = document.getElementById("modo"), s = store.get("cl-modo");
     var actual = function () { var m = root.dataset.modo; if (m) return m; var t = document.documentElement.dataset.theme; if (t) return t === "dark" ? "oscuro" : "claro"; return matchMedia("(prefers-color-scheme: dark)").matches ? "oscuro" : "claro"; };
-    if (s) root.dataset.modo = s;
+    root.dataset.modo = s || "claro"; /* claro por defecto */
     var pinta = function () { var o = actual() === "oscuro"; b.textContent = o ? "Modo claro" : "Modo oscuro"; b.setAttribute("aria-label", o ? "Cambiar a modo claro" : "Cambiar a modo oscuro"); };
     b.onclick = function () { var n = actual() === "oscuro" ? "claro" : "oscuro"; root.dataset.modo = n; store.set("cl-modo", n); pinta(); document.dispatchEvent(new Event("cl:color")); };
     pinta();
@@ -203,9 +203,26 @@ window.CL_PROTO = function () {
 
 (function () {
   var url = (typeof configuration !== "undefined" && configuration.datos) || "/documents/d/campuslab/prototipo-componentes";
+  var host = document.getElementById("cl-vista") || document.querySelector(".cl");
+  host.insertAdjacentHTML("afterbegin", '<div class="cl-carga cl-indet" role="progressbar" aria-label="Cargando datos" aria-valuemin="0" aria-valuemax="100"><span class="cl-carga-t">Cargando datos\u2026</span><span class="cl-carga-b"><i></i></span></div>');
+  var barra = host.querySelector(".cl-carga"), mb = function (b) { return (b / 1048576).toFixed(1); };
+  function avance(n, t) {
+    if (!t) return; var p = Math.min(100, Math.round(n / t * 100));
+    barra.classList.remove("cl-indet"); barra.style.setProperty("--p", p + "%"); barra.setAttribute("aria-valuenow", p);
+    barra.querySelector(".cl-carga-t").textContent = "Cargando datos \u00b7 " + mb(n) + " de " + mb(t) + " MB (" + p + " %)";
+  }
   fetch(url, { credentials: "same-origin" })
-    .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
+    .then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      var total = +r.headers.get("Content-Length") || 0, lector = r.body && r.body.getReader ? r.body.getReader() : null;
+      if (!lector) return r.text();
+      var trozos = [], n = 0;
+      return (function leer() { return lector.read().then(function (x) {
+        if (x.done) { var b = new Uint8Array(n), o = 0; trozos.forEach(function (c) { b.set(c, o); o += c.length; }); return new TextDecoder().decode(b); }
+        trozos.push(x.value); n += x.value.length; avance(n, total); return leer();
+      }); })();
+    })
     .then(function (txt) { if (txt.charAt(0) !== "{") throw new Error("la URL no regresa un JSON"); return txt; })
-    .then(function (txt) { document.getElementById("datos").textContent = txt; window.CL_PROTO(); })
-    .catch(function (e) { var p = document.createElement("p"); p.style.padding = "16px"; p.textContent = "No se pudieron cargar los datos del prototipo (" + e.message + ")."; document.querySelector(".cl").prepend(p); });
+    .then(function (txt) { barra.remove(); document.getElementById("datos").textContent = txt; window.CL_PROTO(); })
+    .catch(function (e) { barra.remove(); var p = document.createElement("p"); p.style.padding = "16px"; p.textContent = "No se pudieron cargar los datos del prototipo (" + e.message + ")."; document.querySelector(".cl").prepend(p); });
 })();

@@ -89,6 +89,15 @@
 .cl-esqueleto i { display: block; height: 16px; border-radius: 6px; background: linear-gradient(90deg, var(--cl-line) 0 40%, color-mix(in srgb, var(--cl-line) 45%, var(--cl-sf)) 50%, var(--cl-line) 60% 100%); background-size: 250% 100%; animation: cl-shimmer 1.3s linear infinite; }
 .cl-esqueleto i.cl-g { height: 240px; }
 @keyframes cl-shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
+/* carga:inicio · barra de avance (preparar_para_liferay.py copia este bloque a los prototipos) */
+.cl-carga { display: grid; gap: 8px; margin-bottom: 16px; }
+.cl-carga-t { font-size: .875rem; color: var(--cl-ink2); font-variant-numeric: tabular-nums; }
+.cl-carga-b { display: block; height: 6px; border-radius: 999px; background: var(--cl-line); overflow: hidden; }
+.cl-carga-b i { display: block; height: 100%; width: var(--p, 0%); border-radius: inherit; background: var(--f1); transition: width 160ms linear; }
+.cl-carga.cl-indet .cl-carga-b i { width: 35%; animation: cl-indet 1.2s cubic-bezier(.45, 0, .55, 1) infinite; }
+@keyframes cl-indet { from { transform: translateX(-100%); } to { transform: translateX(290%); } }
+@media (prefers-reduced-motion: reduce) { .cl .cl-carga.cl-indet .cl-carga-b i { width: 100%; opacity: .45; } }
+/* carga:fin */
 .cl-aviso { padding: 18px; display: grid; gap: 8px; justify-items: start; }
 
 /* ═══ Especie · cl-anillos + datos + mapa chico ═══ */
@@ -169,7 +178,13 @@
   color: #f4f7f6; background: linear-gradient(transparent, rgba(8, 20, 28, .82)); }
 .cl .cl-mos-c.cl-falta { background: var(--cl-sf); border: 1.5px dashed var(--cl-ink2); display: grid; place-content: center; padding: 6px; text-align: center; font-size: .78rem; line-height: 1.15; color: var(--cl-ink2); }
 .cl-mos-c.cl-falta b { display: block; font-size: 1.1rem; color: var(--cl-acc); }
-@media (hover: hover) and (pointer: fine) { .cl-mos-c:hover { outline: 2px solid var(--cl-acc); outline-offset: -2px; } }
+.cl-mosaico { position: relative; }
+/* Contorno por especie (capa SVG encima; ver contornos() en cl-kit.js). El trazo va recortado a la pieza: se ve la mitad, adentro */
+.cl-mos-svg { position: absolute; left: 0; top: 0; z-index: 1; pointer-events: none; overflow: visible; }
+.cl-mos-svg .cl-borde { fill: none; stroke: var(--f1); stroke-width: 6; stroke-linecap: square; transition: stroke-width 120ms var(--cl-ease); }
+.cl-mos-svg .cl-junta { fill: var(--f1); }
+.cl-mos-svg g.cl-on .cl-borde { stroke: var(--cl-ink); stroke-width: 9; }
+.cl-mos-svg g.cl-on .cl-junta { fill: var(--cl-ink); }
 .cl-mos-vacio { padding: 24px; text-align: center; color: var(--cl-ink2); }
 
 @media (max-width: 860px) {

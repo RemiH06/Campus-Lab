@@ -5,14 +5,14 @@
   var html = document.documentElement;
   var B = document.getElementById("p_p_id_com_liferay_journal_content_web_portlet_JournalContentPortlet_INSTANCE_NAVEGACION_");
   var store = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
-  var sistema = window.matchMedia("(prefers-color-scheme: dark)");
 
-  /* ── (b) Modo claro/oscuro: misma clave "cl-modo" que cl-kit.js, para que header, footer y componentes vayan juntos ── */
-  function modo() { return store.get("cl-modo") || (sistema.matches ? "oscuro" : "claro"); }
+  /* ── (b) Modo claro/oscuro: misma clave "cl-modo" que cl-kit.js, para que header, footer y componentes vayan juntos.
+     Por defecto claro (decisión de Remi, 16-oct), aunque el sistema esté en oscuro ── */
+  function modo() { return store.get("cl-modo") || "claro"; }
   function aplicarModo() {
     var m = modo();
     html.dataset.clModo = m;
-    [].forEach.call(document.querySelectorAll(".cl"), function (el) { if (store.get("cl-modo")) el.dataset.modo = m; });
+    [].forEach.call(document.querySelectorAll(".cl"), function (el) { el.dataset.modo = m; });
     [].forEach.call(document.querySelectorAll(".clm-modo"), function (b) {
       var o = m === "oscuro";
       b.setAttribute("aria-pressed", o ? "true" : "false");
@@ -32,7 +32,6 @@
   boton(document.getElementById("whats-desktop"));
   boton(document.querySelector("#mobil-menu .icon-search"));
   aplicarModo();
-  sistema.addEventListener("change", aplicarModo);
   window.addEventListener("storage", function (e) { if (e.key === "cl-modo") aplicarModo(); });
   document.addEventListener("cl-modo", aplicarModo); /* cl-kit avisa cuando su botón cambia el modo */
 
@@ -43,6 +42,19 @@
     a.setAttribute("aria-label", en ? "English" : "Español"); a.setAttribute("hreflang", en ? "en" : "es");
   });
   [].forEach.call(document.querySelectorAll('#banner a[href*="/c/portal/login"]'), function (a) { a.setAttribute("aria-label", "Iniciar sesión"); });
+
+  /* ── Celular: el buscador y el menú hamburguesa no se abren a la vez (se enciman). El buscador lo abre y
+     cierra el jQuery del portlet de ITESO con un clic en la lupa (#icon-search) o en .close-buscador ── */
+  var menu = document.getElementById("navbarToggleExternalContent2");
+  var hamb = document.querySelector('#mobil-menu [data-target="#navbarToggleExternalContent2"]');
+  var buscador = document.getElementById("search-element");
+  var abierto = function () { return buscador && buscador.classList.contains("buscador-show"); };
+  if (menu && hamb && buscador) {
+    document.addEventListener("click", function (e) {
+      if (e.target.closest(".icon-search") && !abierto() && menu.classList.contains("show")) hamb.click();
+      if (e.target.closest('[data-target="#navbarToggleExternalContent2"]') && abierto()) document.querySelector(".close-buscador").click();
+    }, true);
+  }
 
   /* ── (a) Header compacto al bajar, sin mover el contenido ──
      Al plegar la barra superior y la de "Programas…" el contenedor (sticky) se encoge; el mismo alto se le da

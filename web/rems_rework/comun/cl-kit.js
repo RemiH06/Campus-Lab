@@ -44,10 +44,40 @@
   var mesFlor = function () { var m = new Date().getMonth() + 1; return FLOR.filter(function (f) { return f.meses.indexOf(m) >= 0; })[0].id; };
 
   /* ── Datos: se piden una sola vez por página aunque haya varios componentes ── */
-  var cache = {};
+  /* Se leen por partes para mostrar el avance: avance[url] = [bytes bajados, bytes totales (0 si el servidor no lo dice)] */
+  var cache = {}, avance = {};
   function pedir(url) {
-    if (!cache[url]) cache[url] = fetch(url, { credentials: "same-origin" }).then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); });
+    if (!cache[url]) cache[url] = fetch(url, { credentials: "same-origin" }).then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      var total = +r.headers.get("Content-Length") || 0, lector = r.body && r.body.getReader ? r.body.getReader() : null;
+      if (!lector) return r.json();
+      var trozos = [], n = 0;
+      function leer() {
+        return lector.read().then(function (x) {
+          if (x.done) { var b = new Uint8Array(n), o = 0; trozos.forEach(function (t) { b.set(t, o); o += t.length; }); return JSON.parse(new TextDecoder().decode(b)); }
+          trozos.push(x.value); n += x.value.length; avance[url] = [n, total];
+          document.dispatchEvent(new CustomEvent("cl-avance"));
+          return leer();
+        });
+      }
+      return leer();
+    });
     return cache[url];
+  }
+  /* Barra de carga: suma el avance de las URL que espera un componente */
+  var CARGA = '<div class="cl-carga cl-indet" role="progressbar" aria-label="Cargando datos" aria-valuemin="0" aria-valuemax="100"><span class="cl-carga-t">Cargando datos…</span><span class="cl-carga-b"><i></i></span></div>';
+  function seguirCarga(el, urls) {
+    var mb = function (b) { return (b / 1048576).toFixed(1); };
+    function pinta() {
+      var n = 0, t = 0, sabe = true;
+      urls.forEach(function (u) { var a = avance[u]; if (!a || !a[1]) sabe = false; else { n += a[0]; t += a[1]; } });
+      if (!sabe || !t) return;
+      var p = Math.min(100, Math.round(n / t * 100));
+      el.classList.remove("cl-indet"); el.style.setProperty("--p", p + "%"); el.setAttribute("aria-valuenow", p);
+      el.querySelector(".cl-carga-t").textContent = "Cargando datos · " + mb(n) + " de " + mb(t) + " MB (" + p + " %)";
+    }
+    document.addEventListener("cl-avance", pinta); pinta();
+    return function () { document.removeEventListener("cl-avance", pinta); };
   }
   function cargar(cfg) {
     if (window.CL_DATOS) return Promise.resolve(window.CL_DATOS);
@@ -64,10 +94,10 @@
 
   /* ═══ Componente: barra (modo y floración); sincroniza todos los .cl de la página ═══ */
   function todos() { return [].slice.call(document.querySelectorAll(".cl")); }
-  function modoActual() { var m = store.get("cl-modo"); if (m) return m; return window.matchMedia("(prefers-color-scheme: dark)").matches ? "oscuro" : "claro"; }
+  function modoActual() { return store.get("cl-modo") || "claro"; } /* claro por defecto aunque el sistema esté en oscuro */
   function aplicarColor() {
-    var f = store.get("cl-flor") || "auto", m = store.get("cl-modo");
-    todos().forEach(function (el) { el.dataset.floracion = f === "auto" ? mesFlor() : f; if (m) el.dataset.modo = m; else delete el.dataset.modo; });
+    var f = store.get("cl-flor") || "auto", m = modoActual();
+    todos().forEach(function (el) { el.dataset.floracion = f === "auto" ? mesFlor() : f; el.dataset.modo = m; });
   }
   var barra = {
     mount: function (el) {
@@ -167,18 +197,60 @@
     });
     return out;
   }
+  /* Contorno de cada especie. Sus casillas están separadas por huecos de 4 px, así que se unen en una retícula doble
+     (casilla, hueco, casilla…): entra cada casilla, el hueco entre dos vecinas y el centro de un bloque de 2×2. Se trazan
+     solo los lados que dan hacia afuera (las puntas cuadradas del trazo cierran esquinas y entrantes de las piezas en L)
+     y los huecos internos se rellenan del mismo color, como la junta de un vitral: cada especie se lee como una pieza.
+     El trazo se recorta a la forma de la pieza para que quede todo adentro y el hueco entre especies siga limpio */
+  var nPieza = 0;
+  function contornos(piezas, cell, gap) {
+    var px = function (j) { return (Math.floor(j / 2) * (cell + gap) + (j % 2 ? cell : 0)).toFixed(1); };
+    return piezas.filter(function (b) { return b.e.partes.length; }).map(function (b) {
+      var c = {}, L = {}, d = "", junta = "", area = "", id = "cl-pz" + (nPieza++);
+      b.sh.forEach(function (s) { c[(b.x + s[0]) + "," + (b.y + s[1])] = 1; });
+      var en = function (x, y) { return c[x + "," + y]; };
+      Object.keys(c).forEach(function (k) {
+        var x = +k.split(",")[0], y = +k.split(",")[1];
+        L[2 * x + "," + 2 * y] = 1;
+        if (en(x + 1, y)) L[(2 * x + 1) + "," + 2 * y] = 1;
+        if (en(x, y + 1)) L[2 * x + "," + (2 * y + 1)] = 1;
+        if (en(x + 1, y) && en(x, y + 1) && en(x + 1, y + 1)) L[(2 * x + 1) + "," + (2 * y + 1)] = 1;
+      });
+      Object.keys(L).forEach(function (k) {
+        var i = +k.split(",")[0], j = +k.split(",")[1], x0 = px(i), x1 = px(i + 1), y0 = px(j), y1 = px(j + 1);
+        var r = "M" + x0 + " " + y0 + "H" + x1 + "V" + y1 + "H" + x0 + "Z";
+        area += r; if (i % 2 || j % 2) junta += r;
+        if (!L[i + "," + (j - 1)]) d += "M" + x0 + " " + y0 + "H" + x1;
+        if (!L[i + "," + (j + 1)]) d += "M" + x0 + " " + y1 + "H" + x1;
+        if (!L[(i - 1) + "," + j]) d += "M" + x0 + " " + y0 + "V" + y1;
+        if (!L[(i + 1) + "," + j]) d += "M" + x1 + " " + y0 + "V" + y1;
+      });
+      return '<g data-id="' + esc(b.e.id) + '"><clipPath id="' + id + '"><path d="' + area + '"/></clipPath>' + (junta ? '<path class="cl-junta" d="' + junta + '"/>' : "") +
+        '<path class="cl-borde" clip-path="url(#' + id + ')" d="' + d + '"/></g>';
+    }).join("");
+  }
+  /* Al pasar el mouse o llegar con el teclado a cualquier foto, se resalta la pieza completa de su especie */
+  function resaltarPieza(el) {
+    var marca = function (ev) {
+      var c = ev.type === "mouseleave" ? null : ev.target.closest("[data-id]"), id = c && c.dataset.id;
+      [].forEach.call(el.querySelectorAll(".cl-mos-svg g"), function (g) { g.classList.toggle("cl-on", g.dataset.id === id); });
+    };
+    el.addEventListener("mouseover", marca); el.addEventListener("focusin", marca); el.addEventListener("mouseleave", marca); el.addEventListener("focusout", marca);
+  }
   var mosaico = {
     mount: function (el, items, cfg) {
-      var w = el.clientWidth || 800, cell = w < 520 ? 68 : 86, cols = Math.max(4, Math.floor((w + 4) / (cell + 4)));
-      el.style.setProperty("--cols", cols); el.style.setProperty("--cell", ((w - (cols - 1) * 4) / cols).toFixed(1) + "px");
+      var w = el.clientWidth || 800, cell = w < 520 ? 68 : 86, cols = Math.max(4, Math.floor((w + 4) / (cell + 4))), lado = (w - (cols - 1) * 4) / cols;
+      el.style.setProperty("--cols", cols); el.style.setProperty("--cell", lado.toFixed(1) + "px");
+      if (!el.dataset.pieza) { el.dataset.pieza = "1"; resaltarPieza(el); }
       if (!items.length) { el.innerHTML = '<p class="cl-mos-vacio">Ninguna especie coincide. Prueba con el nombre común, la familia o un jardín.</p>'; return; }
-      el.innerHTML = empacar(items, cols).map(function (b) {
+      var piezas = empacar(items, cols), filas = piezas.reduce(function (m, b) { return Math.max(m, b.y + Math.max.apply(null, b.sh.map(function (s) { return s[1]; })) + 1); }, 0);
+      el.innerHTML = '<svg class="cl-mos-svg" aria-hidden="true" width="' + w + '" height="' + (filas * (lado + 4) - 4).toFixed(1) + '">' + contornos(piezas, lado, 4) + "</svg>" + piezas.map(function (b) {
         var e = b.e, nombre = esc(e.com), href = esc(conParam(cfg.ficha, "id", e.id));
-        if (!e.partes.length) return '<a class="cl-mos-c cl-falta" href="' + href + '" style="grid-area:' + (b.y + 1) + "/" + (b.x + 1) + '" aria-label="' + nombre + ', sin fotos todavía"><b>?</b>' + nombre + "</a>";
+        if (!e.partes.length) return '<a class="cl-mos-c cl-falta" href="' + href + '" data-id="' + esc(e.id) + '" style="grid-area:' + (b.y + 1) + "/" + (b.x + 1) + '" aria-label="' + nombre + ', sin fotos todavía"><b>?</b>' + nombre + "</a>";
         var cells = b.sh.length === e.partes.length ? b.sh : b.sh.slice(0, 1);
         return cells.map(function (c, i) {
           var p = e.partes[i] || e.partes[0], area = (b.y + c[1] + 1) + "/" + (b.x + c[0] + 1) + (b.sh.length === 4 && e.partes.length === 1 ? "/span 2/span 2" : ""), first = i === 0;
-          return '<a class="cl-mos-c' + (first ? " cl-lbl" : "") + '" href="' + href + '" data-nombre="' + (first ? nombre : "") + '" style="grid-area:' + area + '"' +
+          return '<a class="cl-mos-c' + (first ? " cl-lbl" : "") + '" href="' + href + '" data-id="' + esc(e.id) + '" data-nombre="' + (first ? nombre : "") + '" style="grid-area:' + area + '"' +
             (first ? ' aria-label="' + nombre + ", " + e.partes.length + ' de 5 partes"' : ' tabindex="-1" aria-hidden="true"') + '><img loading="lazy" src="' + esc(foto(cfg, e.fotos[p].f, "chica")) + '" alt=""></a>';
         }).join("");
       }).join("");
@@ -267,11 +339,11 @@
     var cfg = { n: n++, datos: d.datos, mapa: d.mapa, fotos: d.fotos || "", ext: d.fotosExt || "", grande: d.fotoGrande || "", chica: d.fotoChica || "",
       ficha: d.ficha || "especie", paginaMapa: d.paginaMapa || "mapa", coleccion: d.coleccion || "coleccion" };
     var vista = VISTAS[d.cl]; if (!vista) return;
-    root.innerHTML = '<div class="cl-shell"><div class="cl-barra"></div><div class="cl-main"><div class="cl-esqueleto" aria-busy="true" aria-label="Cargando"><i style="width:40%"></i><i class="cl-g"></i><i style="width:70%"></i></div></div></div>';
+    root.innerHTML = '<div class="cl-shell"><div class="cl-barra"></div><div class="cl-main">' + CARGA + '<div class="cl-esqueleto" aria-hidden="true"><i style="width:40%"></i><i class="cl-g"></i><i style="width:70%"></i></div></div></div>';
     if (d.barra !== "no") barra.mount(root.querySelector(".cl-barra"));
-    var main = root.querySelector(".cl-main");
-    cargar(cfg).then(function (D) { vista(main, preparar(D), cfg); })
-      .catch(function (err) { main.innerHTML = '<div class="cl-card cl-aviso"><b>No se pudieron cargar los datos.</b><p class="cl-muted">Vuelve a intentar en un momento. (' + esc(err.message) + ")</p></div>"; });
+    var main = root.querySelector(".cl-main"), soltar = seguirCarga(main.querySelector(".cl-carga"), [cfg.datos, cfg.mapa]);
+    cargar(cfg).then(function (D) { soltar(); vista(main, preparar(D), cfg); })
+      .catch(function (err) { soltar(); main.innerHTML = '<div class="cl-card cl-aviso"><b>No se pudieron cargar los datos.</b><p class="cl-muted">Vuelve a intentar en un momento. (' + esc(err.message) + ")</p></div>"; });
   }
 
   function iniciar() { aplicarColor(); [].forEach.call(document.querySelectorAll(".cl[data-cl]"), montar); }

@@ -242,7 +242,7 @@ body { background: var(--page); }
   (function () {
     var b = document.getElementById("modo"), s = store.get("cl-modo");
     var actual = function () { var m = root.dataset.modo; if (m) return m; var t = document.documentElement.dataset.theme; if (t) return t === "dark" ? "oscuro" : "claro"; return matchMedia("(prefers-color-scheme: dark)").matches ? "oscuro" : "claro"; };
-    if (s) root.dataset.modo = s;
+    root.dataset.modo = s || "claro"; /* claro por defecto */
     var pinta = function () { var o = actual() === "oscuro"; b.textContent = o ? "Modo claro" : "Modo oscuro"; b.setAttribute("aria-label", o ? "Cambiar a modo claro" : "Cambiar a modo oscuro"); };
     b.onclick = function () { var n = actual() === "oscuro" ? "claro" : "oscuro"; root.dataset.modo = n; store.set("cl-modo", n); pinta(); document.dispatchEvent(new Event("cl:color")); };
     pinta();
