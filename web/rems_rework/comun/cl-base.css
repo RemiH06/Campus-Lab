@@ -1,0 +1,179 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   cl-base.css · Campus Lab (camino B). Se sube una vez a Documentos y Medios
+   y lo cargan todos los Contenidos Web que usan cl-kit.js.
+
+   Tres capas:
+   1. MODO (claro / oscuro): color-scheme en .cl; cada token trae sus dos
+      valores con light-dark(), sin bloques duplicados por modo.
+   2. FLORACIÓN (paleta intercambiable): una regla por floración con tres
+      tokens (--f1 flor, --f1i flor como texto, --f2 follaje). Agregar una
+      paleta es agregar una línea (y su mes en FLOR de cl-kit.js).
+   3. COMPONENTES: solo usan tokens --cl-*; nunca un color suelto.
+
+   Todo vive dentro de .cl y con prefijo cl- para no chocar con el tema de
+   ITESO (trae Bootstrap/Clay: .btn, .card, h1… con sus propios estilos).
+   Contraste verificado WCAG AA en los dos modos y las siete floraciones.
+   ═══════════════════════════════════════════════════════════════════════ */
+.cl {
+  color-scheme: light dark;
+  --cl-bg: light-dark(#f3f6f5, #0c171e);
+  --cl-sf: light-dark(#fbfcfc, #13222b);
+  --cl-ink: light-dark(#12283a, #e3ece9);
+  --cl-ink2: light-dark(#4a5d69, #9db0b5);
+  --cl-line: light-dark(#d2dcdb, #29404a);
+  --cl-acc: var(--f1i);
+  --cl-fill: light-dark(var(--f1i), var(--f1));
+  --cl-on-fill: light-dark(#fbfcfc, #0c171e);
+  --cl-wash: color-mix(in srgb, var(--f1) 14%, var(--cl-sf));
+  --cl-leaf: var(--f2);
+  /* Degular la carga el tema del sitio (familias separadas por peso); Figtree/sistema solo fuera de Liferay */
+  --cl-font: "Degular-Regular", "Degular", "Figtree", system-ui, sans-serif;
+  --cl-font-sb: "Degular-Semibold", "Degular", "Figtree", system-ui, sans-serif;
+  --cl-font-b: "Degular-Bold", "Degular", "Figtree", system-ui, sans-serif;
+  --cl-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --cl-r: 8px;
+  --cl-ease: cubic-bezier(0.23, 1, 0.32, 1);
+  background: var(--cl-bg); color: var(--cl-ink); font: 16px/1.5 var(--cl-font); font-synthesis: none;
+  border-radius: var(--cl-r);
+}
+.cl[data-modo="claro"] { color-scheme: light; }
+.cl[data-modo="oscuro"] { color-scheme: dark; }
+
+/* Floraciones del campus · flor (día, noche) · flor como texto · follaje */
+.cl, .cl[data-floracion="lluvias"], .cl [data-floracion="lluvias"] { --f1: light-dark(#2e8a52, #6fd296); --f1i: light-dark(#297b49, #6fd296); --f2: light-dark(#3a7090, #7fbede); }
+.cl[data-floracion="clavellina"], .cl [data-floracion="clavellina"] { --f1: light-dark(#c2416a, #f2809c); --f1i: light-dark(#c03e67, #f2809c); --f2: light-dark(#7a5a3e, #c9a27e); }
+.cl[data-floracion="rosa-morada"], .cl [data-floracion="rosa-morada"] { --f1: light-dark(#c45a9c, #f08cc8); --f1i: light-dark(#b8428c, #f08cc8); --f2: light-dark(#4c7758, #86c09a); }
+.cl[data-floracion="jacaranda"], .cl [data-floracion="jacaranda"] { --f1: light-dark(#7b5cc8, #b8a0f5); --f1i: light-dark(#7858c7, #b8a0f5); --f2: light-dark(#3f7a4c, #82c492); }
+.cl[data-floracion="primavera"], .cl [data-floracion="primavera"] { --f1: light-dark(#e0ab12, #f4cc4e); --f1i: light-dark(#8b6a0b, #f4cc4e); --f2: light-dark(#5f7434, #a8c46a); }
+.cl[data-floracion="tabachin"], .cl [data-floracion="tabachin"] { --f1: light-dark(#d9431f, #ff7d55); --f1i: light-dark(#c73d1c, #ff7d55); --f2: light-dark(#3b7840, #7cc482); }
+.cl[data-floracion="galeana"], .cl [data-floracion="galeana"] { --f1: light-dark(#e06a12, #ff9e4e); --f1i: light-dark(#b1540e, #ff9e4e); --f2: light-dark(#2e6f5c, #6ec2a6); }
+/* Navegadores sin light-dark(): se quedan en claro, nunca sin color */
+@supports not (color: light-dark(red, red)) {
+  .cl { --cl-bg: #f3f6f5; --cl-sf: #fbfcfc; --cl-ink: #12283a; --cl-ink2: #4a5d69; --cl-line: #d2dcdb; --cl-fill: var(--f1i); --cl-on-fill: #fbfcfc; --f1: #2e8a52; --f1i: #297b49; --f2: #3a7090; }
+}
+
+/* Primitivas (con .cl delante para ganarle al tema) */
+.cl *, .cl *::before, .cl *::after { box-sizing: border-box; }
+.cl :is(h1, h2, h3, p, dl, dd, figure, ul, ol) { margin: 0; }
+.cl :is(h1, h2, h3) { text-wrap: balance; line-height: 1.1; color: inherit; font-family: var(--cl-font-b); font-weight: 700; letter-spacing: 0; text-transform: none; }
+.cl :is(b, strong) { font-family: var(--cl-font-sb); font-weight: 600; }
+.cl :is(button, input, select) { font: inherit; color: inherit; }
+.cl a { color: inherit; }
+.cl :focus-visible { outline: 2px solid var(--cl-acc); outline-offset: 2px; border-radius: 4px; }
+.cl .cl-sci { font-style: italic; }
+.cl .cl-muted { color: var(--cl-ink2); }
+.cl .cl-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.cl .cl-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: 999px; border: 1.5px solid var(--cl-line); background: var(--cl-sf); color: var(--cl-ink); cursor: pointer; white-space: nowrap; text-decoration: none; font-size: 1rem; line-height: 1.2; transition: transform 140ms var(--cl-ease); }
+.cl .cl-btn:active { transform: scale(0.97); }
+.cl .cl-btn[aria-pressed="true"], .cl .cl-btn.cl-solid { background: var(--cl-fill); border-color: var(--cl-fill); color: var(--cl-on-fill); }
+.cl .cl-field { width: 100%; min-height: 42px; padding: 0 14px; border-radius: var(--cl-r); border: 1.5px solid var(--cl-ink2); background: var(--cl-sf); color: var(--cl-ink); }
+.cl .cl-field::placeholder { color: var(--cl-ink2); opacity: 1; }
+.cl .cl-card { background: var(--cl-sf); border: 1px solid var(--cl-line); border-radius: var(--cl-r); }
+.cl .cl-placa { display: inline-flex; align-items: baseline; gap: 6px; font-family: var(--cl-font-b); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .05em; padding: 4px 10px; border-radius: 4px; border: 1.5px solid var(--cl-ink2);
+  background: linear-gradient(180deg, var(--cl-sf), color-mix(in srgb, var(--cl-line) 55%, var(--cl-sf))); text-shadow: 0 1px 0 var(--cl-sf); }
+.cl .cl-placa small { font-family: var(--cl-font); font-weight: 400; letter-spacing: 0; color: var(--cl-ink2); }
+.cl .cl-eyebrow { font-size: .9rem; color: var(--cl-ink2); }
+@media (hover: hover) and (pointer: fine) { .cl .cl-btn:hover { border-color: var(--cl-acc); } }
+@media (prefers-reduced-motion: reduce) { .cl * { transition: none !important; animation: none !important; } }
+
+/* ═══ cl-barra · modo y floración ═══ */
+.cl-shell { max-width: 1180px; margin: 0 auto; padding: 18px max(16px, env(safe-area-inset-right, 0px)) 40px max(16px, env(safe-area-inset-left, 0px)); display: grid; gap: 20px; }
+.cl-barra { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; align-items: center; }
+.cl-flor-pick { position: relative; }
+.cl .cl-flor-pick select { appearance: none; min-height: 36px; padding: 0 32px 0 30px; border-radius: 999px; border: 1.5px solid var(--cl-line); background: var(--cl-sf); color: var(--cl-ink); cursor: pointer; }
+.cl-flor-pick::before { content: ""; position: absolute; left: 11px; top: 50%; translate: 0 -50%; width: 12px; height: 12px; border-radius: 50%; background: var(--f1); box-shadow: 4px 0 0 -1px var(--f2); pointer-events: none; }
+.cl-flor-pick::after { content: ""; position: absolute; right: 13px; top: 50%; width: 7px; height: 7px; border-right: 1.5px solid var(--cl-ink2); border-bottom: 1.5px solid var(--cl-ink2); translate: 0 -70%; rotate: 45deg; pointer-events: none; }
+
+/* ═══ Estados: cargando y error ═══ */
+.cl-esqueleto { display: grid; gap: 12px; }
+.cl-esqueleto i { display: block; height: 16px; border-radius: 6px; background: linear-gradient(90deg, var(--cl-line) 0 40%, color-mix(in srgb, var(--cl-line) 45%, var(--cl-sf)) 50%, var(--cl-line) 60% 100%); background-size: 250% 100%; animation: cl-shimmer 1.3s linear infinite; }
+.cl-esqueleto i.cl-g { height: 240px; }
+@keyframes cl-shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
+.cl-aviso { padding: 18px; display: grid; gap: 8px; justify-items: start; }
+
+/* ═══ Especie · cl-anillos + datos + mapa chico ═══ */
+.cl-especie { display: grid; gap: 18px; }
+.cl-esp-head { display: grid; gap: 4px; }
+.cl-esp-head h1 { font-size: clamp(2rem, 5vw, 3.1rem); }
+.cl-esp-head .cl-sci { font-size: clamp(1.1rem, 2.2vw, 1.35rem); color: var(--cl-ink2); }
+.cl-esp-main { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.cl-foto { margin: 0; display: grid; gap: 8px; }
+.cl-foto .cl-frame { position: relative; aspect-ratio: 4 / 3; border-radius: var(--cl-r); overflow: hidden; background: var(--cl-wash); }
+.cl-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cl-foto img.cl-in { animation: cl-in 220ms var(--cl-ease); }
+@keyframes cl-in { from { opacity: .3; transform: scale(1.015); } to { opacity: 1; transform: none; } }
+.cl-foto .cl-vacia { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; gap: 6px; padding: 20px; color: var(--cl-ink2); }
+.cl-foto figcaption { font-size: .9rem; color: var(--cl-ink2); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.cl-anillos { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 14px; align-items: center; padding: 14px; }
+.cl-anillos svg { width: 100%; height: auto; display: block; overflow: visible; }
+.cl-anillos .cl-ring { cursor: pointer; }
+.cl-anillos .cl-ring path.cl-edge { fill: none; stroke: none; }
+.cl-anillos .cl-ring path.cl-band { stroke: var(--cl-sf); stroke-width: 1.5; }
+.cl-anillos .cl-ring.cl-has path.cl-band { fill: color-mix(in srgb, var(--f1) var(--mix, 60%), var(--cl-sf)); }
+.cl-anillos .cl-ring.cl-no path.cl-band { fill: var(--cl-sf); }
+.cl-anillos .cl-ring.cl-no path.cl-edge { stroke: var(--cl-ink2); stroke-width: 1.2; stroke-dasharray: 3 4; }
+.cl-anillos .cl-ring path.cl-grain { fill: none; stroke: color-mix(in srgb, var(--cl-ink) 22%, transparent); stroke-width: .6; pointer-events: none; }
+.cl-anillos .cl-ring.cl-sel path.cl-edge { stroke: var(--cl-ink); stroke-width: 2.4; stroke-dasharray: none; }
+.cl-anillos .cl-medula { fill: var(--cl-fill); }
+.cl-anillos .cl-medula-t { fill: var(--cl-on-fill); font-family: var(--cl-font-b); font-weight: 700; font-size: 15px; text-anchor: middle; dominant-baseline: central; }
+.cl-leyenda { list-style: none; padding: 0; display: grid; gap: 4px; }
+.cl .cl-leyenda button { width: 100%; display: flex; align-items: center; gap: 10px; min-height: 34px; padding: 2px 8px; border: 0; border-radius: 6px; background: none; cursor: pointer; text-align: left; }
+.cl .cl-leyenda button[aria-pressed="true"] { background: var(--cl-wash); font-family: var(--cl-font-sb); font-weight: 600; }
+.cl-leyenda .cl-sw { width: 14px; height: 14px; border-radius: 50%; flex: none; background: color-mix(in srgb, var(--f1) var(--mix, 60%), var(--cl-sf)); }
+.cl-leyenda .cl-no .cl-sw { background: none; border: 1.5px dashed var(--cl-ink2); }
+.cl .cl-leyenda .cl-no button { color: var(--cl-ink2); cursor: default; }
+.cl-esp-side { display: grid; gap: 14px; }
+.cl-datos { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; padding: 16px; font-size: .95rem; }
+.cl-datos dt { color: var(--cl-ink2); font-weight: 400; }
+.cl-donde { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 16px; padding: 14px; align-items: start; }
+.cl-donde h2 { font-size: 1.15rem; margin-bottom: 8px; }
+.cl-donde ul { list-style: none; padding: 0; display: grid; gap: 4px; font-size: .95rem; }
+.cl-donde li { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--cl-line); padding: 4px 0; }
+.cl-donde li b { font-variant-numeric: tabular-nums; }
+.cl-donde .cl-btn { margin-top: 10px; }
+
+/* ═══ Mapa · cl-mapa + placa ═══ */
+.cl-lugar { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 340px); gap: 18px; align-items: start; }
+.cl-mapa { position: relative; border-radius: var(--cl-r); overflow: hidden; background: var(--cl-sf); border: 1px solid var(--cl-line); touch-action: manipulation; }
+.cl-mapa svg { display: block; width: 100%; height: auto; aspect-ratio: var(--ar, 16 / 10); }
+.cl-mapa .cl-bld { fill: color-mix(in srgb, var(--cl-line) 80%, var(--cl-sf)); stroke: none; }
+.cl-mapa .cl-cam { fill: none; stroke: var(--cl-line); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.cl-mapa .cl-pt { fill: color-mix(in srgb, var(--cl-leaf) 55%, var(--cl-sf)); }
+.cl-mapa.cl-foco .cl-pt { fill: color-mix(in srgb, var(--cl-ink2) 30%, var(--cl-sf)); }
+.cl-mapa .cl-pt.cl-hi { fill: var(--cl-fill); }
+.cl-mapa .cl-yo { fill: none; stroke: var(--cl-ink); stroke-width: 2; }
+.cl-mapa-zoom { position: absolute; right: 8px; top: 8px; display: grid; gap: 6px; }
+.cl .cl-mapa-zoom .cl-btn { min-height: 32px; padding: 0 12px; font-size: .88rem; }
+.cl-lugar-side { display: grid; gap: 12px; }
+.cl-lugar-side .cl-card { padding: 14px; display: grid; gap: 10px; }
+.cl-leyenda-mapa { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .88rem; color: var(--cl-ink2); }
+.cl-leyenda-mapa span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; background: var(--c); }
+.cl-ficha-placa { display: grid; gap: 6px; justify-items: start; }
+.cl-ficha-placa h3 { font-size: 1.3rem; }
+.cl-tabs { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+/* ═══ Colección · cl-buscador + cl-mosaico (empacador de LinNeo) ═══ */
+.cl-coleccion { display: grid; gap: 14px; }
+.cl-col-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: end; }
+.cl-col-head h1 { font-size: clamp(1.8rem, 4.5vw, 2.6rem); }
+.cl-progreso { display: grid; gap: 6px; min-width: min(320px, 100%); }
+.cl-progreso .cl-barra-p { height: 10px; border-radius: 5px; background: var(--cl-line); overflow: hidden; display: flex; }
+.cl-progreso .cl-barra-p i { display: block; height: 100%; background: var(--cl-fill); }
+.cl-progreso p { font-size: .92rem; color: var(--cl-ink2); }
+.cl-progreso b { color: var(--cl-ink); font-variant-numeric: tabular-nums; }
+.cl-col-tools { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.cl-mosaico { display: grid; grid-template-columns: repeat(var(--cols, 8), minmax(0, 1fr)); grid-auto-rows: var(--cell, 84px); gap: 4px; }
+.cl .cl-mos-c { position: relative; display: block; overflow: hidden; border-radius: 4px; background: var(--cl-wash); text-decoration: none; color: inherit; }
+.cl-mos-c img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cl-mos-c.cl-lbl::after { content: attr(data-nombre); position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 6px 4px; font-size: .78rem; line-height: 1.15; font-family: var(--cl-font-sb); font-weight: 600; text-align: left;
+  color: #f4f7f6; background: linear-gradient(transparent, rgba(8, 20, 28, .82)); }
+.cl .cl-mos-c.cl-falta { background: var(--cl-sf); border: 1.5px dashed var(--cl-ink2); display: grid; place-content: center; padding: 6px; text-align: center; font-size: .78rem; line-height: 1.15; color: var(--cl-ink2); }
+.cl-mos-c.cl-falta b { display: block; font-size: 1.1rem; color: var(--cl-acc); }
+@media (hover: hover) and (pointer: fine) { .cl-mos-c:hover { outline: 2px solid var(--cl-acc); outline-offset: -2px; } }
+.cl-mos-vacio { padding: 24px; text-align: center; color: var(--cl-ink2); }
+
+@media (max-width: 860px) {
+  .cl-esp-main, .cl-lugar, .cl-donde { grid-template-columns: 1fr; }
+  .cl-col-head, .cl-col-tools { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) { .cl-anillos { grid-template-columns: minmax(0, 150px) minmax(0, 1fr); padding: 10px; gap: 10px; } }
