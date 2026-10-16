@@ -206,6 +206,29 @@ def construir():
         ws.add_data_validation(dv)
         dv.add(f"M2:M{ws.max_row}")
 
+    # Por fotografiar: especies sin alguna parte básica (completo, tronco, hoja); primero las de Arboretum II,
+    # que concentra la mayoría y está junto al Edificio V
+    pf = wb.create_sheet("Por fotografiar", 1)
+    pf.append(["Especie", "Nombre común", "Árboles en campus", "Falta completo", "Falta tronco", "Falta hoja",
+               "Falta flor", "Falta fruto", "Jardines (árboles)", "Placas en Arboretum II", "Otras placas"])
+    por_especie = defaultdict(list)
+    for a in arboles:
+        if a["especie"]:
+            por_especie[a["especie"]].append(a)
+    pendientes = []
+    for e, lista in por_especie.items():
+        tiene = fotos.get(llave_de(e), {})
+        falta = [p not in tiene for p in PARTES]
+        if any(falta[:3]):
+            arb2 = [a["placa"] for a in lista if a["jardin"] == "7 - Arboretum II"]
+            pendientes.append((not arb2, -sum(falta[:3]), -len(lista), e, lista, falta, arb2))
+    for _, _, _, e, lista, falta, arb2 in sorted(pendientes):
+        js = Counter(a["jardin"] for a in lista)
+        otras = [a["placa"] for a in lista if a["jardin"] != "7 - Arboretum II"][:10]
+        pf.append([e, Counter(a["comun_2018"] or a["comun_2014"] for a in lista).most_common(1)[0][0], len(lista),
+                   *["sí" if f else "" for f in falta], ", ".join(f"{j} ({n})" for j, n in js.most_common()),
+                   ", ".join(arb2), ", ".join(otras)])
+
     filas_c, i = leer_contemplativo()
     wc = wb.create_sheet("Jardín Contemplativo")
     wc.append(["Núm. foto SW Maps", "Archivo de foto", "Latitud", "Longitud", "Pl@ntNet 1", "Score 1",

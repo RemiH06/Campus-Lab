@@ -21,6 +21,8 @@ header { position: sticky; top: 0; z-index: 2; background: var(--papel); border-
 h1 { font-size: 1.2rem; margin: 0; }
 .controles { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
 .controles select, .controles input { width: 100%; min-height: 40px; padding: 6px 10px; border: 1px solid var(--tinta-2); border-radius: 6px; background: var(--papel); }
+.filtro { grid-column: 1 / -1; display: flex; gap: 8px; align-items: center; font-size: .95rem; }
+.filtro input { width: 20px; height: 20px; accent-color: var(--tinta); }
 .resumen { margin: 0; color: var(--tinta-2); font-size: .95rem; }
 main { padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 16px; }
 .especie { border: 1px solid var(--linea); border-radius: 10px; padding: 12px; display: grid; gap: 10px; align-content: start; break-inside: avoid; }
@@ -51,7 +53,7 @@ dialog p { margin: 8px 12px; color: var(--tinta-2); font-size: .9rem; }
 dialog button { margin: 0 12px 12px; min-height: 36px; padding: 6px 12px; border: 1px solid var(--tinta-2); background: var(--papel); border-radius: 6px; }
 @media print {
   header { position: static; }
-  .controles input { display: none; }
+  .controles input[type="search"] { display: none; }
   main { grid-template-columns: 1fr 1fr; gap: 8px; padding: 0; }
   details { display: block; } details > summary { display: none; }
 }
@@ -63,6 +65,7 @@ dialog button { margin: 0 12px 12px; min-height: 36px; padding: 6px 12px; border
   <div class="controles">
     <label><span class="sin-dato">Jardín</span><select id="jardin"></select></label>
     <label><span class="sin-dato">Buscar nombre o placa</span><input id="buscar" type="search" autocomplete="off"></label>
+    <label class="filtro"><input id="faltan" type="checkbox"> Solo especies sin foto de árbol completo, tronco u hoja</label>
   </div>
   <p class="resumen" id="resumen"></p>
 </header>
@@ -115,16 +118,17 @@ function tarjeta(e) {
 function pintar() {
   const j = D.jardines[sel.value], q = sinAcentos($("#buscar").value.trim());
   try { localStorage.setItem("guia_jardin", sel.value); } catch (e) {}
-  const lista = j.especies.filter((e) => !q || sinAcentos([e.especie, ...e.comunes].join(" ")).includes(q) || e.arboles.some((a) => a.placa === q));
+  const faltan = $("#faltan").checked, BASICAS = D.partes.slice(0, 3);
+  const lista = j.especies.filter((e) => !faltan || BASICAS.some((p) => !(D.fotos[e.llave] || {})[p])).filter((e) => !q || sinAcentos([e.especie, ...e.comunes].join(" ")).includes(q) || e.arboles.some((a) => a.placa === q));
   const conFoto = j.especies.filter((e) => D.fotos[e.llave]).length;
-  $("#resumen").textContent = `${j.n} árboles, ${j.especies.length} especies (${conFoto} con fotos nuestras)` + (q ? ` · ${lista.length} coinciden` : "");
+  $("#resumen").textContent = `${j.n} árboles, ${j.especies.length} especies (${conFoto} con fotos nuestras)` + (q || faltan ? ` · ${lista.length} en la lista` : "");
   const m = $("#lista"); m.textContent = "";
   lista.forEach((e) => m.append(tarjeta(e)));
   const pie = document.createElement("p"); pie.className = "pie";
   pie.textContent = "Fotos: base de Campus Lab (confirmadas y clasificadas por parte). Características: fichas publicadas en campuslab.iteso.mx. Especies y placas: inventario ArcGIS 2014-2018.";
   m.append(pie);
 }
-sel.onchange = pintar; $("#buscar").oninput = pintar;
+sel.onchange = pintar; $("#buscar").oninput = pintar; $("#faltan").onchange = pintar;
 $("#grande button").onclick = () => $("#grande").close();
 pintar();
 </script>
