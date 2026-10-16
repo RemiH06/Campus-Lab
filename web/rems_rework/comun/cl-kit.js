@@ -78,7 +78,8 @@
       var pinta = function () { var o = modoActual() === "oscuro"; b.textContent = o ? "Modo claro" : "Modo oscuro"; b.setAttribute("aria-label", o ? "Cambiar a modo claro" : "Cambiar a modo oscuro"); };
       sel.value = store.get("cl-flor") || "auto";
       sel.onchange = function () { store.set("cl-flor", sel.value); aplicarColor(); };
-      b.onclick = function () { store.set("cl-modo", modoActual() === "oscuro" ? "claro" : "oscuro"); aplicarColor(); pinta(); };
+      b.onclick = function () { store.set("cl-modo", modoActual() === "oscuro" ? "claro" : "oscuro"); aplicarColor(); pinta(); document.dispatchEvent(new CustomEvent("cl-modo")); };
+      document.addEventListener("cl-modo", function () { aplicarColor(); pinta(); }); /* el botón del Marco también avisa */
       pinta();
     }
   };

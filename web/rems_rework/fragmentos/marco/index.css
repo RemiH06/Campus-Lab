@@ -1,0 +1,102 @@
+/* Marco Campus Lab: corrige encima el header y el footer del tema ITESO-4, sin reemplazarlos.
+   Todo apunta a ids y clases del tema (Contenido Web "Navegación" 351492, footer788792, footerbotton788792). */
+
+/* ── Colores. Claro = los del tema (con el hover corregido); oscuro = monocromática sobre el azul ITESO (H≈207°) ── */
+:root {
+  --clm-top: 0px;            /* alto del menú de control de Liferay cuando hay sesión; lo pone el JS */
+  --clm-hover-bg: #00457c;   /* antes #42b4e3 con texto gris: 2.4:1, no pasaba AA */
+  --clm-hover-ink: #fbfcfc;  /* 9.5:1 */
+}
+html[data-cl-modo="oscuro"] {
+  --clm-bg: #0e1a24;         /* barra superior, menú de celular */
+  --clm-sf: #122230;         /* fila del logo */
+  --clm-sf2: #0b1620;        /* fila "Programas…" */
+  --clm-ink: #dde6ec;        /* 13.9:1 sobre --clm-bg */
+  --clm-ink2: #b4c3ce;       /* enlaces del menú, 9.0:1 sobre --clm-sf */
+  --clm-acc: #9fd0ee;        /* fila "Programas…", 10.7:1 */
+  --clm-line: #22384a;
+  --clm-pie: #0b2236;        /* footer, más hondo que #004270 para no encandilar de noche */
+  --clm-pie2: #13314d;       /* botones del acordeón del footer */
+  --clm-hover-bg: #6cc8f0;
+  --clm-hover-ink: #0e1a24;  /* 9.4:1 */
+  color-scheme: dark;
+}
+/* ── (a) Header fijo sin salto. El jQuery del tema pone position:fixed en línea; !important le gana ── */
+#p_p_id_com_liferay_journal_content_web_portlet_JournalContentPortlet_INSTANCE_NAVEGACION_ {
+  position: sticky; top: var(--clm-top); z-index: 1000;
+  transition: margin-bottom 220ms cubic-bezier(.2, .7, .2, 1);
+}
+#banner .top-bar, #mobil-menu, #navbarToggleExternalContent2 { position: static !important; }
+#banner .pos-f-t, #navbarToggleExternalContent { display: none !important; } /* barra de scroll del tema: sobra */
+#banner .top-bar, #subm {
+  max-height: 160px; overflow: hidden;
+  transition: max-height 220ms cubic-bezier(.2, .7, .2, 1), padding 220ms cubic-bezier(.2, .7, .2, 1);
+}
+html.clm-compacto #banner .top-bar, html.clm-compacto #subm { max-height: 0; padding-top: 0; padding-bottom: 0; border-width: 0; }
+/* Menú de celular abierto: que se pueda recorrer aunque sea más alto que la pantalla */
+#navbarToggleExternalContent2.show { max-height: calc(100dvh - 56px - var(--clm-top)); overflow-y: auto; overscroll-behavior: contain; }
+@media (prefers-reduced-motion: reduce) {
+  #p_p_id_com_liferay_journal_content_web_portlet_JournalContentPortlet_INSTANCE_NAVEGACION_, #banner .top-bar, #subm { transition: none; }
+}
+
+/* ── (d) Menú principal en un solo renglón de 992 a 1919 px (antes "Familias" y "Contacto" caían tapados) ── */
+@media (min-width: 992px) {
+  #heading #navigation .navbar-nav { flex-wrap: nowrap; justify-content: flex-end; }
+  #heading #navigation .navbar-nav .nav-item a.nav-link {
+    font-size: clamp(.78rem, .2rem + .9vw, 1.313em); white-space: nowrap;
+    padding-left: clamp(5px, .55vw, 15px); padding-right: clamp(5px, .55vw, 15px);
+  }
+}
+#navigation .navbar-nav .nav-item:hover { background: var(--clm-hover-bg); }
+#navigation .navbar-nav .nav-item:hover a.nav-link { color: var(--clm-hover-ink); }
+#navigation .navbar-nav .nav-item a.nav-link:focus-visible, #subm a.nav-link:focus-visible { outline: 2px solid var(--clm-hover-bg); outline-offset: -2px; }
+
+/* ── Aviso del fragmento: solo en el editor de páginas, para poder encontrarlo y seleccionarlo ── */
+.clm-nota { display: none; }
+.page-editor .clm-nota { display: block; padding: 8px 12px; border: 1.5px dashed #8b96a1; border-radius: 6px; color: #4b555f; font-size: 14px; }
+
+/* ── Botón de modo (lo inserta el JS) ── */
+.clm-modo {
+  display: inline-grid; place-items: center; width: 36px; height: 36px; margin: 0 6px; padding: 0;
+  border: 1.5px solid currentColor; border-radius: 50%; background: transparent; color: #4b555f;
+  cursor: pointer; vertical-align: middle; line-height: 0; position: relative; top: -7px; /* centrado con banderas e ícono */
+}
+.clm-modo svg { width: 18px; height: 18px; }
+.clm-modo .clm-sol { display: none; }
+html[data-cl-modo="oscuro"] .clm-modo .clm-sol { display: block; }
+html[data-cl-modo="oscuro"] .clm-modo .clm-luna { display: none; }
+.clm-modo:focus-visible { outline: 2px solid var(--clm-hover-bg); outline-offset: 2px; }
+#mobil-menu .clm-modo { width: 32px; height: 32px; margin: 0 4px 0 0; top: -5px; }
+/* Menú de celular: el gris #a2a2a2 del tema sobre #f8f9fa da 2.4:1; #5d6873 da 5.4:1 */
+#navmobile .btn-link { color: #5d6873 !important; }
+.clm-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ── (b) Modo oscuro del header. data-cl-modo lo pone el JS (elección guardada o la del sistema); sin JS queda en claro ── */
+html[data-cl-modo="oscuro"] #banner .top-bar, html[data-cl-modo="oscuro"] #mobil-menu,
+html[data-cl-modo="oscuro"] #navbarToggleExternalContent2, html[data-cl-modo="oscuro"] .idiomamob,
+html[data-cl-modo="oscuro"] #navmobile, html[data-cl-modo="oscuro"] #subnavmobile,
+html[data-cl-modo="oscuro"] #subnavmobile .btn-link { background: var(--clm-bg) !important; }
+html[data-cl-modo="oscuro"] #heading, html[data-cl-modo="oscuro"] #banner { background: var(--clm-sf) !important; }
+html[data-cl-modo="oscuro"] #subm { border-bottom: 1px solid var(--clm-line); }
+html[data-cl-modo="oscuro"] #subm, html[data-cl-modo="oscuro"] #subm .navbar { background: var(--clm-sf2) !important; }
+html[data-cl-modo="oscuro"] #banner .whats, html[data-cl-modo="oscuro"] #banner .bi-person-circle,
+html[data-cl-modo="oscuro"] #banner .icon-search, html[data-cl-modo="oscuro"] #banner .fa-bars,
+html[data-cl-modo="oscuro"] .clm-modo { color: var(--clm-ink) !important; }
+html[data-cl-modo="oscuro"] #navigation .navbar-nav .nav-item a.nav-link,
+html[data-cl-modo="oscuro"] #navmobile .btn-link, html[data-cl-modo="oscuro"] .idiomamob .nav-languaje { color: var(--clm-ink2) !important; }
+html[data-cl-modo="oscuro"] #navigation .navbar-nav .nav-item:hover a.nav-link { color: var(--clm-hover-ink) !important; }
+html[data-cl-modo="oscuro"] #subm a.nav-item.nav-link, html[data-cl-modo="oscuro"] #subnavmobile .btn-link { color: var(--clm-acc) !important; }
+/* El logo es un SVG en <img> (azul #00457c con el trazo del emblema en blanco): no se recolorea por fill.
+   Invertir y girar 180° el matiz deja el azul claro y el trazo oscuro, así el emblema conserva su dibujo */
+html[data-cl-modo="oscuro"] #banner img.imglog, html[data-cl-modo="oscuro"] #mobil-menu .img-logom img { filter: invert(1) hue-rotate(180deg) saturate(.6) brightness(1.08); }
+html[data-cl-modo="oscuro"] #mobil-menu .navbar-toggler { color: var(--clm-ink); }
+
+/* ── (b) Footer de noche: los logos y textos ya son claros, solo baja el azul ── */
+html[data-cl-modo="oscuro"] #footer, html[data-cl-modo="oscuro"] #footer .footer { background: var(--clm-pie) !important; }
+html[data-cl-modo="oscuro"] #footer .accordion-button-custom { background: var(--clm-pie2) !important; }
+/* ── (d) Footer en celular: sin el hueco de ~100 px antes de los acordeones (sus títulos centrados son a propósito) ── */
+@media (max-width: 991px) {
+  #footer .botomFooter { padding-bottom: 0 !important; }
+  #footer .botomFooter .list-inline { margin-bottom: 0 !important; }
+  #footer .container-it.pt-6 { padding-top: 24px !important; }
+}
