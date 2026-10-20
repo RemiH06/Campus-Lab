@@ -128,6 +128,7 @@ def convertir(plantilla, datos, nombre, nombre_json):
     cargador = (
         '<script>\n(function () {\n'
         '  var url = "/documents/d/campuslab/' + nombre_json + '";\n'
+        '  try { var modo = localStorage.getItem("cl-modo"); if (modo) document.querySelector(".cl").dataset.modo = modo; } catch (e) {}\n'
         '  var host = document.getElementById("cl-vista") || document.querySelector(".cl");\n'
         '  host.insertAdjacentHTML("afterbegin", \'<div class="cl-carga cl-indet" role="progressbar" aria-label="Cargando datos" aria-valuemin="0" aria-valuemax="100"><span class="cl-carga-t">Cargando datos…</span><span class="cl-carga-b"><i></i></span></div>\');\n'
         '  var barra = host.querySelector(".cl-carga"), mb = function (b) { return (b / 1048576).toFixed(1); };\n'

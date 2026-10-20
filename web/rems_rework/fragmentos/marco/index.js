@@ -7,12 +7,14 @@
   var store = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
 
   /* ── (b) Modo claro/oscuro: misma clave "cl-modo" que cl-kit.js, para que header, footer y componentes vayan juntos.
-     Por defecto claro (decisión de Remi, 16-oct), aunque el sistema esté en oscuro ── */
-  function modo() { return store.get("cl-modo") || "claro"; }
+     Sin elección guardada manda el modo del dispositivo (decisión de Remi, 21-oct); eso ya lo resuelve el CSS sin
+     esperar al JS, así que data-cl-modo solo se pone cuando alguien eligió con el botón ── */
+  var sistema = window.matchMedia("(prefers-color-scheme: dark)");
+  function modo() { return store.get("cl-modo") || (sistema.matches ? "oscuro" : "claro"); }
   function aplicarModo() {
-    var m = modo();
-    html.dataset.clModo = m;
-    [].forEach.call(document.querySelectorAll(".cl"), function (el) { el.dataset.modo = m; });
+    var m = modo(), elegido = store.get("cl-modo");
+    if (elegido) html.dataset.clModo = elegido; else delete html.dataset.clModo;
+    [].forEach.call(document.querySelectorAll(".cl"), function (el) { if (elegido) el.dataset.modo = elegido; else delete el.dataset.modo; });
     [].forEach.call(document.querySelectorAll(".clm-modo"), function (b) {
       var o = m === "oscuro";
       b.setAttribute("aria-pressed", o ? "true" : "false");
@@ -32,6 +34,7 @@
   boton(document.getElementById("whats-desktop"));
   boton(document.querySelector("#mobil-menu .icon-search"));
   aplicarModo();
+  sistema.addEventListener("change", aplicarModo); /* el dispositivo cambió de modo (p. ej. de día a noche) */
   window.addEventListener("storage", function (e) { if (e.key === "cl-modo") aplicarModo(); });
   document.addEventListener("cl-modo", aplicarModo); /* cl-kit avisa cuando su botón cambia el modo */
 

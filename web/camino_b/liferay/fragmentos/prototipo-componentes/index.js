@@ -19,7 +19,7 @@ window.CL_PROTO = function () {
   (function () {
     var b = document.getElementById("modo"), s = store.get("cl-modo");
     var actual = function () { var m = root.dataset.modo; if (m) return m; var t = document.documentElement.dataset.theme; if (t) return t === "dark" ? "oscuro" : "claro"; return matchMedia("(prefers-color-scheme: dark)").matches ? "oscuro" : "claro"; };
-    root.dataset.modo = s || "claro"; /* claro por defecto */
+    if (s) root.dataset.modo = s; /* sin elecci\u00f3n guardada, el del dispositivo */
     var pinta = function () { var o = actual() === "oscuro"; b.textContent = o ? "Modo claro" : "Modo oscuro"; b.setAttribute("aria-label", o ? "Cambiar a modo claro" : "Cambiar a modo oscuro"); };
     b.onclick = function () { var n = actual() === "oscuro" ? "claro" : "oscuro"; root.dataset.modo = n; store.set("cl-modo", n); pinta(); document.dispatchEvent(new Event("cl:color")); };
     pinta();
@@ -212,6 +212,7 @@ window.CL_PROTO = function () {
 
 (function () {
   var url = (typeof configuration !== "undefined" && configuration.datos) || "/documents/d/campuslab/prototipo-componentes";
+  try { var modo = localStorage.getItem("cl-modo"); if (modo) document.querySelector(".cl").dataset.modo = modo; } catch (e) {}
   var host = document.getElementById("cl-vista") || document.querySelector(".cl");
   host.insertAdjacentHTML("afterbegin", '<div class="cl-carga cl-indet" role="progressbar" aria-label="Cargando datos" aria-valuemin="0" aria-valuemax="100"><span class="cl-carga-t">Cargando datos\u2026</span><span class="cl-carga-b"><i></i></span></div>');
   var barra = host.querySelector(".cl-carga"), mb = function (b) { return (b / 1048576).toFixed(1); };

@@ -54,7 +54,7 @@ window.CL_PROTO = function () {
   function initModo() {
     var b = document.getElementById("cl-modo"), saved = store.get("cl-modo");
     var actual = function () { var m = root.dataset.modo; if (m) return m; var t = document.documentElement.dataset.theme; if (t === "dark" || t === "light") return t === "dark" ? "oscuro" : "claro"; return matchMedia("(prefers-color-scheme: dark)").matches ? "oscuro" : "claro"; };
-    root.dataset.modo = saved || "claro"; /* claro por defecto */
+    if (saved) root.dataset.modo = saved; /* sin elecci\u00f3n guardada, el del dispositivo */
     var pinta = function () { var o = actual() === "oscuro"; b.textContent = o ? "Modo claro" : "Modo oscuro"; b.setAttribute("aria-label", o ? "Cambiar a modo claro" : "Cambiar a modo oscuro"); };
     b.addEventListener("click", function () { var n = actual() === "oscuro" ? "claro" : "oscuro"; root.dataset.modo = n; store.set("cl-modo", n); pinta(); });
     pinta();
@@ -334,6 +334,7 @@ window.CL_PROTO = function () {
 
 (function () {
   var url = "/documents/d/campuslab/prototipo-plantillas";
+  try { var modo = localStorage.getItem("cl-modo"); if (modo) document.querySelector(".cl").dataset.modo = modo; } catch (e) {}
   var host = document.getElementById("cl-vista") || document.querySelector(".cl");
   host.insertAdjacentHTML("afterbegin", '<div class="cl-carga cl-indet" role="progressbar" aria-label="Cargando datos" aria-valuemin="0" aria-valuemax="100"><span class="cl-carga-t">Cargando datos\u2026</span><span class="cl-carga-b"><i></i></span></div>');
   var barra = host.querySelector(".cl-carga"), mb = function (b) { return (b / 1048576).toFixed(1); };

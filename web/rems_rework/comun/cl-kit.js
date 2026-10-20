@@ -94,10 +94,10 @@
 
   /* ═══ Componente: barra (modo y floración); sincroniza todos los .cl de la página ═══ */
   function todos() { return [].slice.call(document.querySelectorAll(".cl")); }
-  function modoActual() { return store.get("cl-modo") || "claro"; } /* claro por defecto aunque el sistema esté en oscuro */
+  function modoActual() { return store.get("cl-modo") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "oscuro" : "claro"); } /* sin elección guardada, el del dispositivo */
   function aplicarColor() {
-    var f = store.get("cl-flor") || "auto", m = modoActual();
-    todos().forEach(function (el) { el.dataset.floracion = f === "auto" ? mesFlor() : f; el.dataset.modo = m; });
+    var f = store.get("cl-flor") || "auto", m = store.get("cl-modo");
+    todos().forEach(function (el) { el.dataset.floracion = f === "auto" ? mesFlor() : f; if (m) el.dataset.modo = m; else delete el.dataset.modo; });
   }
   var barra = {
     mount: function (el) {

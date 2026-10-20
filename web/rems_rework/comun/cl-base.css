@@ -15,7 +15,7 @@
    Contraste verificado WCAG AA en los dos modos y las siete floraciones.
    ═══════════════════════════════════════════════════════════════════════ */
 .cl {
-  color-scheme: light; /* claro por defecto: sin esto, antes de que el JS ponga data-modo, sigue al sistema y parpadea en oscuro */
+  color-scheme: light dark; /* sigue al dispositivo; data-modo (elección guardada) manda encima. CSS y JS coinciden: no parpadea */
   --cl-bg: light-dark(#f3f6f5, #0c171e);
   --cl-sf: light-dark(#fbfcfc, #13222b);
   --cl-ink: light-dark(#12283a, #e3ece9);

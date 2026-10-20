@@ -3,7 +3,7 @@
 
 /* \002550\002550\002550 cl-base.css (la misma del prototipo de plantillas) \002550\002550\002550 */
 .cl {
-  color-scheme: light; /* claro por defecto: sin esto, antes de que el JS ponga data-modo, sigue al sistema y parpadea en oscuro */
+  color-scheme: light dark; /* sigue al dispositivo; data-modo (elecci\0000f3n guardada) manda encima. CSS y JS coinciden: no parpadea */
   --cl-bg: light-dark(#f3f6f5, #0c171e); --cl-sf: light-dark(#fbfcfc, #13222b); --cl-ink: light-dark(#12283a, #e3ece9);
   --cl-ink2: light-dark(#4a5d69, #9db0b5); --cl-line: light-dark(#d2dcdb, #29404a);
   --cl-acc: var(--f1i); --cl-fill: light-dark(var(--f1i), var(--f1)); --cl-on-fill: light-dark(#fbfcfc, #0c171e);

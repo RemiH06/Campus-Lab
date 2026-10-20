@@ -13,7 +13,7 @@
    3. COMPONENTES: solo usan tokens --cl-*; nunca un color suelto.
    \002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550 */
 .cl {
-  color-scheme: light; /* claro por defecto: sin esto, antes de que el JS ponga data-modo, sigue al sistema y parpadea en oscuro */
+  color-scheme: light dark; /* sigue al dispositivo; data-modo (elecci\0000f3n guardada) manda encima. CSS y JS coinciden: no parpadea */
   /* Neutros (azul ITESO 205\0000b0 muy desaturado) \0000b7 verificados WCAG */
   --cl-bg: light-dark(#f3f6f5, #0c171e);
   --cl-sf: light-dark(#fbfcfc, #13222b);
