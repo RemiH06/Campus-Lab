@@ -326,7 +326,8 @@
     var pintaFoto = function () {
       if (!parte) { frame.innerHTML = '<div class="cl-vacia"><b>Todavía no hay fotos de esta especie</b><span>Si tienes una, ayúdanos a completar el Itesodex.</span></div>'; pie.innerHTML = ""; return; }
       var f = e.fotos[parte];
-      frame.innerHTML = '<img class="cl-in" src="' + esc(foto(cfg, f.f, "grande")) + '" alt="' + esc(NOM[parte] + " de " + e.com + " (" + e.sci + ")") + '">';
+      /* el navegador escoge: 1000 px (Adaptive Media) en pantallas normales, el archivo de 2560 px en anchas o de alta densidad */
+      frame.innerHTML = '<img class="cl-in" src="' + esc(foto(cfg, f.f, "grande")) + '" srcset="' + esc(foto(cfg, f.f, "grande")) + " 1000w, " + esc(cfg.fotos + f.f + cfg.ext) + ' 2560w" sizes="(max-width: 860px) 100vw, 58vw" alt="' + esc(NOM[parte] + " de " + e.com + " (" + e.sci + ")") + '">';
       pie.innerHTML = "<span>" + NOM[parte] + " · " + e.partes.length + " de 5 partes fotografiadas</span><span>Foto: " + esc(f.a || "Campus Lab ITESO") + "</span>";
     };
     var pick = function (p) { parte = p; pintaFoto(); anillos.mount(an, e, parte, pick); };

@@ -4,7 +4,7 @@ Genera lo que se sube a Liferay para el catálogo de árboles (camino B):
   arboles.json       especies: nombres, familia, rasgos de la ficha, árboles por jardín, fotos por parte
   mapa-campus.json   edificios y caminos del campus (OSM) y un punto por árbol con placa (ArcGIS)
   fotos/             una foto por especie y parte (la más pesada), redimensionada al estándar
-                     "liferay" de redimensionar_imagenes.py; nombre <especie>-<parte>.jpg
+                     "liferay_hd" (2560 px) de redimensionar_imagenes.py; nombre <especie>-<parte>.jpg
   datos_local.js     los dos JSON en una variable, para ver rems_rework/vista_local.html sin servidor
   lista_subida.csv   qué archivo va a Documentos y Medios y con qué nombre
 
@@ -123,7 +123,7 @@ def construir(forzar=False):
 
     geo, pts, malos = mapa(puntos)
     elegidas = fotos_elegidas(llave_de)
-    ancho, alto = ESTANDARES["liferay"]
+    ancho, alto = ESTANDARES["liferay_hd"]
     (SALIDA / "fotos").mkdir(parents=True, exist_ok=True)
 
     llaves = sorted(esp, key=lambda k: esp[k]["sci"])

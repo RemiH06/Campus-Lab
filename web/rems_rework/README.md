@@ -38,6 +38,6 @@ Al reemplazar un archivo en Documentos y Medios (subir una versión nueva del mi
 
 ## Imágenes
 
-Se suben ya redimensionadas al estándar `liferay` de `web/scripts/redimensionar_imagenes.py` (máximo 1280×768). Liferay genera solo dos versiones más chicas de cada imagen (Adaptive Media, ya activo en el sitio): `?imageThumbnail=1` (300×300) y `?imagePreview=1` (1000 px de ancho). El kit pide la de 300 para el mosaico y la de 1000 para la ficha, así el visitante no descarga la foto completa.
+Se suben en la mejor calidad útil para pantalla: el estándar `liferay_hd` de `web/scripts/redimensionar_imagenes.py` (2560 px por el lado largo, de la foto más pesada de cada parte; conserva el perfil de color y quita los metadatos EXIF, incluida la ubicación GPS). Liferay genera dos versiones más chicas de cada imagen (Adaptive Media, ya activo en el sitio): `?imageThumbnail=1` (300×300) y `?imagePreview=1` (1000 px de ancho). El kit pide la de 300 para el mosaico; en la ficha el navegador elige entre la de 1000 y el archivo de 2560 según la pantalla. Para imprimir (lonas, carteles) se usa el original del volumen, nunca la copia de Liferay.
 
 Pendiente: créditos de autor. La mayoría de las fotos no tiene autor en la base de datos y la ficha muestra "Campus Lab ITESO"; revisar `lista_subida.csv` antes de publicar.

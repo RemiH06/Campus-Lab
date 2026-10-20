@@ -26,19 +26,25 @@ EXTENSIONES_VALIDAS = {".jpg", ".jpeg", ".png", ".tif", ".tiff", ".webp"}
 # Cada estándar: (ancho_max, alto_max). La imagen se ajusta para caber
 # dentro de esas dimensiones sin recortar ni deformar (mantiene proporción,
 # nunca agranda una imagen más chica que el estándar).
+# "liferay_hd" (20-oct): el diseño ya ocupa todo el ancho (hasta 2560 px y pantallas de alta densidad); más
+# grande ya no se nota en pantalla y solo pesa. Liferay genera solo las versiones chicas (Adaptive Media: 300 y
+# 1000 px). Para imprimir (lonas, carteles) se usa el original del volumen, nunca la copia de Liferay.
 ESTANDARES = {
     "liferay": (1280, 768),
+    "liferay_hd": (2560, 2560),
 }
 
 
 def redimensionar_una(ruta_entrada: Path, ruta_salida: Path, ancho_max: int, alto_max: int) -> tuple[int, int]:
     with Image.open(ruta_entrada) as img:
+        icc = img.info.get("icc_profile")  # perfil de color: sin él, algunas fotos se ven deslavadas
         img = ImageOps.exif_transpose(img)
         if img.mode not in ("RGB", "L"):
             img = img.convert("RGB")
         img.thumbnail((ancho_max, alto_max), Image.LANCZOS)
         ruta_salida.parent.mkdir(parents=True, exist_ok=True)
-        img.save(ruta_salida, "JPEG", quality=85, optimize=True)
+        # Sin EXIF a propósito: quita cámara, fecha y ubicación GPS de quien tomó la foto
+        img.save(ruta_salida, "JPEG", quality=86, optimize=True, progressive=True, icc_profile=icc)
         return img.size
 
 
@@ -46,7 +52,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("carpeta_entrada", type=Path, help="Carpeta con las fotos originales")
     parser.add_argument("--salida", type=Path, default=None, help="Carpeta de salida (default: carpeta hermana 'resized')")
-    parser.add_argument("--estandar", default="liferay", choices=sorted(ESTANDARES), help="Estándar de tamaño a usar")
+    parser.add_argument("--estandar", default="liferay_hd", choices=sorted(ESTANDARES), help="Estándar de tamaño a usar")
     parser.add_argument("--forzar", action="store_true", help="Vuelve a generar aunque ya exista el archivo de salida")
     args = parser.parse_args()
 
