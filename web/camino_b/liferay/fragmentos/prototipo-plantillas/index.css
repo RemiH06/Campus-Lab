@@ -13,7 +13,7 @@
    3. COMPONENTES: solo usan tokens --cl-*; nunca un color suelto.
    \002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550 */
 .cl {
-  color-scheme: light dark;
+  color-scheme: light; /* claro por defecto: sin esto, antes de que el JS ponga data-modo, sigue al sistema y parpadea en oscuro */
   /* Neutros (azul ITESO 205\0000b0 muy desaturado) \0000b7 verificados WCAG */
   --cl-bg: light-dark(#f3f6f5, #0c171e);
   --cl-sf: light-dark(#fbfcfc, #13222b);
@@ -73,7 +73,8 @@
 @media (prefers-reduced-motion: reduce) { .cl * { transition: none !important; animation: none !important; } }
 
 /* \002550\002550\002550 cl-barra \0000b7 modo, floraci\0000f3n y vistas (un componente) \002550\002550\002550 */
-.cl-shell { max-width: 1180px; margin: 0 auto; padding-block: 18px 56px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 22px; }
+.cl :is(p, dd) { max-width: 75ch; } /* el contenedor usa todo el ancho; el texto corrido no pasa de ~75 caracteres por rengl\0000f3n */
+.cl-shell { padding-block: 18px 56px; padding-left: max(clamp(16px, 5vw, 120px), env(safe-area-inset-left, 0px)); padding-right: max(clamp(16px, 5vw, 120px), env(safe-area-inset-right, 0px)); display: grid; gap: 22px; } /* todo el ancho disponible (pedido de Maya, 20-oct) */
 .cl-top { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; }
 .cl-brand { display: grid; gap: 2px; }
 .cl-brand b { font-size: 1.25rem; }
@@ -173,7 +174,7 @@
 /* \002550\002550\002550 Notas para Maya \002550\002550\002550 */
 .sistema { display: grid; gap: 14px; padding: 18px; }
 .sistema h2 { font-size: 1.25rem; }
-.sis-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.sis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 14px; }
 .sis-grid section { display: grid; gap: 6px; align-content: start; }
 .sis-grid h3 { font-size: 1.02rem; }
 .sis-grid p { color: var(--cl-ink2); font-size: .94rem; }

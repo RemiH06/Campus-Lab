@@ -1,6 +1,6 @@
 <title>Árboles del campus</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap">
+<link rel="stylesheet" href="https://fonts.bunny.net/css?family=figtree:400,400i,500,500i,600,700&display=swap">
 <style>
 /* ═══ Página de vista previa (solo para el artifact; en Liferay la pone el tema de ITESO) ═══ */
 :root { --page: #f3f6f5; color-scheme: light; }
@@ -19,7 +19,7 @@ body { background: var(--page); }
    3. COMPONENTES: solo usan tokens --cl-*; nunca un color suelto.
    ═══════════════════════════════════════════════════════════════════════ */
 .cl {
-  color-scheme: light dark;
+  color-scheme: light; /* claro por defecto: sin esto, antes de que el JS ponga data-modo, sigue al sistema y parpadea en oscuro */
   /* Neutros (azul ITESO 205° muy desaturado) · verificados WCAG */
   --cl-bg: light-dark(#f3f6f5, #0c171e);
   --cl-sf: light-dark(#fbfcfc, #13222b);
@@ -79,7 +79,8 @@ body { background: var(--page); }
 @media (prefers-reduced-motion: reduce) { .cl * { transition: none !important; animation: none !important; } }
 
 /* ═══ cl-barra · modo, floración y vistas (un componente) ═══ */
-.cl-shell { max-width: 1180px; margin: 0 auto; padding-block: 18px 56px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 22px; }
+.cl :is(p, dd) { max-width: 75ch; } /* el contenedor usa todo el ancho; el texto corrido no pasa de ~75 caracteres por renglón */
+.cl-shell { padding-block: 18px 56px; padding-left: max(clamp(16px, 5vw, 120px), env(safe-area-inset-left, 0px)); padding-right: max(clamp(16px, 5vw, 120px), env(safe-area-inset-right, 0px)); display: grid; gap: 22px; } /* todo el ancho disponible (pedido de Maya, 20-oct) */
 .cl-top { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; }
 .cl-brand { display: grid; gap: 2px; }
 .cl-brand b { font-size: 1.25rem; }
@@ -179,7 +180,7 @@ body { background: var(--page); }
 /* ═══ Notas para Maya ═══ */
 .sistema { display: grid; gap: 14px; padding: 18px; }
 .sistema h2 { font-size: 1.25rem; }
-.sis-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.sis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 14px; }
 .sis-grid section { display: grid; gap: 6px; align-content: start; }
 .sis-grid h3 { font-size: 1.02rem; }
 .sis-grid p { color: var(--cl-ink2); font-size: .94rem; }
@@ -422,7 +423,7 @@ body { background: var(--page); }
   }
   var mosaico = {
     mount: function (el, items) {
-      var w = el.clientWidth || 800, cell = w < 520 ? 68 : 86, cols = Math.max(4, Math.floor((w + 4) / (cell + 4))), lado = (w - (cols - 1) * 4) / cols;
+      var w = el.clientWidth || 800, cell = w < 520 ? 68 : Math.round(Math.min(120, Math.max(86, w / 16))), /* casillas más grandes en pantallas anchas */ cols = Math.max(4, Math.floor((w + 4) / (cell + 4))), lado = (w - (cols - 1) * 4) / cols;
       el.style.setProperty("--cols", cols); el.style.setProperty("--cell", lado.toFixed(1) + "px");
       if (!el.dataset.pieza) { el.dataset.pieza = "1"; resaltarPieza(el); }
       if (!items.length) { el.innerHTML = '<p class="mos-vacio">Ninguna especie coincide. Prueba con el nombre común, la familia o un jardín.</p>'; return; }

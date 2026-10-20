@@ -5,7 +5,7 @@
 
 /* \002550\002550\002550 cl-base.css (la misma del prototipo de plantillas) \002550\002550\002550 */
 .cl {
-  color-scheme: light dark;
+  color-scheme: light; /* claro por defecto: sin esto, antes de que el JS ponga data-modo, sigue al sistema y parpadea en oscuro */
   --cl-bg: light-dark(#f3f6f5, #0c171e); --cl-sf: light-dark(#fbfcfc, #13222b); --cl-ink: light-dark(#12283a, #e3ece9);
   --cl-ink2: light-dark(#4a5d69, #9db0b5); --cl-line: light-dark(#d2dcdb, #29404a);
   --cl-acc: var(--f1i); --cl-fill: light-dark(var(--f1i), var(--f1)); --cl-on-fill: light-dark(#fbfcfc, #0c171e);
@@ -42,7 +42,7 @@
 @media (hover: hover) and (pointer: fine) { .cl .cl-btn:hover { border-color: var(--cl-acc); } }
 
 /* \002550\002550\002550 P\0000e1gina de muestras \002550\002550\002550 */
-.shell { max-width: 1180px; margin: 0 auto; padding-block: 18px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 28px; }
+.shell { padding-block: 18px 64px; padding-left: max(clamp(16px, 5vw, 120px), env(safe-area-inset-left, 0px)); padding-right: max(clamp(16px, 5vw, 120px), env(safe-area-inset-right, 0px)); display: grid; gap: 28px; } /* todo el ancho disponible (pedido de Maya, 20-oct) */
 .top { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: end; justify-content: space-between; }
 .top h1 { font-size: clamp(1.9rem, 4.6vw, 2.7rem); font-weight: 700; }
 .top p { max-width: 62ch; color: var(--cl-ink2); margin-top: 6px; }
@@ -54,7 +54,7 @@
 .grupo { display: grid; gap: 14px; }
 .grupo > h2 { font-size: 1.35rem; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
 .grupo > h2 small { font-size: .95rem; font-weight: 400; color: var(--cl-ink2); }
-.demos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.demos { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 14px; }
 .demo { display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; }
 .demo .stage { position: relative; min-height: 230px; display: grid; place-items: center; padding: 18px; background: var(--cl-bg); border-bottom: 1px solid var(--cl-line); overflow: hidden; }
 .demo .info { padding: 14px 16px; display: grid; gap: 6px; align-content: start; }
@@ -64,7 +64,6 @@
 .demo .info p b { color: var(--cl-ink); font-weight: 600; }
 .demo .pie { display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 0 16px 14px; }
 .peso { font-size: .82rem; color: var(--cl-ink2); padding: 2px 10px; border-radius: 999px; border: 1px solid var(--cl-line); }
-@media (max-width: 820px) { .demos { grid-template-columns: 1fr; } }
 
 /* 1 \0000b7 Revelado de foto */
 .rev { width: min(100%, 360px); aspect-ratio: 4 / 3; border-radius: var(--cl-r); overflow: hidden; }

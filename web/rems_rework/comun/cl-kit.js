@@ -239,7 +239,7 @@
   }
   var mosaico = {
     mount: function (el, items, cfg) {
-      var w = el.clientWidth || 800, cell = w < 520 ? 68 : 86, cols = Math.max(4, Math.floor((w + 4) / (cell + 4))), lado = (w - (cols - 1) * 4) / cols;
+      var w = el.clientWidth || 800, cell = w < 520 ? 68 : Math.round(Math.min(120, Math.max(86, w / 16))), /* casillas más grandes en pantallas anchas */ cols = Math.max(4, Math.floor((w + 4) / (cell + 4))), lado = (w - (cols - 1) * 4) / cols;
       el.style.setProperty("--cols", cols); el.style.setProperty("--cell", lado.toFixed(1) + "px");
       if (!el.dataset.pieza) { el.dataset.pieza = "1"; resaltarPieza(el); }
       if (!items.length) { el.innerHTML = '<p class="cl-mos-vacio">Ninguna especie coincide. Prueba con el nombre común, la familia o un jardín.</p>'; return; }
