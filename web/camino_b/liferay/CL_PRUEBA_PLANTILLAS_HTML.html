@@ -487,7 +487,7 @@ window.CL_PROTO = function () {
       f["inner" + "HTML"] = '<img class="in" src="' + e.fo[S.parte] + '" alt="' + esc(NOM[S.parte] + " de " + e.com + " (" + e.sci + ")") + '">';
       pie.textContent = NOM[S.parte] + " \u00b7 " + e.partes.length + " de 5 partes fotografiadas";
     };
-    var pick = function (p) { S.parte = p; foto(); anillos.mount(document.getElementById("cl-anillos"), e, S.parte, pick); };
+    var pick = function (p) { S.parte = p; foto(); anillos.mount(document.getElementById("cl-anillos"), e, S.parte, pick); guardar("replace"); };
     foto(); anillos.mount(document.getElementById("cl-anillos"), e, S.parte, pick);
     mapa.mount(document.getElementById("cl-mini"), { hi: [e.id], foco: true, zoom: "hi", ar: 1.4, label: "Ubicaci\u00f3n de los " + e.n + " \u00e1rboles de " + e.com });
   }
@@ -504,30 +504,60 @@ window.CL_PROTO = function () {
       '<div class="leyenda-mapa"><span style="--c:var(--cl-fill)">' + (S.faltan ? nFalt + " \u00e1rboles de especies sin foto" : esc(e.com) + " (" + e.n + ")") + '</span><span style="--c:color-mix(in srgb, var(--cl-ink2) 30%, var(--cl-sf))">Otros \u00e1rboles</span></div>' +
       '<p class="cl-muted" style="font-size:.9rem">Toca un punto para ver su placa. ' + (S.faltan ? "\u00datil para salir a fotografiar: cada punto es un \u00e1rbol cuya especie a\u00fan no tiene foto." : "") + "</p></div></aside></section>";
     mapa.mount(document.getElementById("cl-mapa"), { hi: hi, foco: true, zoom: pl ? "placa" : "hi", placa: pl ? S.placa : null, controles: true, ar: innerWidth < 600 ? 1.1 : 1.5, label: "Mapa de \u00e1rboles del campus",
-      onPick: function (placa) { S.placa = String(placa); vLugar(); } });
+      onPick: function (placa) { S.placa = String(placa); vLugar(); guardar("push"); } });
   }
 
   var VISTAS = { coleccion: vColeccion, especie: vEspecie, lugar: vLugar };
-  function ir(v, scroll) {
+  function ir(v, scroll, quieto) {
     S.vista = v; document.querySelectorAll("[data-vista]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.vista === v)); });
     VISTAS[v](); if (scroll) root.scrollIntoView({ behavior: reduce.matches ? "auto" : "smooth", block: "start" });
+    if (!quieto) guardar("push");
   }
+
+  /* \u2500\u2500 Historial: cada paso (vista, especie, filtro, placa elegida) queda en la URL como un paso del navegador, as\u00ed
+     las flechas atr\u00e1s/adelante regresan al anterior y una ficha se comparte por liga. Lo que se escribe y la parte
+     elegida solo reemplazan el paso actual. Los par\u00e1metros llevan "cl-" para no chocar con los de Liferay \u2500\u2500 */
+  var CLAVES = ["vista", "id", "parte", "q", "filtro", "faltan", "placa"], DEF = { vista: "coleccion", filtro: "todas" };
+  function aUrl() {
+    var u = new URL(location.href);
+    CLAVES.forEach(function (k) {
+      var v = k === "faltan" ? (S.faltan ? "1" : "") : S[k];
+      var sobra = !v || DEF[k] === v || (S.vista === "coleccion" && (k === "id" || k === "parte" || k === "placa" || k === "faltan")) || (S.vista !== "coleccion" && (k === "q" || k === "filtro")) || (S.vista !== "especie" && k === "parte");
+      if (sobra) u.searchParams.delete("cl-" + k); else u.searchParams.set("cl-" + k, v);
+    });
+    return u.pathname + u.search + u.hash;
+  }
+  function guardar(modo) {
+    var foto = {}; CLAVES.forEach(function (k) { foto[k] = S[k]; });
+    try { history[modo === "push" ? "pushState" : "replaceState"]({ cl: foto }, "", aUrl()); } catch (e) {}
+  }
+  function desdeUrl() {
+    var u = new URLSearchParams(location.search), v = u.get("cl-vista");
+    S.vista = VISTAS[v] ? v : "coleccion";
+    if (byId[u.get("cl-id")]) S.id = u.get("cl-id");
+    S.parte = u.get("cl-parte"); S.q = u.get("cl-q") || ""; S.filtro = u.get("cl-filtro") || "todas";
+    S.faltan = u.get("cl-faltan") === "1"; S.placa = u.get("cl-placa");
+  }
+  addEventListener("popstate", function (ev) {
+    if (ev.state && ev.state.cl) { CLAVES.forEach(function (k) { S[k] = ev.state.cl[k]; }); } else desdeUrl();
+    ir(S.vista, false, true);
+  });
   document.querySelector(".cl-tabs").addEventListener("click", function (ev) { var b = ev.target.closest("[data-vista]"); if (b) ir(b.dataset.vista); });
   main.addEventListener("click", function (ev) {
     var t = ev.target.closest("[data-id],[data-abre],[data-filtro],[data-ir],[data-faltan]"); if (!t) return;
-    if (t.dataset.filtro) { S.filtro = t.dataset.filtro; vColeccion(); return; }
+    if (t.dataset.filtro) { S.filtro = t.dataset.filtro; vColeccion(); guardar("push"); return; }
     if (t.dataset.ir) { S.faltan = false; S.placa = null; ir(t.dataset.ir, true); return; }
-    if (t.dataset.faltan) { S.faltan = t.dataset.faltan === "1"; S.placa = null; vLugar(); return; }
+    if (t.dataset.faltan) { S.faltan = t.dataset.faltan === "1"; S.placa = null; vLugar(); guardar("push"); return; }
     S.id = t.dataset.id || t.dataset.abre; S.parte = null; ir("especie", true);
   });
   var tq;
   main.addEventListener("input", function (ev) {
-    if (ev.target.id === "cl-q") { S.q = ev.target.value; clearTimeout(tq); tq = setTimeout(function () { mosaico.mount(document.getElementById("cl-mos"), buscar()); }, 120); }
-    if (ev.target.id === "cl-placa") { var v = ev.target.value.replace(/\D/g, ""); clearTimeout(tq); tq = setTimeout(function () { S.placa = v || null; vLugar(); var i = document.getElementById("cl-placa"); i.focus(); i.setSelectionRange(i.value.length, i.value.length); }, 400); }
+    if (ev.target.id === "cl-q") { S.q = ev.target.value; clearTimeout(tq); tq = setTimeout(function () { mosaico.mount(document.getElementById("cl-mos"), buscar()); guardar("replace"); }, 120); }
+    if (ev.target.id === "cl-placa") { var v = ev.target.value.replace(/\D/g, ""); clearTimeout(tq); tq = setTimeout(function () { S.placa = v || null; vLugar(); guardar("replace"); var i = document.getElementById("cl-placa"); i.focus(); i.setSelectionRange(i.value.length, i.value.length); }, 400); }
   });
   var tr; addEventListener("resize", function () { clearTimeout(tr); tr = setTimeout(function () { if (S.vista === "coleccion") mosaico.mount(document.getElementById("cl-mos"), buscar()); }, 150); });
 
-  initModo(); initFlor(); ir("coleccion");
+  initModo(); initFlor(); desdeUrl(); ir(S.vista, false, true); guardar("replace");
 };
 </script>
 <script>

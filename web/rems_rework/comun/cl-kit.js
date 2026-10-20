@@ -257,15 +257,36 @@
     }
   };
 
+  /* ── Historial dentro de una página: el estado de la vista (búsqueda, filtro, placa) vive en la URL. Los pasos
+     (filtro, placa elegida) se deshacen con las flechas del navegador; lo que se escribe solo reemplaza el paso
+     actual. defs = valor por defecto de cada clave (no se escribe en la URL) ── */
+  var txt = function (v) { return v === true ? "1" : v === false ? "0" : v == null ? "" : String(v); };
+  function historial(S, defs, alVolver) {
+    function guardar(modo) {
+      try {
+        var u = new URL(location.href);
+        Object.keys(defs).forEach(function (k) { var v = txt(S[k]); if (v === "" || v === txt(defs[k])) u.searchParams.delete(k); else u.searchParams.set(k, v); });
+        history[modo === "push" ? "pushState" : "replaceState"]({ cl: JSON.parse(JSON.stringify(S)) }, "", u.pathname + u.search + u.hash);
+      } catch (e) {}
+    }
+    window.addEventListener("popstate", function (ev) {
+      var st = ev.state && ev.state.cl; if (!st) return;
+      Object.keys(defs).forEach(function (k) { if (k in st) S[k] = st[k]; }); alVolver();
+    });
+    guardar("replace");
+    return guardar;
+  }
+  var deUrl = function (k, porDefecto) { var v = param(k); return v == null ? porDefecto : v === "1" ? true : v === "0" ? false : v; };
+
   function foto(cfg, nombre, tam) { return cfg.fotos + nombre + cfg.ext + (tam === "chica" ? cfg.chica : cfg.grande); }
 
   /* ═══ Vistas (una por página de Liferay) ═══ */
   function vColeccion(main, D, cfg) {
-    var E = D.arboles.especies, S = { q: "", filtro: "todas" };
+    var E = D.arboles.especies, S = { q: deUrl("q", ""), filtro: deUrl("filtro", "todas") };
     var con = E.filter(function (e) { return e.partes.length; }).length, partes = E.reduce(function (s, e) { return s + e.partes.length; }, 0), tot = E.length * 5;
     main.innerHTML = '<section class="cl-coleccion"><div class="cl-col-head"><div><p class="cl-eyebrow">Itesodex · árboles</p><h1>' + E.length + ' especies en el inventario</h1></div>' +
       '<div class="cl-progreso"><p><b>' + con + "</b> con foto · <b>" + partes + "</b> de " + tot + ' partes fotografiadas</p><div class="cl-barra-p" aria-hidden="true"><i style="width:' + (100 * partes / tot).toFixed(1) + '%"></i></div></div></div>' +
-      '<div class="cl-col-tools"><input class="cl-field" type="search" autocomplete="off" placeholder="Busca por nombre, familia o jardín" aria-label="Buscar especie">' +
+      '<div class="cl-col-tools"><input class="cl-field" type="search" autocomplete="off" placeholder="Busca por nombre, familia o jardín" aria-label="Buscar especie" value="' + esc(S.q) + '">' +
       '<div class="cl-tabs" role="group" aria-label="Filtrar">' + [["todas", "Todas"], ["con", "Con foto"], ["faltan", "Les faltan partes"], ["sin", "Sin foto"]].map(function (f) { return '<button class="cl-btn" type="button" data-filtro="' + f[0] + '" aria-pressed="' + (S.filtro === f[0]) + '">' + f[1] + "</button>"; }).join("") + "</div></div>" +
       '<div class="cl-mosaico"></div></section>';
     var mos = main.querySelector(".cl-mosaico"), t;
@@ -278,8 +299,13 @@
       }).sort(function (a, b) { return b.n - a.n; });
     };
     var pinta = function () { mosaico.mount(mos, lista(), cfg); };
-    main.querySelector("input").oninput = function (ev) { S.q = ev.target.value; clearTimeout(t); t = setTimeout(pinta, 120); };
-    main.querySelector(".cl-tabs").onclick = function (ev) { var b = ev.target.closest("[data-filtro]"); if (!b) return; S.filtro = b.dataset.filtro; main.querySelectorAll("[data-filtro]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); pinta(); };
+    var guardar = historial(S, { q: "", filtro: "todas" }, function () {
+      main.querySelector("input").value = S.q;
+      main.querySelectorAll("[data-filtro]").forEach(function (x) { x.setAttribute("aria-pressed", String(x.dataset.filtro === S.filtro)); });
+      pinta();
+    });
+    main.querySelector("input").oninput = function (ev) { S.q = ev.target.value; clearTimeout(t); t = setTimeout(function () { pinta(); guardar("replace"); }, 120); };
+    main.querySelector(".cl-tabs").onclick = function (ev) { var b = ev.target.closest("[data-filtro]"); if (!b) return; S.filtro = b.dataset.filtro; main.querySelectorAll("[data-filtro]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); pinta(); guardar("push"); };
     var tr; window.addEventListener("resize", function () { clearTimeout(tr); tr = setTimeout(pinta, 150); });
     pinta();
   }
@@ -309,7 +335,8 @@
   }
 
   function vMapa(main, D, cfg) {
-    var E = D.arboles.especies, S = { id: param("id"), placa: param("placa"), faltan: !param("id") && !param("placa") }; // sin especie ni placa: marca los árboles sin foto
+    var marcaFaltan = !param("id") && !param("placa"); // sin especie ni placa: marca los árboles sin foto
+    var E = D.arboles.especies, S = { id: param("id"), placa: param("placa"), faltan: deUrl("faltan", marcaFaltan) };
     if (!D.byId[S.id]) S.id = null;
     var nFalt = D.mapa.pts.filter(function (p) { return !E[p[3]].partes.length; }).length;
     var pinta = function () {
@@ -324,11 +351,11 @@
         '<div class="cl-leyenda-mapa">' + (S.faltan ? '<span style="--c:var(--cl-fill)">' + nFalt + " árboles de especies sin foto</span>" : e ? '<span style="--c:var(--cl-fill)">' + esc(e.com) + " (" + e.n + ")</span>" : "") +
         '<span style="--c:color-mix(in srgb, var(--cl-ink2) 30%, var(--cl-sf))">Otros árboles</span></div><p class="cl-muted" style="font-size:.9rem">Toca un punto para ver su placa.' + (S.faltan ? " Cada punto marcado es un árbol cuya especie aún no tiene foto." : "") + "</p></div></aside></section>";
       mapa.mount(main.querySelector(".cl-mapa-host"), D, { hi: hi, foco: hi.length > 0, zoom: pl ? "placa" : "hi", placa: pl ? S.placa : null, controles: true, ar: window.innerWidth < 600 ? 1.1 : 1.5, label: "Mapa de árboles del campus",
-        onPick: function (placa) { S.placa = String(placa); pinta(); } });
+        onPick: function (placa) { S.placa = String(placa); pinta(); guardar("push"); } });
     };
-    var t;
-    main.addEventListener("input", function (ev) { if (!ev.target.matches(".cl-field")) return; var v = ev.target.value.replace(/\D/g, ""); clearTimeout(t); t = setTimeout(function () { S.placa = v || null; pinta(); var i = main.querySelector(".cl-field"); i.focus(); i.setSelectionRange(i.value.length, i.value.length); }, 400); });
-    main.addEventListener("click", function (ev) { var b = ev.target.closest("[data-faltan]"); if (b) { S.faltan = b.dataset.faltan === "1"; S.placa = null; pinta(); } });
+    var guardar = historial(S, { id: null, placa: null, faltan: marcaFaltan }, pinta), t;
+    main.addEventListener("input", function (ev) { if (!ev.target.matches(".cl-field")) return; var v = ev.target.value.replace(/\D/g, ""); clearTimeout(t); t = setTimeout(function () { S.placa = v || null; pinta(); guardar("replace"); var i = main.querySelector(".cl-field"); i.focus(); i.setSelectionRange(i.value.length, i.value.length); }, 400); });
+    main.addEventListener("click", function (ev) { var b = ev.target.closest("[data-faltan]"); if (b) { S.faltan = b.dataset.faltan === "1"; S.placa = null; pinta(); guardar("push"); } });
     pinta();
   }
 
