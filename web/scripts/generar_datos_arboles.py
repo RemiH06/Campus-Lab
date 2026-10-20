@@ -5,11 +5,11 @@ Genera lo que se sube a Liferay para el catálogo de árboles (camino B):
   mapa-campus.json   edificios y caminos del campus (OSM) y un punto por árbol con placa (ArcGIS)
   fotos/             una foto por especie y parte (la más pesada), redimensionada al estándar
                      "liferay_hd" (2560 px) de redimensionar_imagenes.py; nombre <especie>-<parte>.jpg
-  datos_local.js     los dos JSON en una variable, para ver rems_rework/vista_local.html sin servidor
+  datos_local.js     los dos JSON en una variable, para ver web/fuentes/vista_local.html sin servidor
   lista_subida.csv   qué archivo va a Documentos y Medios y con qué nombre
 
 Uso (desde la raíz del repo):  python web/scripts/generar_datos_arboles.py
-Salida (gitignorada): reestructura/salida/liferay_subir/arboles/
+Salida (gitignorada): catalogo/salida/liferay_subir/arboles/
 Es resumible: una foto ya redimensionada no se vuelve a hacer (pasar --forzar para rehacerlas).
 
 Reúsa la lectura del inventario de herramientas/rutas_jardines/guia.py (mismas especies, mismas
@@ -30,12 +30,12 @@ from pathlib import Path
 from PIL import Image, ImageOps
 
 REPO = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(REPO / "reestructura" / "herramientas" / "rutas_jardines"))
+sys.path.insert(0, str(REPO / "catalogo" / "herramientas" / "rutas_jardines"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import guia  # noqa: E402
 from redimensionar_imagenes import ESTANDARES, redimensionar_una  # noqa: E402
 
-SALIDA = REPO / "reestructura" / "salida" / "liferay_subir" / "arboles"
+SALIDA = REPO / "catalogo" / "salida" / "liferay_subir" / "arboles"
 OSM = guia.SALIDA / "osm_campus.json"
 PARTES = {"arbol_completo": "arbol-completo", "tronco": "tronco", "hoja": "hoja", "flor": "flor", "fruto": "fruto"}
 CAMINOS = {"footway", "service", "living_street", "steps", "cycleway", "pedestrian", "path", "residential", "tertiary"}

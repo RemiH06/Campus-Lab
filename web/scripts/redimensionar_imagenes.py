@@ -6,7 +6,7 @@ Uso:
 
 Por default, si <carpeta_entrada> es ".../Arboretum/imgs", la salida es
 ".../Arboretum/resized" (carpeta hermana "resized"), como ya está armado
-en web/Pre/Arboretum/. Se puede apuntar a otra carpeta con --salida.
+en web/contenidos/Arboretum/. Se puede apuntar a otra carpeta con --salida.
 
 Nunca sobrescribe los originales: solo lee de <carpeta_entrada> y escribe
 copias redimensionadas en <carpeta_salida>. Es resumible — si ya existe el

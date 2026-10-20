@@ -1,0 +1,201 @@
+/* Generado por web/scripts/preparar_para_liferay.py; no editar a mano. */
+
+/* \002550\002550\002550 P\0000e1gina de vista previa (solo para el artifact; en Liferay la pone el tema de ITESO) \002550\002550\002550 */
+
+/* \002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550
+   cl-base.css \0000b7 lo que en Liferay ir\0000eda en Documentos y Medios, una sola vez.
+   Tres capas, como tarot:
+   1. MODO (claro / oscuro): color-scheme en .cl; cada token trae sus dos
+      valores con light-dark(), as\0000ed no hay bloques duplicados por modo.
+   2. FLORACI\0000d3N (paleta intercambiable): una regla por floraci\0000f3n con tres
+      tokens (--f1 flor, --f1i flor como texto, --f2 follaje). Agregar una
+      paleta es agregar una l\0000ednea.
+   3. COMPONENTES: solo usan tokens --cl-*; nunca un color suelto.
+   \002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550\002550 */
+.cl {
+  color-scheme: light dark; /* sigue al dispositivo; data-modo (elecci\0000f3n guardada) manda encima. CSS y JS coinciden: no parpadea */
+  /* Neutros (azul ITESO 205\0000b0 muy desaturado) \0000b7 verificados WCAG */
+  --cl-bg: light-dark(#f3f6f5, #0c171e);
+  --cl-sf: light-dark(#fbfcfc, #13222b);
+  --cl-ink: light-dark(#12283a, #e3ece9);
+  --cl-ink2: light-dark(#4a5d69, #9db0b5);
+  --cl-line: light-dark(#d2dcdb, #29404a);
+  /* Derivados de la floraci\0000f3n vigente */
+  --cl-acc: var(--f1i);
+  --cl-fill: light-dark(var(--f1i), var(--f1));
+  --cl-on-fill: light-dark(#fbfcfc, #0c171e);
+  --cl-wash: color-mix(in srgb, var(--f1) 14%, var(--cl-sf));
+  --cl-leaf: var(--f2);
+  /* Tipo: Degular es la del sitio; Figtree solo la sustituye en esta vista previa */
+  --cl-font: "Degular", "Figtree", system-ui, sans-serif;
+  --cl-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --cl-r: 8px;
+  --cl-ease: cubic-bezier(0.23, 1, 0.32, 1);
+  background: var(--cl-bg); color: var(--cl-ink); font: 16px/1.5 var(--cl-font);
+}
+.cl[data-modo="claro"] { color-scheme: light; }
+.cl[data-modo="oscuro"] { color-scheme: dark; }
+:root[data-theme="dark"] .cl:not([data-modo]) { color-scheme: dark; }
+:root[data-theme="light"] .cl:not([data-modo]) { color-scheme: light; }
+
+/* Floraciones del campus \0000b7 flor (d\0000eda, noche) \0000b7 flor como texto \0000b7 follaje */
+.cl, .cl[data-floracion="lluvias"], .cl [data-floracion="lluvias"] { --f1: light-dark(#2e8a52, #6fd296); --f1i: light-dark(#297b49, #6fd296); --f2: light-dark(#3a7090, #7fbede); }
+.cl[data-floracion="clavellina"], .cl [data-floracion="clavellina"] { --f1: light-dark(#c2416a, #f2809c); --f1i: light-dark(#c03e67, #f2809c); --f2: light-dark(#7a5a3e, #c9a27e); }
+.cl[data-floracion="rosa-morada"], .cl [data-floracion="rosa-morada"] { --f1: light-dark(#c45a9c, #f08cc8); --f1i: light-dark(#b8428c, #f08cc8); --f2: light-dark(#4c7758, #86c09a); }
+.cl[data-floracion="jacaranda"], .cl [data-floracion="jacaranda"] { --f1: light-dark(#7b5cc8, #b8a0f5); --f1i: light-dark(#7858c7, #b8a0f5); --f2: light-dark(#3f7a4c, #82c492); }
+.cl[data-floracion="primavera"], .cl [data-floracion="primavera"] { --f1: light-dark(#e0ab12, #f4cc4e); --f1i: light-dark(#8b6a0b, #f4cc4e); --f2: light-dark(#5f7434, #a8c46a); }
+.cl[data-floracion="tabachin"], .cl [data-floracion="tabachin"] { --f1: light-dark(#d9431f, #ff7d55); --f1i: light-dark(#c73d1c, #ff7d55); --f2: light-dark(#3b7840, #7cc482); }
+.cl[data-floracion="galeana"], .cl [data-floracion="galeana"] { --f1: light-dark(#e06a12, #ff9e4e); --f1i: light-dark(#b1540e, #ff9e4e); --f2: light-dark(#2e6f5c, #6ec2a6); }
+/* Navegadores sin light-dark(): se quedan en claro, nunca sin color */
+@supports not (color: light-dark(red, red)) {
+  .cl { --cl-bg: #f3f6f5; --cl-sf: #fbfcfc; --cl-ink: #12283a; --cl-ink2: #4a5d69; --cl-line: #d2dcdb; --cl-fill: var(--f1i); --cl-on-fill: #fbfcfc; --f1: #2e8a52; --f1i: #297b49; --f2: #3a7090; }
+}
+
+/* Primitivas compartidas */
+.cl *, .cl *::before, .cl *::after { box-sizing: border-box; }
+.cl :is(h1, h2, h3, p, dl, dd, figure, ul, ol) { margin: 0; }
+.cl :is(h1, h2, h3) { text-wrap: balance; line-height: 1.1; }
+.cl :is(button, input, select) { font: inherit; color: inherit; }
+.cl :focus-visible { outline: 2px solid var(--cl-acc); outline-offset: 2px; border-radius: 4px; }
+.cl i.sci, .cl .sci { font-style: italic; }
+.cl .cl-muted { color: var(--cl-ink2); }
+.cl .cl-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: 999px; border: 1.5px solid var(--cl-line); background: var(--cl-sf); cursor: pointer; white-space: nowrap; transition: transform 140ms var(--cl-ease); }
+.cl .cl-btn:active { transform: scale(0.97); }
+.cl .cl-btn[aria-pressed="true"], .cl .cl-btn.cl-solid { background: var(--cl-fill); border-color: var(--cl-fill); color: var(--cl-on-fill); }
+.cl .cl-field { width: 100%; min-height: 42px; padding: 0 14px; border-radius: var(--cl-r); border: 1.5px solid var(--cl-ink2); background: var(--cl-sf); }
+.cl .cl-field::placeholder { color: var(--cl-ink2); }
+.cl .cl-card { background: var(--cl-sf); border: 1px solid var(--cl-line); border-radius: var(--cl-r); }
+.cl .placa { display: inline-flex; align-items: baseline; gap: 6px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .05em; padding: 4px 10px; border-radius: 4px; border: 1.5px solid var(--cl-ink2);
+  background: linear-gradient(180deg, var(--cl-sf), color-mix(in srgb, var(--cl-line) 55%, var(--cl-sf))); text-shadow: 0 1px 0 var(--cl-sf); }
+.cl .placa small { font-weight: 500; letter-spacing: 0; color: var(--cl-ink2); }
+.cl .eyebrow { font-size: .9rem; color: var(--cl-ink2); }
+@media (hover: hover) and (pointer: fine) { .cl .cl-btn:hover { border-color: var(--cl-acc); } }
+@media (prefers-reduced-motion: reduce) { .cl * { transition: none !important; animation: none !important; } }
+
+/* \002550\002550\002550 cl-barra \0000b7 modo, floraci\0000f3n y vistas (un componente) \002550\002550\002550 */
+.cl :is(p, dd) { max-width: 75ch; } /* el contenedor usa todo el ancho; el texto corrido no pasa de ~75 caracteres por rengl\0000f3n */
+.cl-shell { padding-block: 18px 56px; padding-left: max(clamp(16px, 5vw, 120px), env(safe-area-inset-left, 0px)); padding-right: max(clamp(16px, 5vw, 120px), env(safe-area-inset-right, 0px)); display: grid; gap: 22px; } /* todo el ancho disponible (pedido de Maya, 20-oct) */
+.cl-top { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; }
+.cl-brand { display: grid; gap: 2px; }
+.cl-brand b { font-size: 1.25rem; }
+.cl-tabs, .cl-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.cl-flor { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.cl-flor-pick { position: relative; }
+.cl-flor-pick select { appearance: none; min-height: 36px; padding: 0 32px 0 30px; border-radius: 999px; border: 1.5px solid var(--cl-line); background: var(--cl-sf); cursor: pointer; }
+.cl-flor-pick::before { content: ""; position: absolute; left: 11px; top: 50%; translate: 0 -50%; width: 12px; height: 12px; border-radius: 50%; background: var(--f1); box-shadow: 4px 0 0 -1px var(--f2); pointer-events: none; }
+.cl-flor-pick::after { content: ""; position: absolute; right: 13px; top: 50%; width: 7px; height: 7px; border-right: 1.5px solid var(--cl-ink2); border-bottom: 1.5px solid var(--cl-ink2); translate: 0 -70%; rotate: 45deg; pointer-events: none; }
+
+/* \002550\002550\002550 Plantilla ESPECIE \0000b7 cl-anillos + datos + mapa chico \002550\002550\002550 */
+.v-especie { display: grid; gap: 18px; }
+.esp-head { display: grid; gap: 4px; }
+.esp-head h1 { font-size: clamp(2rem, 5vw, 3.1rem); font-weight: 700; }
+.esp-head .sci { font-size: clamp(1.1rem, 2.2vw, 1.35rem); color: var(--cl-ink2); }
+.url { font-family: var(--cl-mono); font-size: .76rem; color: var(--cl-ink2); overflow-wrap: anywhere; }
+.url b { color: var(--cl-acc); font-weight: 600; }
+.esp-main { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.esp-photo { margin: 0; display: grid; gap: 8px; }
+.esp-photo .frame { position: relative; aspect-ratio: 4 / 3; border-radius: var(--cl-r); overflow: hidden; background: var(--cl-wash); }
+.esp-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.esp-photo img.in { animation: clin 220ms var(--cl-ease); }
+@keyframes clin { from { opacity: .3; transform: scale(1.015); } to { opacity: 1; transform: none; } }
+.esp-photo .vacia { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; gap: 6px; padding: 20px; color: var(--cl-ink2); }
+.esp-photo figcaption { font-size: .9rem; color: var(--cl-ink2); }
+.anillos { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 14px; align-items: center; padding: 14px; }
+.anillos svg { width: 100%; height: auto; display: block; overflow: visible; }
+.anillos .ring { cursor: pointer; transition: opacity 160ms ease; }
+.anillos .ring path.edge { fill: none; stroke: none; }
+.anillos .ring path.band { stroke: var(--cl-sf); stroke-width: 1.5; }
+.anillos .ring.has path.band { fill: color-mix(in srgb, var(--f1) var(--mix, 60%), var(--cl-sf)); }
+.anillos .ring.no path.band { fill: var(--cl-sf); }
+.anillos .ring.no path.edge { fill: none; stroke: var(--cl-ink2); stroke-width: 1.2; stroke-dasharray: 3 4; }
+.anillos .ring path.grain { fill: none; stroke: color-mix(in srgb, var(--cl-ink) 22%, transparent); stroke-width: .6; pointer-events: none; }
+.anillos .ring.sel path.edge { stroke: var(--cl-ink); stroke-width: 2.4; stroke-dasharray: none; fill: none; }
+.anillos .medula { fill: var(--cl-fill); }
+.anillos .medula-t { fill: var(--cl-on-fill); font-weight: 700; font-size: 15px; text-anchor: middle; dominant-baseline: central; }
+.anillos-leyenda { list-style: none; padding: 0; display: grid; gap: 4px; }
+.anillos-leyenda button { width: 100%; display: flex; align-items: center; gap: 10px; min-height: 34px; padding: 2px 8px; border: 0; border-radius: 6px; background: none; cursor: pointer; text-align: left; }
+.anillos-leyenda button[aria-pressed="true"] { background: var(--cl-wash); font-weight: 600; }
+.anillos-leyenda .sw { width: 14px; height: 14px; border-radius: 50%; flex: none; background: color-mix(in srgb, var(--f1) var(--mix, 60%), var(--cl-sf)); }
+.anillos-leyenda .no .sw { background: none; border: 1.5px dashed var(--cl-ink2); }
+.anillos-leyenda .no { color: var(--cl-ink2); cursor: default; }
+.esp-side { display: grid; gap: 14px; }
+.datos { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; padding: 16px; font-size: .95rem; }
+.datos dt { color: var(--cl-ink2); }
+.esp-donde { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 16px; padding: 14px; align-items: start; }
+.esp-donde ul { list-style: none; padding: 0; display: grid; gap: 4px; font-size: .95rem; }
+.esp-donde li { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--cl-line); padding: 4px 0; }
+.esp-donde li b { font-variant-numeric: tabular-nums; }
+
+/* \002550\002550\002550 Plantilla LUGAR \0000b7 cl-mapa + placa \002550\002550\002550 */
+.v-lugar { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 340px); gap: 18px; align-items: start; }
+.mapa { position: relative; border-radius: var(--cl-r); overflow: hidden; background: var(--cl-sf); border: 1px solid var(--cl-line); touch-action: manipulation; }
+.mapa svg { display: block; width: 100%; height: auto; aspect-ratio: var(--ar, 16 / 10); }
+.mapa .bld { fill: color-mix(in srgb, var(--cl-line) 80%, var(--cl-sf)); stroke: none; }
+.mapa .cam { fill: none; stroke: var(--cl-line); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.mapa .pt { fill: color-mix(in srgb, var(--cl-leaf) 55%, var(--cl-sf)); }
+.mapa.foco .pt { fill: color-mix(in srgb, var(--cl-ink2) 30%, var(--cl-sf)); }
+.mapa .pt.hi { fill: var(--cl-fill); }
+.mapa .yo { fill: none; stroke: var(--cl-ink); stroke-width: 2; }
+.mapa-zoom { position: absolute; right: 8px; top: 8px; display: grid; gap: 6px; }
+.mapa-zoom .cl-btn { min-height: 32px; padding: 0 12px; font-size: .88rem; }
+.lugar-side { display: grid; gap: 12px; }
+.lugar-side .cl-card { padding: 14px; display: grid; gap: 10px; }
+.leyenda-mapa { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .88rem; color: var(--cl-ink2); }
+.leyenda-mapa span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; background: var(--c); }
+.ficha-placa { display: grid; gap: 6px; justify-items: start; }
+.ficha-placa h3 { font-size: 1.3rem; }
+
+/* \002550\002550\002550 Plantilla COLECCI\0000d3N \0000b7 cl-buscador + cl-mosaico (empacador de LinNeo) \002550\002550\002550 */
+.v-coleccion { display: grid; gap: 14px; }
+.col-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: end; }
+.col-head h1 { font-size: clamp(1.8rem, 4.5vw, 2.6rem); font-weight: 700; }
+.progreso { display: grid; gap: 6px; min-width: min(320px, 100%); }
+.progreso .barra { height: 10px; border-radius: 5px; background: var(--cl-line); overflow: hidden; display: flex; }
+.progreso .barra i { display: block; height: 100%; background: var(--cl-fill); }
+.progreso p { font-size: .92rem; color: var(--cl-ink2); }
+.progreso b { color: var(--cl-ink); font-variant-numeric: tabular-nums; }
+.col-tools { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.mosaico { display: grid; grid-template-columns: repeat(var(--cols, 8), minmax(0, 1fr)); grid-auto-rows: var(--cell, 84px); gap: 4px; }
+.mos-c { position: relative; overflow: hidden; border-radius: 4px; background: var(--cl-wash); border: 0; padding: 0; cursor: pointer; }
+.mos-c img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mos-c.lbl::after { content: attr(data-nombre); position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 6px 4px; font-size: .78rem; line-height: 1.15; font-weight: 600; text-align: left;
+  color: #f4f7f6; background: linear-gradient(transparent, rgba(8, 20, 28, .82)); }
+.mos-c.falta { background: var(--cl-sf); border: 1.5px dashed var(--cl-ink2); display: grid; place-content: center; padding: 6px; text-align: center; font-size: .78rem; line-height: 1.15; color: var(--cl-ink2); }
+.mos-c.falta b { display: block; font-size: 1.1rem; color: var(--cl-acc); }
+.mosaico { position: relative; }
+/* Contorno por especie (capa SVG encima; ver contornos()). El trazo va recortado a la pieza: se ve la mitad, adentro */
+.mos-svg { position: absolute; left: 0; top: 0; z-index: 1; pointer-events: none; overflow: visible; }
+.mos-svg .borde { fill: none; stroke: var(--f1); stroke-width: 6; stroke-linecap: square; transition: stroke-width 120ms var(--cl-ease); }
+.mos-svg .junta { fill: var(--f1); }
+.mos-svg g.on .borde { stroke: var(--cl-ink); stroke-width: 9; }
+.mos-svg g.on .junta { fill: var(--cl-ink); }
+.mos-vacio { padding: 24px; text-align: center; color: var(--cl-ink2); }
+
+/* \002550\002550\002550 Notas para Maya \002550\002550\002550 */
+.sistema { display: grid; gap: 14px; padding: 18px; }
+.sistema h2 { font-size: 1.25rem; }
+.sis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 14px; }
+.sis-grid section { display: grid; gap: 6px; align-content: start; }
+.sis-grid h3 { font-size: 1.02rem; }
+.sis-grid p { color: var(--cl-ink2); font-size: .94rem; }
+.cal { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 3px; }
+.cal div { display: grid; gap: 3px; font-size: .72rem; text-align: center; color: var(--cl-ink2); }
+.cal i { height: 22px; border-radius: 3px; background: var(--c); }
+.cal .hoy { color: var(--cl-ink); font-weight: 700; }
+
+@media (max-width: 860px) {
+  .esp-main, .v-lugar, .esp-donde, .sis-grid { grid-template-columns: 1fr; }
+  .col-head, .col-tools { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) { .anillos { grid-template-columns: minmax(0, 150px) minmax(0, 1fr); padding: 10px; gap: 10px; } .cal { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+#detalle:has(.cl) { padding-left: 0 !important; padding-right: 0 !important; font-size: 16px !important; min-height: 0 !important; }
+#detalle:has(.cl) > #share-media { display: none; }
+/* carga:inicio \0000b7 barra de avance (preparar_para_liferay.py copia este bloque a los prototipos) */
+.cl-carga { display: grid; gap: 8px; margin-bottom: 16px; }
+.cl-carga-t { font-size: .875rem; color: var(--cl-ink2); font-variant-numeric: tabular-nums; }
+.cl-carga-b { display: block; height: 6px; border-radius: 999px; background: var(--cl-line); overflow: hidden; }
+.cl-carga-b i { display: block; height: 100%; width: var(--p, 0%); border-radius: inherit; background: var(--f1); transition: width 160ms linear; }
+.cl-carga.cl-indet .cl-carga-b i { width: 35%; animation: cl-indet 1.2s cubic-bezier(.45, 0, .55, 1) infinite; }
+@keyframes cl-indet { from { transform: translateX(-100%); } to { transform: translateX(290%); } }
+@media (prefers-reduced-motion: reduce) { .cl .cl-carga.cl-indet .cl-carga-b i { width: 100%; opacity: .45; } }
+/* carga:fin */

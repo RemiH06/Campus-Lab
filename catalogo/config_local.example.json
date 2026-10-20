@@ -1,0 +1,7 @@
+{
+  "plantnet_api_key": "TU_API_KEY_DE_PLANTNET",
+  "nombre_revisor": "TU_NOMBRE",
+  "ruta_excel_base_datos_general": "../listas/BASE_DATOS_GENERAL.xlsx",
+  "ruta_espejo_local_fotos": "",
+  "inaturalist_token": "TOKEN_DE_INATURALIST_DURA_24_HORAS"
+}

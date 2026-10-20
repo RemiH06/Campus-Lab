@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vista local · árboles Campus Lab</title>
+<!-- Prueba local de las tres páginas antes de subirlas. Primero correr:
+       python web/scripts/generar_datos_arboles.py
+     y abrir este archivo directo en el navegador (no hace falta servidor).
+     Uso: vista_local.html?vista=coleccion | especie&id=tabebuia-rosea | mapa -->
+<link rel="stylesheet" href="comun/cl-base.css">
+<style>body { margin: 0; background: #e9edec; } nav { display: flex; gap: 12px; padding: 10px 16px; font: 14px system-ui; } nav a { color: #12283a; }</style>
+</head>
+<body>
+<nav><a href="?vista=coleccion">Colección</a><a href="?vista=especie&amp;id=tabebuia-rosea">Ficha (rosa morada)</a><a href="?vista=mapa">Mapa</a></nav>
+<div class="cl" id="raiz"
+     data-fotos="../../catalogo/salida/liferay_subir/arboles/fotos/" data-fotos-ext=".jpg"
+     data-coleccion="vista_local.html?vista=coleccion" data-ficha="vista_local.html?vista=especie" data-pagina-mapa="vista_local.html?vista=mapa"></div>
+<script>document.getElementById("raiz").dataset.cl = new URLSearchParams(location.search).get("vista") || "coleccion";</script>
+<script src="../../catalogo/salida/liferay_subir/arboles/datos_local.js"></script>
+<script src="comun/cl-kit.js"></script>
+</body>
+</html>

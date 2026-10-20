@@ -9,17 +9,17 @@ Estado al 20 de octubre de 2026. Para revisiones de derechos, datos personales, 
 | Derechos de las fotos propias | Parcial | Base de datos (`fotos.autor_id`), carpetas de autor del volumen | Solo 22 % de las fotos confirmadas tiene autor registrado |
 | Fotos de terceros (iNaturalist, concurso) | Parcial | Tabla `inat_fotos` (licencia por foto), convocatoria del concurso | Confirmar si la convocatoria cede derechos de uso a ITESO |
 | Datos personales | Parcial | Carpetas `perso/`, `salida/`, `entrada/` (fuera de git) | Copias locales en una computadora personal |
-| Licencias de software y datos | Completo | [web/DEPENDENCIAS.md](../web/DEPENDENCIAS.md) | Elegir licencia del repositorio si se publica |
+| Licencias de software y datos | Completo | [docs/DEPENDENCIAS.md](DEPENDENCIAS.md) | Elegir licencia del repositorio si se publica |
 | Servicios externos | Completo en inventario, falta revisar términos | Esta página | Términos de Pl@ntNet e iNaturalist para fotos enviadas |
 | Uso de inteligencia artificial | Sin documentar formalmente | Esta página | Declararlo y revisar contra la política de ITESO |
 | Seguridad (credenciales, accesos) | Bien en el repositorio | `.gitignore`, `config_local.json` | Traspaso de accesos al terminar la beca |
 | Accesibilidad | Parcial | READMEs de cada fragmento | Revisión completa con lector de pantalla |
-| Documentación técnica y traspaso | Parcial | `BITACORA.md`, READMEs; `CLAUDE.md` fuera de git | La referencia técnica principal no está en el repositorio |
+| Documentación técnica y traspaso | Parcial | `README.md` (20-oct), `BITACORA.md`, READMEs; `CLAUDE.md` e `HISTORIAL.md` fuera de git | Las reglas técnicas y los aprendizajes completos todavía no están en el repositorio |
 
 ## Derechos de las fotos
 
 - **Fotos del volumen de Campus Lab:** 5,969 registros, 1,671 con autor identificado (28 %). De las 4,038 confirmadas, 897 tienen autor (22 %). La convención de nombres guarda el autor cuando se conoce, pero muchas fotos heredadas llegaron sin él.
-- **Concurso Naturalista:** la convocatoria 2025 pedía registrar cada foto en iNaturalist con licencia Creative Commons (CC BY-NC sugerida). Una licencia no comercial con crédito permite el uso institucional de difusión, pero **no hay registro de una cesión expresa de derechos a ITESO**; antes de imprimir (carteles, lonas) conviene avisar a cada autor. Las fotos de promoción 2025 tienen su tabla de créditos (`reestructura/salida/naturalista_2025_promo/`).
+- **Concurso Naturalista:** la convocatoria 2025 pedía registrar cada foto en iNaturalist con licencia Creative Commons (CC BY-NC sugerida). Una licencia no comercial con crédito permite el uso institucional de difusión, pero **no hay registro de una cesión expresa de derechos a ITESO**; antes de imprimir (carteles, lonas) conviene avisar a cada autor. Las fotos de promoción 2025 tienen su tabla de créditos (`catalogo/salida/naturalista_2025_promo/`).
 - **Fotos de iNaturalist del proyecto Naturalista ITESO:** 4,499 fotos. Licencias: CC BY-NC 3,464; sin licencia (todos los derechos reservados) 970; CC BY-NC-SA 60; CC BY 3; CC0 2. **Las 970 sin licencia no se pueden publicar** sin permiso de su autor; las demás, solo con crédito y sin fines comerciales.
 - **Contenido de terceros en SharePoint:** la carpeta de ilustraciones de *Birds of the World* (obra protegida) no debe publicarse; está marcada para revisión.
 - **Regla:** toda imagen que se publique debe tener anotados su origen, su autor y su licencia. Ante cualquier reclamo de derechos, no responder ni pagar sin el visto bueno de Jurídico de ITESO.
@@ -62,7 +62,7 @@ Se verificó el contraste (WCAG AA o mejor) de toda paleta nueva, se agregaron t
 | Documento | Para quién | En git |
 |---|---|---|
 | `BITACORA.md` | Coordinación, beca (resumen semanal) | Sí |
-| `web/DEPENDENCIAS.md` | Revisión de dependencias y costos | Sí |
+| `docs/DEPENDENCIAS.md` | Revisión de dependencias y costos | Sí |
 | READMEs de cada fragmento y herramienta | Quien mantenga el sitio | Sí |
 | `CLAUDE.md` (referencia técnica completa, decisiones, bugs resueltos) | Quien continúe el proyecto | **No** (tiene nombres reales) |
 | Directorio de contactos, correos con especialistas | Coordinación | No (datos personales) |
@@ -79,7 +79,7 @@ Se verificó el contraste (WCAG AA o mejor) de toda paleta nueva, se agregaron t
 
 ## Pendientes, en orden
 
-- [ ] Versión de `CLAUDE.md` sin datos personales dentro del repositorio.
+- [ ] Versión de `CLAUDE.md` sin datos personales dentro del repositorio (el `README.md` del 20-oct cubre estructura, arranque y reglas; faltan los aprendizajes y la referencia de la base de datos).
 - [ ] Declarar el uso de IA y revisarlo con la política de ITESO.
 - [ ] Revisar si el concurso cede derechos de uso a ITESO; si no, agregarlo a la convocatoria 2027.
 - [ ] Completar la autoría de las fotos confirmadas (hoy 22 %).

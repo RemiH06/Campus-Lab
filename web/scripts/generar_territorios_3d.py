@@ -4,7 +4,7 @@ Datos de los mapas 3D de los territorios del ITESO (campus, Casa ITESO Clavigero
 Uso (desde la raíz del repo):
     python web/scripts/generar_territorios_3d.py [--forzar]
 
-Salida (gitignorada): reestructura/salida/liferay_subir/mapa3d/territorio-<id>.json, uno por territorio, para subir a
+Salida (gitignorada): catalogo/salida/liferay_subir/mapa3d/territorio-<id>.json, uno por territorio, para subir a
 Documentos y Medios. Cada archivo trae, en metros sobre un plano local (x al este, z al sur, origen en el centro):
   lim   contorno del territorio (polígonos)            bld  edificios: [alto, x, z, x, z, ...]
   cam   calles y andadores: [ancho, x, z, ...]         ver  canchas, parques y jardines (polígonos)
@@ -32,12 +32,12 @@ from pathlib import Path
 from PIL import Image
 
 REPO = Path(__file__).resolve().parents[2]
-SALIDA = REPO / "reestructura" / "salida" / "liferay_subir" / "mapa3d"
+SALIDA = REPO / "catalogo" / "salida" / "liferay_subir" / "mapa3d"
 CACHE = SALIDA / "cache"
-CSV_ARCGIS = REPO / "reestructura" / "salida" / "inventario_arboles" / "arcgis_2014_2018_export.csv"
-ARBOLES = REPO / "reestructura" / "salida" / "liferay_subir" / "arboles" / "arboles.json"
+CSV_ARCGIS = REPO / "catalogo" / "salida" / "inventario_arboles" / "arcgis_2014_2018_export.csv"
+ARBOLES = REPO / "catalogo" / "salida" / "liferay_subir" / "arboles" / "arboles.json"
 BD = REPO / "experimentos" / "bd" / "campuslab_volumen.db"
-sys.path.insert(0, str(REPO / "reestructura" / "herramientas" / "rutas_jardines"))
+sys.path.insert(0, str(REPO / "catalogo" / "herramientas" / "rutas_jardines"))
 import guia  # noqa: E402  (binomio(): misma normalización de nombres que el resto del proyecto)
 
 OVERPASS = ("https://overpass-api.de/api/interpreter", "https://maps.mail.ru/osm/tools/overpass/api/interpreter",

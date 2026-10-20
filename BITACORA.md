@@ -1,6 +1,6 @@
-# Bitácora — Reestructura de activos digitales, Campus Lab
+# Bitácora: reestructura de activos digitales, Campus Lab
 
-Registro semanal de avance, en el formato que pide ITESO para la beca (Tareas y aprendizajes / Compromisos para la siguiente semana, máx. 500 caracteres cada uno). Complementa al `CLAUDE.md`, que es la referencia técnica del proyecto — esta bitácora es la versión legible para quien no vaya a tocar código.
+Registro semanal de avance, en el formato que pide ITESO para la beca (Tareas y aprendizajes / Compromisos para la siguiente semana, máx. 500 caracteres cada uno). Complementa al `CLAUDE.md`, que es la referencia técnica del proyecto; esta bitácora es la versión legible para quien no vaya a tocar código.
 
 ## Semana 1
 
@@ -71,3 +71,23 @@ Se corrigió que el género no se sincronizaba al confirmar especie por otra ví
 **Compromisos para la siguiente semana**
 
 Confirmar los grupos de espécimen pendientes que no sean orquídeas ni suculentas (esos se revisan aparte, con ayuda de Hugo de Alba). Enviar el correo a Miriam Andrade para identificación de suculentas. Reunir y capturar a mano las placas metálicas sueltas de árboles antes de seguir con el inventario maestro.
+
+## Semana 8
+
+**Tareas y aprendizajes**
+
+Se cruzó el mapa ArcGIS con el Inventario Forestal 2018: coincide el 73% y la numeración de 2018 se repite entre jardines. Se bajaron las 333 fichas de especie del sitio y una copia de sus componentes: todo está escrito a mano, sin campos. Se enviaron los correos a especialistas (primero la solicitud, el archivo solo si aceptan) y se ordenó el repositorio. Aprendizaje: sin panel de administración, el sitio tiene que leer sus datos de un archivo JSON.
+
+**Compromisos para la siguiente semana**
+
+Aplicar las respuestas de especialistas conforme lleguen. Construir una herramienta para etiquetar qué parte del árbol muestra cada foto, porque la clasificación automática con BioCLIP no acierta sola. Cruzar nuestras fotos con las observaciones de Naturalista ITESO para confirmar especies y encontrar las que faltan. Probar si se pueden subir archivos a Documentos y Medios de Liferay.
+
+## Semana 9
+
+**Tareas y aprendizajes**
+
+Se construyó la herramienta de partes del árbol (8047) y se clasificaron las 1,681 fotos de 119 especies. Se cruzaron nuestras fotos con las 4,499 de Naturalista ITESO y se confirmaron 27 con su identificación. Se armaron rutas y una guía de campo por jardín para el recorrido del inventario. En Liferay se encontró que los fragmentos sí aceptan código y los Contenidos Web no; con eso se publicaron los prototipos del catálogo y el Marco que corrige el header del tema.
+
+**Compromisos para la siguiente semana**
+
+Pegar en Liferay las versiones nuevas del Marco y de los prototipos y revisarlas con sesión iniciada. Armar la Master Page con el Marco arriba y empezar a rehacer las páginas con fragmentos chicos y zonas editables sin código. Revisar con Maya las plantas del nivel 2 de Naturalista. Llevar a Juan Gabriel los puntos nuevos (Jardín Contemplativo, Prepa, estacionamiento nuevo) para que identifique las especies.

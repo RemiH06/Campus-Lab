@@ -1,3 +1,0 @@
-/* Prueba de subida: si este archivo carga, el recuadro se pone verde con borde continuo. */
-.cl-prueba2 { border: 3px solid #297b49 !important; background: #e6f2ea !important; }
-.cl-prueba2 .css-ok::after { content: " ✔"; }
