@@ -1,0 +1,47 @@
+/* Sección Campus Lab: título, texto, botón y foto editables desde el editor de páginas.
+   Los colores siguen el modo claro/oscuro del Marco (color-scheme en <html>) y la paleta de floración elegida.
+   Por ahora trae sus propios tokens; en el rework, la base común vivirá en el Marco (va en todas las páginas). */
+.cl-sec {
+  --s-bg: light-dark(#fbfcfc, #13222b);
+  --s-ink: light-dark(#12283a, #e3ece9);
+  --s-ink2: light-dark(#4a5d69, #9db0b5);
+  --s-line: light-dark(#d2dcdb, #29404a);
+  --f1: light-dark(#2e8a52, #6fd296); --f1i: light-dark(#297b49, #6fd296);
+  display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(20px, 4vw, 56px); align-items: center;
+  padding: clamp(24px, 4vw, 56px) max(clamp(16px, 5vw, 120px), env(safe-area-inset-left, 0px));
+  background: var(--s-bg); color: var(--s-ink);
+  font: 16px/1.55 "Degular-Regular", "Degular", system-ui, sans-serif;
+}
+.cl-sec[data-paleta="clavellina"] { --f1: light-dark(#c2416a, #f2809c); --f1i: light-dark(#c03e67, #f2809c); }
+.cl-sec[data-paleta="rosa-morada"] { --f1: light-dark(#c45a9c, #f08cc8); --f1i: light-dark(#b8428c, #f08cc8); }
+.cl-sec[data-paleta="jacaranda"] { --f1: light-dark(#7b5cc8, #b8a0f5); --f1i: light-dark(#7858c7, #b8a0f5); }
+.cl-sec[data-paleta="primavera"] { --f1: light-dark(#e0ab12, #f4cc4e); --f1i: light-dark(#8b6a0b, #f4cc4e); }
+.cl-sec[data-paleta="tabachin"] { --f1: light-dark(#d9431f, #ff7d55); --f1i: light-dark(#c73d1c, #ff7d55); }
+.cl-sec[data-paleta="galeana"] { --f1: light-dark(#e06a12, #ff9e4e); --f1i: light-dark(#b1540e, #ff9e4e); }
+@supports not (color: light-dark(red, red)) { .cl-sec { --s-bg: #fbfcfc; --s-ink: #12283a; --s-ink2: #4a5d69; --s-line: #d2dcdb; --f1: #2e8a52; --f1i: #297b49; } }
+
+.cl-sec[data-lado="izquierda"] .cl-sec-foto { order: -1; }
+.cl-sec:not(:has(.cl-sec-foto)) { grid-template-columns: minmax(0, 1fr); }
+.cl-sec-texto { display: grid; gap: 12px; align-content: center; max-width: 68ch; }
+.cl-sec .cl-sec-antetitulo { margin: 0; font-size: .95rem; color: var(--f1i); font-family: "Degular-Semibold", "Degular", system-ui, sans-serif; letter-spacing: .02em; }
+.cl-sec .cl-sec-titulo { margin: 0; font-size: clamp(1.7rem, 1.2rem + 2vw, 2.8rem); line-height: 1.08; text-wrap: balance; color: inherit; font-family: "Degular-Bold", "Degular", system-ui, sans-serif; font-weight: 700; text-transform: none; letter-spacing: 0; }
+.cl-sec-cuerpo { color: var(--s-ink2); font-size: 1.05rem; }
+.cl-sec-cuerpo > * { margin: 0 0 .7em; }
+.cl-sec-cuerpo > :last-child { margin-bottom: 0; }
+.cl-sec-cuerpo a { color: var(--f1i); }
+.cl-sec .cl-sec-accion { margin: 6px 0 0; }
+.cl-sec .cl-sec-boton {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 20px; border-radius: 999px;
+  background: var(--f1i); color: light-dark(#fbfcfc, #0c171e); text-decoration: none; font-family: "Degular-Semibold", "Degular", system-ui, sans-serif;
+  transition: transform 140ms cubic-bezier(.23, 1, .32, 1);
+}
+.cl-sec .cl-sec-boton:active { transform: scale(.97); }
+.cl-sec .cl-sec-boton:focus-visible { outline: 2px solid var(--f1i); outline-offset: 3px; }
+.cl-sec-foto { margin: 0; }
+.cl-sec-foto img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; background: var(--s-line); }
+
+@media (max-width: 760px) {
+  .cl-sec { grid-template-columns: minmax(0, 1fr); }
+  .cl-sec[data-lado] .cl-sec-foto { order: -1; }
+}
+@media (prefers-reduced-motion: reduce) { .cl-sec .cl-sec-boton { transition: none; } }

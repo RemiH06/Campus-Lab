@@ -1,0 +1,53 @@
+{
+  "fieldSets": [
+    {
+      "label": "Apariencia",
+      "fields": [
+        {
+          "name": "paleta",
+          "label": "Paleta de floración",
+          "type": "select",
+          "dataType": "string",
+          "typeOptions": {
+            "validValues": [
+              { "value": "auto", "label": "La del mes (cambia sola)" },
+              { "value": "clavellina", "label": "Clavellina (dic-ene)" },
+              { "value": "rosa-morada", "label": "Rosa morada (feb)" },
+              { "value": "jacaranda", "label": "Jacaranda (mar)" },
+              { "value": "primavera", "label": "Primavera (abr)" },
+              { "value": "tabachin", "label": "Tabachín (may-jun)" },
+              { "value": "lluvias", "label": "Lluvias (jul-oct)" },
+              { "value": "galeana", "label": "Galeana (nov)" }
+            ]
+          },
+          "defaultValue": "auto"
+        },
+        {
+          "name": "foto",
+          "label": "Mostrar foto",
+          "type": "checkbox",
+          "defaultValue": true
+        },
+        {
+          "name": "lado",
+          "label": "Foto del lado",
+          "type": "select",
+          "dataType": "string",
+          "typeOptions": {
+            "validValues": [
+              { "value": "derecha", "label": "Derecho" },
+              { "value": "izquierda", "label": "Izquierdo" }
+            ]
+          },
+          "defaultValue": "derecha"
+        },
+        {
+          "name": "boton",
+          "label": "Mostrar botón",
+          "type": "checkbox",
+          "defaultValue": true
+        }
+      ]
+    }
+  ]
+}

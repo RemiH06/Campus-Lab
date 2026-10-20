@@ -1,0 +1,17 @@
+<section class="cl-sec" data-paleta="${configuration.paleta}" data-lado="${configuration.lado}">
+  <div class="cl-sec-texto">
+    <p class="cl-sec-antetitulo" data-lfr-editable-id="antetitulo" data-lfr-editable-type="text">Campus Lab ITESO</p>
+    <h2 class="cl-sec-titulo" data-lfr-editable-id="titulo" data-lfr-editable-type="text">Un título corto y claro</h2>
+    <div class="cl-sec-cuerpo" data-lfr-editable-id="cuerpo" data-lfr-editable-type="rich-text">
+      <p>Haz clic en este texto para escribir el tuyo. Puedes poner <strong>negritas</strong>, listas y ligas; el diseño se queda igual.</p>
+    </div>
+    [#if configuration.boton]
+    <p class="cl-sec-accion"><a class="cl-sec-boton" href="#" data-lfr-editable-id="boton" data-lfr-editable-type="link">Conoce más</a></p>
+    [/#if]
+  </div>
+  [#if configuration.foto]
+  <figure class="cl-sec-foto">
+    <img data-lfr-editable-id="foto" data-lfr-editable-type="image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'%3E%3Crect width='4' height='3' fill='%23dfe8e5'/%3E%3C/svg%3E" alt="Foto de la sección (haz clic para elegir una de Documentos y Medios)" />
+  </figure>
+  [/#if]
+</section>
