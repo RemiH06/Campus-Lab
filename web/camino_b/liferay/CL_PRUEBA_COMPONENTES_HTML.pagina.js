@@ -102,8 +102,14 @@ window.CL_PROTO = function () {
       '</div><div class="carr-nav"><div class="carr-dots">' + ps.map(function (p, i) { return '<button type="button" aria-label="Ir a ' + NOM[p].toLowerCase() + '" aria-current="' + (i === 0) + '"></button>'; }).join("") + "</div></div></div>";
     var tr = el.querySelector(".carr-track"), dots = el.querySelectorAll(".carr-dots button"), figs = tr.querySelectorAll("figure");
     dots.forEach(function (d, i) { d.onclick = function () { tr.scrollTo({ left: figs[i].offsetLeft - (tr.clientWidth - figs[i].clientWidth) / 2, behavior: reduce.matches ? "auto" : "smooth" }); }; });
-    var io = new IntersectionObserver(function (en) { en.forEach(function (x) { if (x.intersectionRatio > .6) { var i = [].indexOf.call(figs, x.target); dots.forEach(function (d, j) { d.setAttribute("aria-current", String(i === j)); }); } }); }, { root: tr, threshold: [.6] });
-    figs.forEach(function (f) { io.observe(f); });
+    /* el punto activo es el de la foto m\u00e1s cercana al centro (con dos fotos a la vista, "la m\u00e1s visible" fallaba) */
+    var marca = function () {
+      var c = tr.scrollLeft + tr.clientWidth / 2, i = 0, mejor = Infinity;
+      figs.forEach(function (f, j) { var d = Math.abs(f.offsetLeft + f.clientWidth / 2 - c); if (d < mejor) { mejor = d; i = j; } });
+      dots.forEach(function (d, j) { d.setAttribute("aria-current", String(i === j)); });
+    };
+    var raf; tr.addEventListener("scroll", function () { cancelAnimationFrame(raf); raf = requestAnimationFrame(marca); }, { passive: true });
+    marca();
   };
   /* 6 */ M.flip = function (el) {
     var e = by["delonix-regia"];
@@ -111,7 +117,8 @@ window.CL_PROTO = function () {
     var b = el.firstChild; b.onclick = function () { b.setAttribute("aria-pressed", String(b.getAttribute("aria-pressed") !== "true")); };
   };
   /* 7 */ M.ac = function (el) {
-    el["inner" + "HTML"] = '<div class="ac"><label class="cl-sr" for="ac-q">Buscar especie</label><input class="cl-field" id="ac-q" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ac-l" autocomplete="off" placeholder="Prueba con \u00abtabach\u00bb o \u00abceiba\u00bb"><ul id="ac-l" role="listbox" hidden></ul></div>';
+    el["inner" + "HTML"] = '<div class="ac"><label class="cl-sr" for="ac-q">Buscar especie</label><input class="cl-field" id="ac-q" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ac-l" autocomplete="off" placeholder="Busca una especie"><ul id="ac-l" role="listbox" hidden></ul>' +
+      '<p class="ac-pista">Prueba con <button type="button">tabach</button> <button type="button">ceiba</button> <button type="button">quercus</button></p></div>';
     var q = el.querySelector("input"), ul = el.querySelector("ul"), sel = -1, res = [], t;
     var marca = function (txt, k) { var n = norm(txt), i = n.indexOf(k); return i < 0 ? esc(txt) : esc(txt.slice(0, i)) + "<mark>" + esc(txt.slice(i, i + k.length)) + "</mark>" + esc(txt.slice(i + k.length)); };
     var pinta = function () {
@@ -125,6 +132,8 @@ window.CL_PROTO = function () {
     q.oninput = function () { clearTimeout(t); t = setTimeout(pinta, 150); };
     q.onkeydown = function (ev) { if (ev.key === "ArrowDown") { ev.preventDefault(); mueve(1); } else if (ev.key === "ArrowUp") { ev.preventDefault(); mueve(-1); } else if (ev.key === "Enter") { ev.preventDefault(); elige(sel); } else if (ev.key === "Escape") { ul.hidden = true; q.setAttribute("aria-expanded", "false"); } };
     ul.onclick = function (ev) { var li = ev.target.closest("li[id]"); if (li) elige(+li.id.slice(3)); };
+    /* sin nada escrito, unas palabras de ejemplo para que el recuadro no quede vac\u00edo */
+    el.querySelector(".ac-pista").onclick = function (ev) { var b = ev.target.closest("button"); if (!b) return; q.value = b.textContent; q.focus(); pinta(); };
   };
   /* 8 */ M.fg = function (el) {
     var items = D.sel, filtro = "todas";

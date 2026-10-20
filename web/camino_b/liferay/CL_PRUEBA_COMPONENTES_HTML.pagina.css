@@ -52,6 +52,7 @@
 .flor-pick::before { content: ""; position: absolute; left: 11px; top: 50%; translate: 0 -50%; width: 12px; height: 12px; border-radius: 50%; background: var(--f1); box-shadow: 4px 0 0 -1px var(--f2); pointer-events: none; }
 .flor-pick::after { content: ""; position: absolute; right: 13px; top: 50%; width: 7px; height: 7px; border-right: 1.5px solid var(--cl-ink2); border-bottom: 1.5px solid var(--cl-ink2); translate: 0 -70%; rotate: 45deg; pointer-events: none; }
 .grupo { display: grid; gap: 14px; }
+.grupo + .grupo { margin-top: 22px; } /* el t\0000edtulo de secci\0000f3n se lee con sus tarjetas, no con las de arriba */
 .grupo > h2 { font-size: 1.35rem; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
 .grupo > h2 small { font-size: .95rem; font-weight: 400; color: var(--cl-ink2); }
 .demos { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 14px; }
@@ -128,10 +129,13 @@
 
 /* 7 \0000b7 Autocompletado */
 .ac { width: min(100%, 380px); position: relative; align-self: start; }
+.ac-pista { margin: 10px 0 0; font-size: .9rem; color: var(--cl-ink2); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.ac-pista button { font: inherit; color: var(--cl-acc); background: none; border: 1.5px solid var(--cl-line); border-radius: 999px; padding: 2px 10px; cursor: pointer; }
+.ac ul:not([hidden]) ~ .ac-pista { display: none; }
 .ac ul { list-style: none; margin: 6px 0 0; padding: 4px; border-radius: var(--cl-r); border: 1px solid var(--cl-line); background: var(--cl-sf); max-height: 190px; overflow: auto; }
 .ac li { padding: 6px 10px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; gap: 10px; }
 .ac li[aria-selected="true"] { background: var(--cl-wash); }
-.ac li mark { background: none; color: var(--cl-acc); font-weight: 700; }
+.ac li mark { background: none; color: var(--cl-acc); font-weight: 700; padding: 0; margin: 0; box-shadow: none; } /* el Bootstrap del tema le pone relleno y fondo a <mark> */
 .ac li small { color: var(--cl-ink2); font-style: italic; }
 .ac .vacio { padding: 8px 10px; color: var(--cl-ink2); }
 

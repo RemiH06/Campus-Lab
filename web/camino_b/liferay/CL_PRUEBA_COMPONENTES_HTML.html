@@ -53,6 +53,7 @@
 .flor-pick::before { content: ""; position: absolute; left: 11px; top: 50%; translate: 0 -50%; width: 12px; height: 12px; border-radius: 50%; background: var(--f1); box-shadow: 4px 0 0 -1px var(--f2); pointer-events: none; }
 .flor-pick::after { content: ""; position: absolute; right: 13px; top: 50%; width: 7px; height: 7px; border-right: 1.5px solid var(--cl-ink2); border-bottom: 1.5px solid var(--cl-ink2); translate: 0 -70%; rotate: 45deg; pointer-events: none; }
 .grupo { display: grid; gap: 14px; }
+.grupo + .grupo { margin-top: 22px; } /* el t\0000edtulo de secci\0000f3n se lee con sus tarjetas, no con las de arriba */
 .grupo > h2 { font-size: 1.35rem; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
 .grupo > h2 small { font-size: .95rem; font-weight: 400; color: var(--cl-ink2); }
 .demos { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 14px; }
@@ -129,10 +130,13 @@
 
 /* 7 \0000b7 Autocompletado */
 .ac { width: min(100%, 380px); position: relative; align-self: start; }
+.ac-pista { margin: 10px 0 0; font-size: .9rem; color: var(--cl-ink2); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.ac-pista button { font: inherit; color: var(--cl-acc); background: none; border: 1.5px solid var(--cl-line); border-radius: 999px; padding: 2px 10px; cursor: pointer; }
+.ac ul:not([hidden]) ~ .ac-pista { display: none; }
 .ac ul { list-style: none; margin: 6px 0 0; padding: 4px; border-radius: var(--cl-r); border: 1px solid var(--cl-line); background: var(--cl-sf); max-height: 190px; overflow: auto; }
 .ac li { padding: 6px 10px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; gap: 10px; }
 .ac li[aria-selected="true"] { background: var(--cl-wash); }
-.ac li mark { background: none; color: var(--cl-acc); font-weight: 700; }
+.ac li mark { background: none; color: var(--cl-acc); font-weight: 700; padding: 0; margin: 0; box-shadow: none; } /* el Bootstrap del tema le pone relleno y fondo a <mark> */
 .ac li small { color: var(--cl-ink2); font-style: italic; }
 .ac .vacio { padding: 8px 10px; color: var(--cl-ink2); }
 
@@ -324,8 +328,14 @@ window.CL_PROTO = function () {
       '</div><div class="carr-nav"><div class="carr-dots">' + ps.map(function (p, i) { return '<button type="button" aria-label="Ir a ' + NOM[p].toLowerCase() + '" aria-current="' + (i === 0) + '"></button>'; }).join("") + "</div></div></div>";
     var tr = el.querySelector(".carr-track"), dots = el.querySelectorAll(".carr-dots button"), figs = tr.querySelectorAll("figure");
     dots.forEach(function (d, i) { d.onclick = function () { tr.scrollTo({ left: figs[i].offsetLeft - (tr.clientWidth - figs[i].clientWidth) / 2, behavior: reduce.matches ? "auto" : "smooth" }); }; });
-    var io = new IntersectionObserver(function (en) { en.forEach(function (x) { if (x.intersectionRatio > .6) { var i = [].indexOf.call(figs, x.target); dots.forEach(function (d, j) { d.setAttribute("aria-current", String(i === j)); }); } }); }, { root: tr, threshold: [.6] });
-    figs.forEach(function (f) { io.observe(f); });
+    /* el punto activo es el de la foto m\u00e1s cercana al centro (con dos fotos a la vista, "la m\u00e1s visible" fallaba) */
+    var marca = function () {
+      var c = tr.scrollLeft + tr.clientWidth / 2, i = 0, mejor = Infinity;
+      figs.forEach(function (f, j) { var d = Math.abs(f.offsetLeft + f.clientWidth / 2 - c); if (d < mejor) { mejor = d; i = j; } });
+      dots.forEach(function (d, j) { d.setAttribute("aria-current", String(i === j)); });
+    };
+    var raf; tr.addEventListener("scroll", function () { cancelAnimationFrame(raf); raf = requestAnimationFrame(marca); }, { passive: true });
+    marca();
   };
   /* 6 */ M.flip = function (el) {
     var e = by["delonix-regia"];
@@ -333,7 +343,8 @@ window.CL_PROTO = function () {
     var b = el.firstChild; b.onclick = function () { b.setAttribute("aria-pressed", String(b.getAttribute("aria-pressed") !== "true")); };
   };
   /* 7 */ M.ac = function (el) {
-    el["inner" + "HTML"] = '<div class="ac"><label class="cl-sr" for="ac-q">Buscar especie</label><input class="cl-field" id="ac-q" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ac-l" autocomplete="off" placeholder="Prueba con \u00abtabach\u00bb o \u00abceiba\u00bb"><ul id="ac-l" role="listbox" hidden></ul></div>';
+    el["inner" + "HTML"] = '<div class="ac"><label class="cl-sr" for="ac-q">Buscar especie</label><input class="cl-field" id="ac-q" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ac-l" autocomplete="off" placeholder="Busca una especie"><ul id="ac-l" role="listbox" hidden></ul>' +
+      '<p class="ac-pista">Prueba con <button type="button">tabach</button> <button type="button">ceiba</button> <button type="button">quercus</button></p></div>';
     var q = el.querySelector("input"), ul = el.querySelector("ul"), sel = -1, res = [], t;
     var marca = function (txt, k) { var n = norm(txt), i = n.indexOf(k); return i < 0 ? esc(txt) : esc(txt.slice(0, i)) + "<mark>" + esc(txt.slice(i, i + k.length)) + "</mark>" + esc(txt.slice(i + k.length)); };
     var pinta = function () {
@@ -347,6 +358,8 @@ window.CL_PROTO = function () {
     q.oninput = function () { clearTimeout(t); t = setTimeout(pinta, 150); };
     q.onkeydown = function (ev) { if (ev.key === "ArrowDown") { ev.preventDefault(); mueve(1); } else if (ev.key === "ArrowUp") { ev.preventDefault(); mueve(-1); } else if (ev.key === "Enter") { ev.preventDefault(); elige(sel); } else if (ev.key === "Escape") { ul.hidden = true; q.setAttribute("aria-expanded", "false"); } };
     ul.onclick = function (ev) { var li = ev.target.closest("li[id]"); if (li) elige(+li.id.slice(3)); };
+    /* sin nada escrito, unas palabras de ejemplo para que el recuadro no quede vac\u00edo */
+    el.querySelector(".ac-pista").onclick = function (ev) { var b = ev.target.closest("button"); if (!b) return; q.value = b.textContent; q.focus(); pinta(); };
   };
   /* 8 */ M.fg = function (el) {
     var items = D.sel, filtro = "todas";
