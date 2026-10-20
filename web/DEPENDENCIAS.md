@@ -2,7 +2,7 @@
 
 Revisado el 20 de octubre de 2026, a pedido de Maya: que nada de lo que usamos sea de paga, incompatible o un problema a futuro.
 
-**Respuesta corta:** lo que se publica en Liferay no usa ninguna librería, plugin ni servicio externo. Todo es HTML, CSS y JavaScript escritos aquí, guardados como fragmentos de Liferay, más archivos (JSON y fotos) en Documentos y Medios del propio sitio. No hay nada que pagar, que caduque ni que dependa de una empresa externa.
+**Respuesta corta:** lo que se publica en Liferay no usa ningún plugin ni servicio externo, y una sola librería: Three.js (gratuita, MIT), solo en el mapa 3D y copiada dentro del archivo que subimos, nunca cargada de otro sitio. Todo es HTML, CSS y JavaScript escritos aquí, guardados como fragmentos de Liferay, más archivos (JSON y fotos) en Documentos y Medios del propio sitio. No hay nada que pagar, que caduque ni que dependa de una empresa externa.
 
 ## Lo que se publica en Liferay
 
@@ -13,11 +13,12 @@ Revisado el 20 de octubre de 2026, a pedido de Maya: que nada de lo que usamos s
 | Tipografía | Degular, que ya carga el tema de ITESO | Ninguno (la licencia es de ITESO; nosotros no la distribuimos) | Si el tema dejara de cargarla, el navegador usa su fuente del sistema. No descargamos fuentes de ningún servicio |
 | Datos (JSON) y fotos | Documentos y Medios del sitio | Ninguno | Ninguno. Liferay genera sus versiones chicas de las fotos (Adaptive Media, ya activo) |
 | Mapa de árboles del rework | Las coordenadas exportadas del inventario, dibujadas por el propio código | Ninguno | No usa Google Maps, ArcGIS ni ningún servicio de mapas |
+| Mapa 3D de los territorios | **Three.js r186** (licencia MIT, gratuita), empaquetado dentro de `cl-mapa3d.js` en Documentos y Medios; datos de OpenStreetMap, del inventario, de Naturalista y de relieve, horneados en JSON | Ninguno | Three.js es la librería 3D más usada en la web y no cambia sola: la versión queda fija dentro del archivo. Sin WebGL, el fragmento muestra un aviso y liga al mapa 2D |
 | Preferencias del visitante (modo claro/oscuro, paleta) | El almacenamiento local del navegador | Ninguno | Ninguno; si el navegador lo bloquea, la página funciona en claro |
 
 **Compatibilidad con navegadores.** Se usan funciones de CSS de 2023-2024 (`light-dark()`, `color-mix()`, `:has()`). Los navegadores que no las tienen ven la página en modo claro con colores fijos: nunca se quedan sin color ni sin contenido. Probado en escritorio (1280, 1920 y 2560 px) y en celular (390 px).
 
-**Sin jQuery ni otras librerías.** El JavaScript no depende del jQuery que trae el tema: si ITESO lo quita, nuestras piezas siguen funcionando.
+**Sin jQuery.** El JavaScript no depende del jQuery que trae el tema: si ITESO lo quita, nuestras piezas siguen funcionando. La única librería es Three.js, y solo en el mapa 3D.
 
 ## Enlaces a servicios externos (solo ligas, no dependencias)
 
@@ -35,9 +36,10 @@ Solo corren en la computadora de quien mantiene el proyecto, para preparar datos
 | Pillow | Redimensionar fotos | MIT-CMU (libre) |
 | Playwright | Probar fragmentos sobre la página real | Apache 2.0 (libre) |
 | FastAPI, NumPy, requests | Herramientas internas de revisión de fotos (`reestructura/herramientas/`) | MIT / BSD / Apache 2.0 (libres) |
+| esbuild | Empaquetar Three.js y el mapa 3D en un solo archivo (`web/rems_rework/mapa3d`) | MIT (libre) |
 | Figtree en las vistas previas locales | Fuente de respaldo al ver los prototipos fuera de Liferay, desde Bunny Fonts | SIL OFL (libre); no llega a Liferay |
 
-Servicios de consulta usados al preparar datos, nunca desde el sitio: GBIF (abierto), API de lectura de iNaturalist (abierta) y Pl@ntNet (gratuita con límite diario de consultas).
+Servicios de consulta usados al preparar datos, nunca desde el sitio: GBIF (abierto), API de lectura de iNaturalist (abierta), Pl@ntNet (gratuita con límite diario de consultas), Overpass de OpenStreetMap (abierto; los datos son ODbL y piden crédito, ya puesto al pie del mapa 3D) y los Terrain Tiles de AWS (relieve, abiertos).
 
 ## Qué revisar si algo cambia
 

@@ -1,0 +1,14 @@
+{
+  "name": "cl-mapa3d",
+  "private": true,
+  "description": "Mapa 3D de los territorios del ITESO. Solo para armar cl-mapa3d.js (Three.js empaquetado); nada de esto viaja al sitio.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "scripts": {
+    "build": "esbuild mapa3d.js --bundle --format=esm --minify --target=es2020 --legal-comments=eof --outfile=dist/cl-mapa3d.js"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.10",
+    "three": "0.186.0"
+  }
+}

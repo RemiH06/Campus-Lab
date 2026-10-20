@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mapa 3D · vista local</title>
+<!-- Vista previa del fragmento "Mapa 3D" sin Liferay. Servir desde la raíz del repo:
+       python -m http.server 8048 --bind 127.0.0.1
+     y abrir http://127.0.0.1:8048/web/rems_rework/mapa3d/vista_local.html
+     Antes: python web/scripts/generar_territorios_3d.py  y  npm run build (en esta carpeta). -->
+<link rel="stylesheet" href="https://fonts.bunny.net/css?family=figtree:400,600,700&display=swap">
+<style>
+  html { color-scheme: light dark; } body { margin: 0; font-family: Figtree, system-ui, sans-serif; background: light-dark(#f3f6f5, #0c171e); }
+  .barra { display: flex; gap: 8px; justify-content: flex-end; padding: 8px 16px; font: 14px system-ui; }
+</style>
+<link rel="stylesheet" href="../fragmentos/mapa3d/index.css">
+</head>
+<body>
+<div class="barra"><button type="button" id="modo">Cambiar modo</button></div>
+<div id="frag"></div>
+<script>
+  /* Como Liferay: sustituye ${configuration.x} y [#if], y corre el JS con fragmentElement y configuration */
+  var configuration = {
+    territorio: "campus",
+    datos: "../../../reestructura/salida/liferay_subir/mapa3d/territorio-{t}.json",
+    arboles: "../../../reestructura/salida/liferay_subir/arboles/arboles.json",
+    script: "dist/cl-mapa3d.js", ficha: "../vista_local.html?vista=especie", mapa2d: "../vista_local.html?vista=mapa"
+  };
+  Promise.all(["index.html", "index.js"].map(function (f) { return fetch("../fragmentos/mapa3d/" + f).then(function (r) { return r.text(); }); })).then(function (r) {
+    var html = r[0].replace(/\$\{configuration\.(\w+)\}/g, function (_, k) { return configuration[k]; });
+    var fragmentElement = document.getElementById("frag"); fragmentElement.innerHTML = html;
+    new Function("fragmentElement", "configuration", r[1])(fragmentElement, configuration);
+  });
+  document.getElementById("modo").onclick = function () {
+    var r = document.documentElement, o = r.dataset.clModo === "oscuro" || (!r.dataset.clModo && matchMedia("(prefers-color-scheme: dark)").matches);
+    var m = o ? "claro" : "oscuro"; r.dataset.clModo = m; r.style.colorScheme = o ? "light" : "dark";
+    try { localStorage.setItem("cl-modo", m); } catch (e) {}
+    document.dispatchEvent(new CustomEvent("cl-modo"));
+  };
+</script>
+</body>
+</html>

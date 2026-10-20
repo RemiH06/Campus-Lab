@@ -32,3 +32,4 @@ web/Pre/JardinSuculentas/*
 !web/Pre/JardinSuculentas/*.html
 
 __pycache__/
+node_modules/

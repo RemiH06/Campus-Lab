@@ -1,0 +1,62 @@
+/* Mapa 3D de los territorios. Colores: light-dark() sobre el color-scheme que pone el Marco (o el dispositivo). */
+.cl-m3d {
+  --m-bg: light-dark(#f3f6f5, #0c171e); --m-sf: light-dark(#fbfcfc, #13222b); --m-ink: light-dark(#12283a, #e3ece9);
+  --m-ink2: light-dark(#4a5d69, #9db0b5); --m-line: light-dark(#d2dcdb, #29404a); --m-acc: light-dark(#297b49, #6fd296);
+  --m-on: light-dark(#fbfcfc, #0c171e);
+  display: grid; gap: 14px; padding: clamp(18px, 3vw, 40px) max(clamp(16px, 5vw, 120px), env(safe-area-inset-left, 0px));
+  background: var(--m-bg); color: var(--m-ink); font: 16px/1.5 "Degular-Regular", "Degular", system-ui, sans-serif;
+}
+@supports not (color: light-dark(red, red)) { .cl-m3d { --m-bg: #f3f6f5; --m-sf: #fbfcfc; --m-ink: #12283a; --m-ink2: #4a5d69; --m-line: #d2dcdb; --m-acc: #297b49; --m-on: #fbfcfc; } }
+.cl-m3d * { box-sizing: border-box; }
+.cl-m3d [hidden] { display: none !important; } /* mis display:grid/flex le ganaban al atributo hidden */
+.m3d-cab { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: end; justify-content: space-between; }
+.cl-m3d .m3d-ante { margin: 0; color: var(--m-acc); font-family: "Degular-Semibold", "Degular", system-ui, sans-serif; font-size: .95rem; }
+.cl-m3d .m3d-nombre { margin: 0; font-size: clamp(1.6rem, 1.1rem + 1.8vw, 2.5rem); line-height: 1.08; color: inherit; font-family: "Degular-Bold", "Degular", system-ui, sans-serif; text-transform: none; letter-spacing: 0; }
+.cl-m3d .m3d-sub { margin: 4px 0 0; color: var(--m-ink2); }
+.m3d-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.cl-m3d button { font: inherit; color: inherit; }
+.m3d-tabs button { min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1.5px solid var(--m-line); background: var(--m-sf); cursor: pointer; }
+.m3d-tabs button[aria-pressed="true"] { background: var(--m-acc); border-color: var(--m-acc); color: var(--m-on); }
+
+.m3d-vista { position: relative; height: clamp(420px, 72vh, 860px); border-radius: 12px; overflow: hidden; border: 1px solid var(--m-line);
+  background: radial-gradient(120% 90% at 50% 0%, var(--m-sf), var(--m-bg)); }
+.m3d-lienzo { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; outline: none; }
+.m3d-herr { position: absolute; right: 12px; top: 12px; display: grid; gap: 6px; z-index: 2; }
+.m3d-herr button { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--m-line); background: var(--m-sf); cursor: pointer; font-size: 1.15rem; line-height: 1; box-shadow: 0 4px 12px -8px rgba(12, 23, 30, .5); }
+.cl-m3d button:focus-visible, .cl-m3d input:focus-visible { outline: 2px solid var(--m-acc); outline-offset: 2px; }
+.cl-m3d .m3d-pista-tactil { display: none; }
+@media (hover: none) { .cl-m3d .m3d-pista-raton { display: none; } .cl-m3d .m3d-pista-tactil { display: inline; } }
+.cl-m3d .m3d-pista { position: absolute; left: 12px; bottom: 10px; margin: 0; padding: 4px 10px; border-radius: 999px; font-size: .82rem; color: var(--m-ink2);
+  background: color-mix(in srgb, var(--m-sf) 85%, transparent); pointer-events: none; z-index: 2; max-width: calc(100% - 24px); }
+.m3d-tip { position: absolute; z-index: 3; display: grid; gap: 2px; max-width: 280px; padding: 10px 12px; border-radius: 10px; background: var(--m-sf);
+  border: 1px solid var(--m-line); box-shadow: 0 10px 24px -14px rgba(12, 23, 30, .6); font-size: .9rem; cursor: pointer; }
+.m3d-tip i { color: var(--m-ink2); }
+.m3d-tip span { color: var(--m-ink2); }
+.m3d-tip .m3d-tip-accion { color: var(--m-acc); font-family: "Degular-Semibold", "Degular", system-ui, sans-serif; }
+.m3d-aviso { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; padding: 24px; gap: 8px; }
+.m3d-aviso a { color: var(--m-acc); }
+/* Etiquetas de lugares sobre la maqueta (las acomoda el JS en cada cuadro) */
+.m3d-etqs { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.m3d-etqs button { pointer-events: auto; cursor: pointer; margin: 0; position: absolute; left: 0; top: 0; padding: 2px 8px; border-radius: 6px; white-space: nowrap; font-size: .8rem; line-height: 1.4;
+  background: color-mix(in srgb, var(--m-sf) 88%, transparent); color: var(--m-ink); border: 1px solid var(--m-line); font-family: "Degular-Semibold", "Degular", system-ui, sans-serif; }
+
+.m3d-pie { display: grid; grid-template-columns: auto 1fr; gap: 10px 28px; align-items: center; }
+.m3d-buscar { display: grid; gap: 4px; }
+.m3d-buscar label { font-size: .9rem; color: var(--m-ink2); }
+.m3d-campo { display: flex; gap: 6px; }
+.m3d-campo input { width: 12ch; min-height: 40px; padding: 0 12px; border-radius: 10px; border: 1.5px solid var(--m-ink2); background: var(--m-sf); color: inherit; font: inherit; font-variant-numeric: tabular-nums; }
+.m3d-campo button { min-height: 40px; padding: 0 16px; border-radius: 999px; border: 0; background: var(--m-acc); color: var(--m-on); cursor: pointer; }
+.m3d-capas { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.m3d-capas label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+.m3d-capas input { accent-color: var(--m-acc); width: 18px; height: 18px; }
+.m3d-leyenda { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: .9rem; color: var(--m-ink2); }
+.m3d-ley { display: inline-flex; gap: 6px; align-items: center; }
+.m3d-ley i { width: 12px; height: 12px; border-radius: 50%; background: var(--c); flex: none; }
+.m3d-ley i.m3d-ley-arbol { background: light-dark(#4f8a5b, #3f7a52); }
+.cl-m3d .m3d-estado { grid-column: 1 / -1; margin: 0; min-height: 1.5em; }
+.cl-m3d .m3d-creditos { grid-column: 1 / -1; margin: 0; font-size: .8rem; color: var(--m-ink2); }
+@media (max-width: 760px) {
+  .m3d-pie { grid-template-columns: 1fr; }
+  .m3d-vista { height: 70vh; }
+  .m3d-herr button { width: 36px; height: 36px; }
+}

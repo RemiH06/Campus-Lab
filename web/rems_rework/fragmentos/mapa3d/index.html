@@ -1,0 +1,39 @@
+<section class="cl-m3d" data-territorio="${configuration.territorio}" aria-labelledby="m3d-nombre">
+  <header class="m3d-cab">
+    <div class="m3d-titulo">
+      <p class="m3d-ante">Territorios del ITESO</p>
+      <h2 class="m3d-nombre" id="m3d-nombre">Campus ITESO</h2>
+      <p class="m3d-sub"></p>
+    </div>
+    <div class="m3d-tabs" role="group" aria-label="Elegir territorio">
+      <button type="button" data-t="campus" aria-pressed="true">Campus</button>
+      <button type="button" data-t="clavigero" aria-pressed="false">Casa Clavigero</button>
+      <button type="button" data-t="primavera" aria-pressed="false">Bosque La Primavera</button>
+    </div>
+  </header>
+  <div class="m3d-vista">
+    <div class="m3d-tip" hidden></div>
+    <div class="m3d-herr" role="group" aria-label="Mover la vista">
+      <button type="button" data-h="mas" aria-label="Acercar">+</button>
+      <button type="button" data-h="menos" aria-label="Alejar">&minus;</button>
+      <button type="button" data-h="izq" aria-label="Girar a la izquierda">&#10226;</button>
+      <button type="button" data-h="der" aria-label="Girar a la derecha">&#10227;</button>
+      <button type="button" data-h="inicio" aria-label="Vista inicial">&#8962;</button>
+    </div>
+    <p class="m3d-pista"><span class="m3d-pista-raton">Arrastra para moverte, clic derecho para girar, rueda para acercar. Clic en un árbol o un lugar para ir.</span><span class="m3d-pista-tactil">Mueve el mapa con dos dedos. Toca un árbol para ver su placa.</span></p>
+    <div class="m3d-aviso" hidden>Este navegador no puede mostrar el mapa en 3D. <a href="${configuration.mapa2d}">Ver el mapa del campus</a></div>
+  </div>
+  <div class="m3d-pie">
+    <form class="m3d-buscar">
+      <label for="m3d-placa">Busca un árbol por su placa</label>
+      <span class="m3d-campo"><input id="m3d-placa" inputmode="numeric" autocomplete="off" placeholder="Ej. 1229"><button type="submit">Buscar</button></span>
+    </form>
+    <div class="m3d-capas" role="group" aria-label="Qué se muestra">
+      <label><input type="checkbox" data-capa="arb" checked> Árboles</label>
+      <label><input type="checkbox" data-capa="obs" checked> Observaciones de Naturalista</label>
+    </div>
+    <div class="m3d-leyenda"></div>
+    <p class="m3d-estado" aria-live="polite"></p>
+    <p class="m3d-creditos"></p>
+  </div>
+</section>
