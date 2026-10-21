@@ -6,6 +6,15 @@
   var cfg = typeof configuration !== "undefined" ? configuration : {};
   var $ = function (s) { return raiz.querySelector(s); }, $$ = function (s) { return [].slice.call(raiz.querySelectorAll(s)); };
   var TERR = ["campus", "clavigero", "primavera"], mapa = null, actual = null;
+  /* floración: la que eligió quien visita en cualquier selector del sitio (clave "cl-flor") o la del mes */
+  var porMes = { 12: "clavellina", 1: "clavellina", 2: "rosa-morada", 3: "jacaranda", 4: "primavera", 5: "tabachin", 6: "tabachin", 11: "galeana" };
+  var paleta = function () {
+    var f = null; try { f = localStorage.getItem("cl-flor"); } catch (e) { /* sin almacenamiento: la del mes */ }
+    raiz.dataset.paleta = f && f !== "auto" ? f : porMes[new Date().getMonth() + 1] || "lluvias";
+  };
+  paleta();
+  document.addEventListener("cl-flor", paleta);
+  window.addEventListener("storage", function (e) { if (e.key === "cl-flor") paleta(); });
   /* "{t}" en la URL se cambia por el territorio; si no lo trae, se agrega al final (URL corta de Documentos y Medios) */
   var url = function (t) { var d = cfg.datos || "/documents/d/campuslab/territorio-"; return d.indexOf("{t}") >= 0 ? d.replace("{t}", t) : d + t; };
 

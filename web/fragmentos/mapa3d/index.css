@@ -6,6 +6,12 @@
   display: grid; gap: 14px; padding: clamp(18px, 3vw, 40px) max(clamp(16px, 5vw, 120px), env(safe-area-inset-left, 0px));
   background: var(--m-bg); color: var(--m-ink); font: 16px/1.5 "Degular-Regular", "Degular", system-ui, sans-serif;
 }
+.cl-m3d[data-paleta="clavellina"] { --m-acc: light-dark(#c03e67, #f2809c); }  /* el acento sigue la floración del sitio (la misma de Sección y los prototipos) */
+.cl-m3d[data-paleta="rosa-morada"] { --m-acc: light-dark(#b8428c, #f08cc8); }
+.cl-m3d[data-paleta="jacaranda"] { --m-acc: light-dark(#7858c7, #b8a0f5); }
+.cl-m3d[data-paleta="primavera"] { --m-acc: light-dark(#8b6a0b, #f4cc4e); }
+.cl-m3d[data-paleta="tabachin"] { --m-acc: light-dark(#c73d1c, #ff7d55); }
+.cl-m3d[data-paleta="galeana"] { --m-acc: light-dark(#b1540e, #ff9e4e); }
 @supports not (color: light-dark(red, red)) { .cl-m3d { --m-bg: #f3f6f5; --m-sf: #fbfcfc; --m-ink: #12283a; --m-ink2: #4a5d69; --m-line: #d2dcdb; --m-acc: #297b49; --m-on: #fbfcfc; } }
 .cl-m3d * { box-sizing: border-box; }
 .cl-m3d [hidden] { display: none !important; } /* mis display:grid/flex le ganaban al atributo hidden */

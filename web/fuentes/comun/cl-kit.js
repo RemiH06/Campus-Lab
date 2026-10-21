@@ -191,7 +191,7 @@
     orden.forEach(function (e) {
       var R = rng(hash(e.id)), k = e.partes.length, sh;
       if (k <= 1) { sh = [[0, 0]]; if (k === 1 && R() < 0.35 && cols >= 6) { var big = [[0, 0], [1, 0], [0, 1], [1, 1]]; if (busca(big)) sh = big; } }
-      else { var fs = FORMAS[Math.min(k, 5)]; sh = fs[Math.floor(R() * fs.length)]; }
+      else { var fs = FORMAS[Math.min(k, 5)].filter(function (f) { return f.every(function (c) { return c[0] < cols; }); }); sh = fs.length ? fs[Math.floor(R() * fs.length)] : [[0, 0]]; } /* en celular hay pocas columnas: solo las formas que caben */
       var pos = busca(sh); if (!pos) return;
       sh.forEach(function (c) { occ[(pos[0] + c[0]) + "," + (pos[1] + c[1])] = 1; });
       out.push({ e: e, x: pos[0], y: pos[1], sh: sh });
@@ -204,8 +204,23 @@
      y los huecos internos se rellenan del mismo color, como la junta de un vitral: cada especie se lee como una pieza.
      El trazo se recorta a la forma de la pieza para que quede todo adentro y el hueco entre especies siga limpio */
   var nPieza = 0;
+  /* Color de cada pieza: uno de seis, el que le toca por su id salvo que ya lo tenga una vecina (también en diagonal) */
+  function colores(piezas) {
+    var dueno = {}, color = [];
+    piezas.forEach(function (b, n) { b.sh.forEach(function (s) { dueno[(b.x + s[0]) + "," + (b.y + s[1])] = n; }); });
+    piezas.forEach(function (b, n) {
+      var usados = {};
+      b.sh.forEach(function (s) {
+        for (var dx = -1; dx <= 1; dx++) for (var dy = -1; dy <= 1; dy++) { var o = dueno[(b.x + s[0] + dx) + "," + (b.y + s[1] + dy)]; if (o !== undefined && o !== n && color[o] !== undefined) usados[color[o]] = 1; }
+      });
+      var k0 = hash(b.e.id) % 6, c = k0; for (var k = 0; k < 6; k++) { c = (k0 + k) % 6; if (!usados[c]) break; }
+      color[n] = c;
+    });
+    return color;
+  }
   function contornos(piezas, cell, gap) {
-    var px = function (j) { return (Math.floor(j / 2) * (cell + gap) + (j % 2 ? cell : 0)).toFixed(1); };
+    var px = function (j) { return (Math.floor(j / 2) * (cell + gap) + (j % 2 ? cell : 0)).toFixed(1); }, color = colores(piezas);
+    piezas.forEach(function (b, n) { b.c = color[n]; });
     return piezas.filter(function (b) { return b.e.partes.length; }).map(function (b) {
       var c = {}, L = {}, d = "", junta = "", area = "", id = "cl-pz" + (nPieza++);
       b.sh.forEach(function (s) { c[(b.x + s[0]) + "," + (b.y + s[1])] = 1; });
@@ -226,7 +241,7 @@
         if (!L[(i - 1) + "," + j]) d += "M" + x0 + " " + y0 + "V" + y1;
         if (!L[(i + 1) + "," + j]) d += "M" + x1 + " " + y0 + "V" + y1;
       });
-      return '<g data-id="' + esc(b.e.id) + '"><clipPath id="' + id + '"><path d="' + area + '"/></clipPath>' + (junta ? '<path class="cl-junta" d="' + junta + '"/>' : "") +
+      return '<g class="cl-c' + b.c + '" data-id="' + esc(b.e.id) + '"><clipPath id="' + id + '"><path d="' + area + '"/></clipPath>' + (junta ? '<path class="cl-junta" d="' + junta + '"/>' : "") +
         '<path class="cl-borde" clip-path="url(#' + id + ')" d="' + d + '"/></g>';
     }).join("");
   }
@@ -240,12 +255,23 @@
   }
   var mosaico = {
     mount: function (el, items, cfg) {
-      var w = el.clientWidth || 800, u = parseFloat(getComputedStyle(el).fontSize) / 16 || 1, cell = w < 520 ? 68 : Math.round(Math.min(120 * u, Math.max(86, w / 16))), /* casillas más grandes en pantallas anchas, al paso del texto (--u) */ cols = Math.max(4, Math.floor((w + 4) / (cell + 4))), lado = (w - (cols - 1) * 4) / cols;
-      el.style.setProperty("--cols", cols); el.style.setProperty("--cell", lado.toFixed(1) + "px");
-      if (!el.dataset.pieza) { el.dataset.pieza = "1"; resaltarPieza(el); }
+      /* lado mínimo de la casilla: 149 px (116 en celular) y crece con el texto (--u); las columnas llenan el ancho, así cada
+         casilla queda entre el mínimo y el doble. Todo se guarda como fracción del ancho */
+      var w = el.clientWidth || 800, u = parseFloat(getComputedStyle(el).fontSize) / 16 || 1, min = (w < 520 ? 116 : 149) * u,
+          cols = Math.max(2, Math.floor((w + 4) / (min + 4))), lado = (w - (cols - 1) * 4) / cols;
+      el.style.setProperty("--cols", cols); el.style.setProperty("--cr", (lado / w).toFixed(5)); el.style.setProperty("--gr", (4 / w).toFixed(5));
+      el._args = [items, cfg]; el._cols = cols;
+      if (!el.dataset.pieza) {
+        el.dataset.pieza = "1"; resaltarPieza(el);
+        /* al cambiar el ancho (ventana, zoom, barra de scroll) solo se rearma si cambia el número de columnas; si no, todo escala solo */
+        if (window.ResizeObserver) { var t; new ResizeObserver(function () { clearTimeout(t); t = setTimeout(function () {
+          var ww = el.clientWidth, mm = (ww < 520 ? 116 : 149) * (parseFloat(getComputedStyle(el).fontSize) / 16 || 1);
+          if (ww && Math.max(2, Math.floor((ww + 4) / (mm + 4))) !== el._cols) mosaico.mount(el, el._args[0], el._args[1]);
+        }, 120); }).observe(el); }
+      }
       if (!items.length) { el.innerHTML = '<p class="cl-mos-vacio">Ninguna especie coincide. Prueba con el nombre común, la familia o un jardín.</p>'; return; }
       var piezas = empacar(items, cols), filas = piezas.reduce(function (m, b) { return Math.max(m, b.y + Math.max.apply(null, b.sh.map(function (s) { return s[1]; })) + 1); }, 0);
-      el.innerHTML = '<svg class="cl-mos-svg" aria-hidden="true" width="' + w + '" height="' + (filas * (lado + 4) - 4).toFixed(1) + '">' + contornos(piezas, lado, 4) + "</svg>" + piezas.map(function (b) {
+      el.innerHTML = '<svg class="cl-mos-svg" aria-hidden="true" viewBox="0 0 ' + w + " " + (filas * (lado + 4) - 4).toFixed(1) + '">' + contornos(piezas, lado, 4) + "</svg>" + piezas.map(function (b) {
         var e = b.e, nombre = esc(e.com), href = esc(conParam(cfg.ficha, "id", e.id));
         if (!e.partes.length) return '<a class="cl-mos-c cl-falta" href="' + href + '" data-id="' + esc(e.id) + '" style="grid-area:' + (b.y + 1) + "/" + (b.x + 1) + '" aria-label="' + nombre + ', sin fotos todavía"><b>?</b>' + nombre + "</a>";
         var cells = b.sh.length === e.partes.length ? b.sh : b.sh.slice(0, 1);
@@ -289,7 +315,7 @@
       '<div class="cl-progreso"><p><b>' + con + "</b> con foto · <b>" + partes + "</b> de " + tot + ' partes fotografiadas</p><div class="cl-barra-p" aria-hidden="true"><i style="width:' + (100 * partes / tot).toFixed(1) + '%"></i></div></div></div>' +
       '<div class="cl-col-tools"><input class="cl-field" type="search" autocomplete="off" placeholder="Busca por nombre, familia o jardín" aria-label="Buscar especie" value="' + esc(S.q) + '">' +
       '<div class="cl-tabs" role="group" aria-label="Filtrar">' + [["todas", "Todas"], ["con", "Con foto"], ["faltan", "Les faltan partes"], ["sin", "Sin foto"]].map(function (f) { return '<button class="cl-btn" type="button" data-filtro="' + f[0] + '" aria-pressed="' + (S.filtro === f[0]) + '">' + f[1] + "</button>"; }).join("") + "</div></div>" +
-      '<div class="cl-mosaico"></div></section>';
+      '<div class="cl-mos-caja"><div class="cl-mosaico"></div></div></section>';
     var mos = main.querySelector(".cl-mosaico"), t;
     var lista = function () {
       var q = norm(S.q.trim());
@@ -307,7 +333,6 @@
     });
     main.querySelector("input").oninput = function (ev) { S.q = ev.target.value; clearTimeout(t); t = setTimeout(function () { pinta(); guardar("replace"); }, 120); };
     main.querySelector(".cl-tabs").onclick = function (ev) { var b = ev.target.closest("[data-filtro]"); if (!b) return; S.filtro = b.dataset.filtro; main.querySelectorAll("[data-filtro]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); pinta(); guardar("push"); };
-    var tr; window.addEventListener("resize", function () { clearTimeout(tr); tr = setTimeout(pinta, 150); });
     pinta();
   }
 

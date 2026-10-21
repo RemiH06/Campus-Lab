@@ -22,6 +22,7 @@ Todos se corren desde la raíz del repo. Lo que generan con datos o fotos queda 
 | `probar_en_sitio.py` | Inyecta un fragmento en `/web/campuslab/temp` sin publicarlo y saca capturas (escritorio/celular, claro/oscuro). Requiere Playwright |
 | `generar_datos_arboles.py` | `arboles.json`, `mapa-campus.json` y fotos de árboles para Documentos y Medios |
 | `generar_territorios_3d.py` | `territorio-*.json` del mapa 3D |
+| `generar_inventario_csv.py` | Siembra `inventario-arboles.csv` desde la exportación de ArcGIS. **Una sola vez**: después el CSV se edita en Excel y es la fuente de la verdad (no escribe si ya existe; `--forzar` lo rehace) |
 | `redimensionar_imagenes.py` | Copias para web de las fotos (estándar `liferay_hd`) |
 | `scraper_liferay.py` | Regenera `sitio_actual/` (`SCRAPER_BASE_URL=https://bosque.iteso.mx` para el sitio del bosque) |
 | `scraper_fichas.py`, `sondeo_fichas_bosque.py` | Bajan y parsean las fichas de especie publicadas |
