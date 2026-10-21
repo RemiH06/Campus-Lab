@@ -19,6 +19,7 @@ body { background: var(--page); }
    3. COMPONENTES: solo usan tokens --cl-*; nunca un color suelto.
    ═══════════════════════════════════════════════════════════════════════ */
 .cl {
+  --u: clamp(16px, 10.8px + .36vw, 22px); /* tamaño base: 16 px hasta ~1440 px de ancho, crece hasta 22 px en monitores anchos (2560-3440) */
   color-scheme: light dark; /* sigue al dispositivo; data-modo (elección guardada) manda encima. CSS y JS coinciden: no parpadea */
   /* Neutros (azul ITESO 205° muy desaturado) · verificados WCAG */
   --cl-bg: light-dark(#f3f6f5, #0c171e);
@@ -37,7 +38,7 @@ body { background: var(--page); }
   --cl-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
   --cl-r: 8px;
   --cl-ease: cubic-bezier(0.23, 1, 0.32, 1);
-  background: var(--cl-bg); color: var(--cl-ink); font: 16px/1.5 var(--cl-font); min-height: 100vh;
+  background: var(--cl-bg); color: var(--cl-ink); font: var(--u)/1.5 var(--cl-font); min-height: 100vh;
 }
 .cl[data-modo="claro"] { color-scheme: light; }
 .cl[data-modo="oscuro"] { color-scheme: dark; }
@@ -74,7 +75,7 @@ body { background: var(--page); }
 .cl .placa { display: inline-flex; align-items: baseline; gap: 6px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .05em; padding: 4px 10px; border-radius: 4px; border: 1.5px solid var(--cl-ink2);
   background: linear-gradient(180deg, var(--cl-sf), color-mix(in srgb, var(--cl-line) 55%, var(--cl-sf))); text-shadow: 0 1px 0 var(--cl-sf); }
 .cl .placa small { font-weight: 500; letter-spacing: 0; color: var(--cl-ink2); }
-.cl .eyebrow { font-size: .9rem; color: var(--cl-ink2); }
+.cl .eyebrow { font-size: calc(.9 * var(--u)); color: var(--cl-ink2); }
 @media (hover: hover) and (pointer: fine) { .cl .btn:hover { border-color: var(--cl-acc); } }
 @media (prefers-reduced-motion: reduce) { .cl * { transition: none !important; animation: none !important; } }
 
@@ -83,7 +84,7 @@ body { background: var(--page); }
 .cl-shell { padding-block: 18px 56px; padding-left: max(clamp(16px, 5vw, 120px), env(safe-area-inset-left, 0px)); padding-right: max(clamp(16px, 5vw, 120px), env(safe-area-inset-right, 0px)); display: grid; gap: 22px; } /* todo el ancho disponible (pedido de Maya, 20-oct) */
 .cl-top { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; }
 .cl-brand { display: grid; gap: 2px; }
-.cl-brand b { font-size: 1.25rem; }
+.cl-brand b { font-size: calc(1.25 * var(--u)); }
 .cl-tabs, .cl-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .cl-flor { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
 .cl-flor-pick { position: relative; }
@@ -94,23 +95,23 @@ body { background: var(--page); }
 /* ═══ Plantilla ESPECIE · cl-anillos + datos + mapa chico ═══ */
 .v-especie { display: grid; gap: 18px; }
 .esp-head { display: grid; gap: 4px; }
-.esp-head h1 { font-size: clamp(2rem, 5vw, 3.1rem); font-weight: 700; }
-.esp-head .sci { font-size: clamp(1.1rem, 2.2vw, 1.35rem); color: var(--cl-ink2); }
-.url { font-family: var(--cl-mono); font-size: .76rem; color: var(--cl-ink2); overflow-wrap: anywhere; }
+.esp-head h1 { font-size: clamp(calc(2 * var(--u)), 5vw, calc(3.1 * var(--u))); font-weight: 700; }
+.esp-head .sci { font-size: clamp(calc(1.1 * var(--u)), 2.2vw, calc(1.35 * var(--u))); color: var(--cl-ink2); }
+.url { font-family: var(--cl-mono); font-size: calc(.76 * var(--u)); color: var(--cl-ink2); overflow-wrap: anywhere; }
 .url b { color: var(--cl-acc); font-weight: 600; }
 .esp-main { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 20px; align-items: start; }
-.esp-photo { margin: 0; display: grid; gap: 8px; }
-.esp-photo .frame { position: relative; aspect-ratio: 4 / 3; border-radius: var(--cl-r); overflow: hidden; background: var(--cl-wash); }
-.esp-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.esp-photo { margin: 0; display: grid; gap: 8px; container-type: inline-size; }
+.esp-photo .frame { position: relative; height: min(75cqi, 72vh); border-radius: var(--cl-r); overflow: hidden; background: var(--cl-wash); }
+.esp-photo img { width: 100%; height: 100%; object-fit: cover; display: block; } /* en monitores anchos la foto no pasa del 72 % del alto de la pantalla */
 .esp-photo img.in { animation: clin 220ms var(--cl-ease); }
 @keyframes clin { from { opacity: .3; transform: scale(1.015); } to { opacity: 1; transform: none; } }
 .esp-photo .vacia { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; gap: 6px; padding: 20px; color: var(--cl-ink2); }
-.esp-photo figcaption { font-size: .9rem; color: var(--cl-ink2); }
+.esp-photo figcaption { font-size: calc(.9 * var(--u)); color: var(--cl-ink2); }
 .anillos { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 14px; align-items: center; padding: 14px; }
 .anillos svg { width: 100%; height: auto; display: block; overflow: visible; }
 .anillos .ring { cursor: pointer; transition: opacity 160ms ease; }
 .anillos .ring path.edge { fill: none; stroke: none; }
-.anillos .ring path.band { stroke: var(--cl-sf); stroke-width: 1.5; }
+.anillos .ring path.band { fill-rule: evenodd; stroke: var(--cl-sf); stroke-width: 1.5; } /* banda entre dos radios: cada anillo se toca solo */
 .anillos .ring.has path.band { fill: color-mix(in srgb, var(--f1) var(--mix, 60%), var(--cl-sf)); }
 .anillos .ring.no path.band { fill: var(--cl-sf); }
 .anillos .ring.no path.edge { fill: none; stroke: var(--cl-ink2); stroke-width: 1.2; stroke-dasharray: 3 4; }
@@ -125,10 +126,10 @@ body { background: var(--page); }
 .anillos-leyenda .no .sw { background: none; border: 1.5px dashed var(--cl-ink2); }
 .anillos-leyenda .no { color: var(--cl-ink2); cursor: default; }
 .esp-side { display: grid; gap: 14px; }
-.datos { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; padding: 16px; font-size: .95rem; }
+.datos { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; padding: 16px; font-size: calc(.95 * var(--u)); }
 .datos dt { color: var(--cl-ink2); }
 .esp-donde { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 16px; padding: 14px; align-items: start; }
-.esp-donde ul { list-style: none; padding: 0; display: grid; gap: 4px; font-size: .95rem; }
+.esp-donde ul { list-style: none; padding: 0; display: grid; gap: 4px; font-size: calc(.95 * var(--u)); }
 .esp-donde li { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--cl-line); padding: 4px 0; }
 .esp-donde li b { font-variant-numeric: tabular-nums; }
 
@@ -143,31 +144,31 @@ body { background: var(--page); }
 .mapa .pt.hi { fill: var(--cl-fill); }
 .mapa .yo { fill: none; stroke: var(--cl-ink); stroke-width: 2; }
 .mapa-zoom { position: absolute; right: 8px; top: 8px; display: grid; gap: 6px; }
-.mapa-zoom .btn { min-height: 32px; padding: 0 12px; font-size: .88rem; }
+.mapa-zoom .btn { min-height: 32px; padding: 0 12px; font-size: calc(.88 * var(--u)); }
 .lugar-side { display: grid; gap: 12px; }
 .lugar-side .card { padding: 14px; display: grid; gap: 10px; }
-.leyenda-mapa { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .88rem; color: var(--cl-ink2); }
+.leyenda-mapa { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: calc(.88 * var(--u)); color: var(--cl-ink2); }
 .leyenda-mapa span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; background: var(--c); }
 .ficha-placa { display: grid; gap: 6px; justify-items: start; }
-.ficha-placa h3 { font-size: 1.3rem; }
+.ficha-placa h3 { font-size: calc(1.3 * var(--u)); }
 
 /* ═══ Plantilla COLECCIÓN · cl-buscador + cl-mosaico (empacador de LinNeo) ═══ */
 .v-coleccion { display: grid; gap: 14px; }
 .col-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: end; }
-.col-head h1 { font-size: clamp(1.8rem, 4.5vw, 2.6rem); font-weight: 700; }
+.col-head h1 { font-size: clamp(calc(1.8 * var(--u)), 4.5vw, calc(2.6 * var(--u))); font-weight: 700; }
 .progreso { display: grid; gap: 6px; min-width: min(320px, 100%); }
 .progreso .barra { height: 10px; border-radius: 5px; background: var(--cl-line); overflow: hidden; display: flex; }
 .progreso .barra i { display: block; height: 100%; background: var(--cl-fill); }
-.progreso p { font-size: .92rem; color: var(--cl-ink2); }
+.progreso p { font-size: calc(.92 * var(--u)); color: var(--cl-ink2); }
 .progreso b { color: var(--cl-ink); font-variant-numeric: tabular-nums; }
 .col-tools { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; }
 .mosaico { display: grid; grid-template-columns: repeat(var(--cols, 8), minmax(0, 1fr)); grid-auto-rows: var(--cell, 84px); gap: 4px; }
 .mos-c { position: relative; overflow: hidden; border-radius: 4px; background: var(--cl-wash); border: 0; padding: 0; cursor: pointer; }
 .mos-c img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.mos-c.lbl::after { content: attr(data-nombre); position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 6px 4px; font-size: .78rem; line-height: 1.15; font-weight: 600; text-align: left;
+.mos-c.lbl::after { content: attr(data-nombre); position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 6px 4px; font-size: calc(.78 * var(--u)); line-height: 1.15; font-weight: 600; text-align: left;
   color: #f4f7f6; background: linear-gradient(transparent, rgba(8, 20, 28, .82)); }
-.mos-c.falta { background: var(--cl-sf); border: 1.5px dashed var(--cl-ink2); display: grid; place-content: center; padding: 6px; text-align: center; font-size: .78rem; line-height: 1.15; color: var(--cl-ink2); }
-.mos-c.falta b { display: block; font-size: 1.1rem; color: var(--cl-acc); }
+.mos-c.falta { background: var(--cl-sf); border: 1.5px dashed var(--cl-ink2); display: grid; place-content: center; padding: 6px; text-align: center; font-size: calc(.78 * var(--u)); line-height: 1.15; color: var(--cl-ink2); }
+.mos-c.falta b { display: block; font-size: calc(1.1 * var(--u)); color: var(--cl-acc); }
 .mosaico { position: relative; }
 /* Contorno por especie (capa SVG encima; ver contornos()). El trazo va recortado a la pieza: se ve la mitad, adentro */
 .mos-svg { position: absolute; left: 0; top: 0; z-index: 1; pointer-events: none; overflow: visible; }
@@ -179,13 +180,13 @@ body { background: var(--page); }
 
 /* ═══ Notas para Maya ═══ */
 .sistema { display: grid; gap: 14px; padding: 18px; }
-.sistema h2 { font-size: 1.25rem; }
+.sistema h2 { font-size: calc(1.25 * var(--u)); }
 .sis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 14px; }
 .sis-grid section { display: grid; gap: 6px; align-content: start; }
-.sis-grid h3 { font-size: 1.02rem; }
-.sis-grid p { color: var(--cl-ink2); font-size: .94rem; }
+.sis-grid h3 { font-size: calc(1.02 * var(--u)); }
+.sis-grid p { color: var(--cl-ink2); font-size: calc(.94 * var(--u)); }
 .cal { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 3px; }
-.cal div { display: grid; gap: 3px; font-size: .72rem; text-align: center; color: var(--cl-ink2); }
+.cal div { display: grid; gap: 3px; font-size: calc(.72 * var(--u)); text-align: center; color: var(--cl-ink2); }
 .cal i { height: 22px; border-radius: 3px; background: var(--c); }
 .cal .hoy { color: var(--cl-ink); font-weight: 700; }
 
@@ -308,7 +309,7 @@ body { background: var(--page); }
         var grains = ""; for (var g = 1; g <= 2; g++) grains += '<path class="grain" d="' + curva(ri + dr * g / 3) + '"/>';
         svg += '<g class="ring ' + (has ? "has" : "no") + (p === sel ? " sel" : "") + '" style="--mix:' + MIX[p] + '" data-parte="' + p + '"' +
           (has ? ' role="button" tabindex="0" aria-label="Ver foto de ' + NOM[p].toLowerCase() + '"' : ' aria-hidden="true"') + ">" +
-          '<path class="band" d="' + curva(ro) + '"/>' + (has ? grains : "") + '<path class="edge" d="' + curva(ro) + '"/></g>';
+          '<path class="band" d="' + curva(ro) + curva(ri) + '"/>' + (has ? grains : "") + '<path class="edge" d="' + curva(ro) + '"/></g>';
       }
       svg += '<path class="medula" d="' + curva(r0) + '"/><text class="medula-t" x="' + cx + '" y="' + cy + '">' + e.partes.length + "/5</text>";
       var leg = PARTES.slice().reverse().map(function (p) {
@@ -423,7 +424,7 @@ body { background: var(--page); }
   }
   var mosaico = {
     mount: function (el, items) {
-      var w = el.clientWidth || 800, cell = w < 520 ? 68 : Math.round(Math.min(120, Math.max(86, w / 16))), /* casillas más grandes en pantallas anchas */ cols = Math.max(4, Math.floor((w + 4) / (cell + 4))), lado = (w - (cols - 1) * 4) / cols;
+      var w = el.clientWidth || 800, u = parseFloat(getComputedStyle(el).fontSize) / 16 || 1, cell = w < 520 ? 68 : Math.round(Math.min(120 * u, Math.max(86, w / 16))), /* casillas más grandes en pantallas anchas, al paso del texto (--u) */ cols = Math.max(4, Math.floor((w + 4) / (cell + 4))), lado = (w - (cols - 1) * 4) / cols;
       el.style.setProperty("--cols", cols); el.style.setProperty("--cell", lado.toFixed(1) + "px");
       if (!el.dataset.pieza) { el.dataset.pieza = "1"; resaltarPieza(el); }
       if (!items.length) { el.innerHTML = '<p class="mos-vacio">Ninguna especie coincide. Prueba con el nombre común, la familia o un jardín.</p>'; return; }
@@ -471,7 +472,7 @@ body { background: var(--page); }
     main.innerHTML = '<article class="v-especie"><div class="esp-head"><p class="url">campuslab.iteso.mx/web/campuslab/especie?id=<b>' + esc(e.id) + '</b></p><p class="eyebrow">' + esc(e.fam || "Familia por confirmar") + "</p><h1>" + esc(e.com) + '</h1><p class="sci">' + esc(e.sci) + "</p></div>" +
       '<div class="esp-main"><figure class="esp-photo"><div class="frame" id="cl-foto"></div><figcaption id="cl-pie"></figcaption></figure>' +
       '<div class="esp-side"><div class="card anillos" id="cl-anillos"></div><dl class="card datos"><dt>Origen</dt><dd>' + esc(e.ori || "Sin dato todavía") + "</dd>" + ras + "</dl></div></div>" +
-      '<section class="card esp-donde"><div><h2 style="font-size:1.15rem;margin-bottom:8px">' + e.n + " " + (e.n === 1 ? "árbol" : "árboles") + " en el campus</h2><ul>" + jar.map(function (j) { return "<li><span>" + esc(j) + "</span><b>" + e.jar[j] + "</b></li>"; }).join("") +
+      '<section class="card esp-donde"><div><h2 style="font-size:calc(1.15 * var(--u));margin-bottom:8px">' + e.n + " " + (e.n === 1 ? "árbol" : "árboles") + " en el campus</h2><ul>" + jar.map(function (j) { return "<li><span>" + esc(j) + "</span><b>" + e.jar[j] + "</b></li>"; }).join("") +
       '</ul><p style="margin-top:10px"><button class="btn" type="button" data-ir="lugar">Ver en el mapa</button></p></div><div id="cl-mini"></div></section></article>';
     var foto = function () {
       var f = document.getElementById("cl-foto"), pie = document.getElementById("cl-pie");
@@ -494,7 +495,7 @@ body { background: var(--page); }
       (pe ? '<div class="ficha-placa"><span class="placa">' + pl[0] + "<small>placa</small></span><h3>" + esc(pe.com) + '</h3><p class="sci muted">' + esc(pe.sci) + '</p><p><button class="btn solid" type="button" data-abre="' + pe.id + '">Ver ficha</button></p></div>' : "") + "</div>" +
       '<div class="card"><b>Qué se marca</b><div class="cl-tabs" role="group" aria-label="Marcar en el mapa"><button class="btn" type="button" data-faltan="0" aria-pressed="' + !S.faltan + '">' + esc(e.com) + '</button><button class="btn" type="button" data-faltan="1" aria-pressed="' + S.faltan + '">Sin foto todavía</button></div>' +
       '<div class="leyenda-mapa"><span style="--c:var(--cl-fill)">' + (S.faltan ? nFalt + " árboles de especies sin foto" : esc(e.com) + " (" + e.n + ")") + '</span><span style="--c:color-mix(in srgb, var(--cl-ink2) 30%, var(--cl-sf))">Otros árboles</span></div>' +
-      '<p class="muted" style="font-size:.9rem">Toca un punto para ver su placa. ' + (S.faltan ? "Útil para salir a fotografiar: cada punto es un árbol cuya especie aún no tiene foto." : "") + "</p></div></aside></section>";
+      '<p class="muted" style="font-size:calc(.9 * var(--u))">Toca un punto para ver su placa. ' + (S.faltan ? "Útil para salir a fotografiar: cada punto es un árbol cuya especie aún no tiene foto." : "") + "</p></div></aside></section>";
     mapa.mount(document.getElementById("cl-mapa"), { hi: hi, foco: true, zoom: pl ? "placa" : "hi", placa: pl ? S.placa : null, controles: true, ar: innerWidth < 600 ? 1.1 : 1.5, label: "Mapa de árboles del campus",
       onPick: function (placa) { S.placa = String(placa); vLugar(); guardar("push"); } });
   }

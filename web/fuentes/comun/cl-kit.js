@@ -126,7 +126,7 @@
         var p = PARTES[i], ro = r0 + dr * (i + 1), ri = r0 + dr * i, has = !!e.fotos[p], grains = "";
         if (has) for (var g = 1; g <= 2; g++) grains += '<path class="cl-grain" d="' + curva(ri + dr * g / 3) + '"/>';
         svg += '<g class="cl-ring ' + (has ? "cl-has" : "cl-no") + (p === sel ? " cl-sel" : "") + '" style="--mix:' + MIX[p] + '" data-parte="' + p + '"' +
-          (has ? ' role="button" tabindex="0" aria-label="Ver foto de ' + NOM[p].toLowerCase() + '"' : ' aria-hidden="true"') + '><path class="cl-band" d="' + curva(ro) + '"/>' + grains + '<path class="cl-edge" d="' + curva(ro) + '"/></g>';
+          (has ? ' role="button" tabindex="0" aria-label="Ver foto de ' + NOM[p].toLowerCase() + '"' : ' aria-hidden="true"') + '><path class="cl-band" d="' + curva(ro) + curva(ri) + '"/>' + grains + '<path class="cl-edge" d="' + curva(ro) + '"/></g>';
       }
       svg += '<path class="cl-medula" d="' + curva(r0) + '"/><text class="cl-medula-t" x="' + cx + '" y="' + cy + '">' + e.partes.length + "/5</text>";
       var leg = PARTES.slice().reverse().map(function (p) {
@@ -239,7 +239,7 @@
   }
   var mosaico = {
     mount: function (el, items, cfg) {
-      var w = el.clientWidth || 800, cell = w < 520 ? 68 : Math.round(Math.min(120, Math.max(86, w / 16))), /* casillas más grandes en pantallas anchas */ cols = Math.max(4, Math.floor((w + 4) / (cell + 4))), lado = (w - (cols - 1) * 4) / cols;
+      var w = el.clientWidth || 800, u = parseFloat(getComputedStyle(el).fontSize) / 16 || 1, cell = w < 520 ? 68 : Math.round(Math.min(120 * u, Math.max(86, w / 16))), /* casillas más grandes en pantallas anchas, al paso del texto (--u) */ cols = Math.max(4, Math.floor((w + 4) / (cell + 4))), lado = (w - (cols - 1) * 4) / cols;
       el.style.setProperty("--cols", cols); el.style.setProperty("--cell", lado.toFixed(1) + "px");
       if (!el.dataset.pieza) { el.dataset.pieza = "1"; resaltarPieza(el); }
       if (!items.length) { el.innerHTML = '<p class="cl-mos-vacio">Ninguna especie coincide. Prueba con el nombre común, la familia o un jardín.</p>'; return; }

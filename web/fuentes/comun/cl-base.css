@@ -15,6 +15,7 @@
    Contraste verificado WCAG AA en los dos modos y las siete floraciones.
    ═══════════════════════════════════════════════════════════════════════ */
 .cl {
+  --u: clamp(16px, 10.8px + .36vw, 22px); /* tamaño base: 16 px hasta ~1440 px de ancho, crece hasta 22 px en monitores anchos (2560-3440) */
   color-scheme: light dark; /* sigue al dispositivo; data-modo (elección guardada) manda encima. CSS y JS coinciden: no parpadea */
   --cl-bg: light-dark(#f3f6f5, #0c171e);
   --cl-sf: light-dark(#fbfcfc, #13222b);
@@ -33,7 +34,7 @@
   --cl-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
   --cl-r: 8px;
   --cl-ease: cubic-bezier(0.23, 1, 0.32, 1);
-  background: var(--cl-bg); color: var(--cl-ink); font: 16px/1.5 var(--cl-font); font-synthesis: none;
+  background: var(--cl-bg); color: var(--cl-ink); font: var(--u)/1.5 var(--cl-font); font-synthesis: none;
   border-radius: var(--cl-r);
 }
 .cl[data-modo="claro"] { color-scheme: light; }
@@ -63,7 +64,7 @@
 .cl .cl-sci { font-style: italic; }
 .cl .cl-muted { color: var(--cl-ink2); }
 .cl .cl-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.cl .cl-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: 999px; border: 1.5px solid var(--cl-line); background: var(--cl-sf); color: var(--cl-ink); cursor: pointer; white-space: nowrap; text-decoration: none; font-size: 1rem; line-height: 1.2; transition: transform 140ms var(--cl-ease); }
+.cl .cl-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: 999px; border: 1.5px solid var(--cl-line); background: var(--cl-sf); color: var(--cl-ink); cursor: pointer; white-space: nowrap; text-decoration: none; font-size: calc(1 * var(--u)); line-height: 1.2; transition: transform 140ms var(--cl-ease); }
 .cl .cl-btn:active { transform: scale(0.97); }
 .cl .cl-btn[aria-pressed="true"], .cl .cl-btn.cl-solid { background: var(--cl-fill); border-color: var(--cl-fill); color: var(--cl-on-fill); }
 .cl .cl-field { width: 100%; min-height: 42px; padding: 0 14px; border-radius: var(--cl-r); border: 1.5px solid var(--cl-ink2); background: var(--cl-sf); color: var(--cl-ink); }
@@ -72,7 +73,7 @@
 .cl .cl-placa { display: inline-flex; align-items: baseline; gap: 6px; font-family: var(--cl-font-b); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .05em; padding: 4px 10px; border-radius: 4px; border: 1.5px solid var(--cl-ink2);
   background: linear-gradient(180deg, var(--cl-sf), color-mix(in srgb, var(--cl-line) 55%, var(--cl-sf))); text-shadow: 0 1px 0 var(--cl-sf); }
 .cl .cl-placa small { font-family: var(--cl-font); font-weight: 400; letter-spacing: 0; color: var(--cl-ink2); }
-.cl .cl-eyebrow { font-size: .9rem; color: var(--cl-ink2); }
+.cl .cl-eyebrow { font-size: calc(.9 * var(--u)); color: var(--cl-ink2); }
 @media (hover: hover) and (pointer: fine) { .cl .cl-btn:hover { border-color: var(--cl-acc); } }
 @media (prefers-reduced-motion: reduce) { .cl * { transition: none !important; animation: none !important; } }
 
@@ -92,7 +93,7 @@
 @keyframes cl-shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
 /* carga:inicio · barra de avance (preparar_para_liferay.py copia este bloque a los prototipos) */
 .cl-carga { display: grid; gap: 8px; margin-bottom: 16px; }
-.cl-carga-t { font-size: .875rem; color: var(--cl-ink2); font-variant-numeric: tabular-nums; }
+.cl-carga-t { font-size: calc(.875 * var(--u)); color: var(--cl-ink2); font-variant-numeric: tabular-nums; }
 .cl-carga-b { display: block; height: 6px; border-radius: 999px; background: var(--cl-line); overflow: hidden; }
 .cl-carga-b i { display: block; height: 100%; width: var(--p, 0%); border-radius: inherit; background: var(--f1); transition: width 160ms linear; }
 .cl-carga.cl-indet .cl-carga-b i { width: 35%; animation: cl-indet 1.2s cubic-bezier(.45, 0, .55, 1) infinite; }
@@ -104,21 +105,21 @@
 /* ═══ Especie · cl-anillos + datos + mapa chico ═══ */
 .cl-especie { display: grid; gap: 18px; }
 .cl-esp-head { display: grid; gap: 4px; }
-.cl-esp-head h1 { font-size: clamp(2rem, 5vw, 3.1rem); }
-.cl-esp-head .cl-sci { font-size: clamp(1.1rem, 2.2vw, 1.35rem); color: var(--cl-ink2); }
+.cl-esp-head h1 { font-size: clamp(calc(2 * var(--u)), 5vw, calc(3.1 * var(--u))); }
+.cl-esp-head .cl-sci { font-size: clamp(calc(1.1 * var(--u)), 2.2vw, calc(1.35 * var(--u))); color: var(--cl-ink2); }
 .cl-esp-main { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 20px; align-items: start; }
-.cl-foto { margin: 0; display: grid; gap: 8px; }
-.cl-foto .cl-frame { position: relative; aspect-ratio: 4 / 3; border-radius: var(--cl-r); overflow: hidden; background: var(--cl-wash); }
-.cl-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cl-foto { margin: 0; display: grid; gap: 8px; container-type: inline-size; }
+.cl-foto .cl-frame { position: relative; height: min(75cqi, 72vh); border-radius: var(--cl-r); overflow: hidden; background: var(--cl-wash); }
+.cl-foto img { width: 100%; height: 100%; object-fit: cover; display: block; } /* en monitores anchos la foto no pasa del 72 % del alto de la pantalla */
 .cl-foto img.cl-in { animation: cl-in 220ms var(--cl-ease); }
 @keyframes cl-in { from { opacity: .3; transform: scale(1.015); } to { opacity: 1; transform: none; } }
 .cl-foto .cl-vacia { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; gap: 6px; padding: 20px; color: var(--cl-ink2); }
-.cl-foto figcaption { font-size: .9rem; color: var(--cl-ink2); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.cl-foto figcaption { font-size: calc(.9 * var(--u)); color: var(--cl-ink2); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 .cl-anillos { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 14px; align-items: center; padding: 14px; }
 .cl-anillos svg { width: 100%; height: auto; display: block; overflow: visible; }
 .cl-anillos .cl-ring { cursor: pointer; }
 .cl-anillos .cl-ring path.cl-edge { fill: none; stroke: none; }
-.cl-anillos .cl-ring path.cl-band { stroke: var(--cl-sf); stroke-width: 1.5; }
+.cl-anillos .cl-ring path.cl-band { fill-rule: evenodd; stroke: var(--cl-sf); stroke-width: 1.5; } /* banda entre dos radios: cada anillo se toca solo */
 .cl-anillos .cl-ring.cl-has path.cl-band { fill: color-mix(in srgb, var(--f1) var(--mix, 60%), var(--cl-sf)); }
 .cl-anillos .cl-ring.cl-no path.cl-band { fill: var(--cl-sf); }
 .cl-anillos .cl-ring.cl-no path.cl-edge { stroke: var(--cl-ink2); stroke-width: 1.2; stroke-dasharray: 3 4; }
@@ -133,11 +134,11 @@
 .cl-leyenda .cl-no .cl-sw { background: none; border: 1.5px dashed var(--cl-ink2); }
 .cl .cl-leyenda .cl-no button { color: var(--cl-ink2); cursor: default; }
 .cl-esp-side { display: grid; gap: 14px; }
-.cl-datos { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; padding: 16px; font-size: .95rem; }
+.cl-datos { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; padding: 16px; font-size: calc(.95 * var(--u)); }
 .cl-datos dt { color: var(--cl-ink2); font-weight: 400; }
 .cl-donde { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 16px; padding: 14px; align-items: start; }
-.cl-donde h2 { font-size: 1.15rem; margin-bottom: 8px; }
-.cl-donde ul { list-style: none; padding: 0; display: grid; gap: 4px; font-size: .95rem; }
+.cl-donde h2 { font-size: calc(1.15 * var(--u)); margin-bottom: 8px; }
+.cl-donde ul { list-style: none; padding: 0; display: grid; gap: 4px; font-size: calc(.95 * var(--u)); }
 .cl-donde li { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--cl-line); padding: 4px 0; }
 .cl-donde li b { font-variant-numeric: tabular-nums; }
 .cl-donde .cl-btn { margin-top: 10px; }
@@ -153,32 +154,32 @@
 .cl-mapa .cl-pt.cl-hi { fill: var(--cl-fill); }
 .cl-mapa .cl-yo { fill: none; stroke: var(--cl-ink); stroke-width: 2; }
 .cl-mapa-zoom { position: absolute; right: 8px; top: 8px; display: grid; gap: 6px; }
-.cl .cl-mapa-zoom .cl-btn { min-height: 32px; padding: 0 12px; font-size: .88rem; }
+.cl .cl-mapa-zoom .cl-btn { min-height: 32px; padding: 0 12px; font-size: calc(.88 * var(--u)); }
 .cl-lugar-side { display: grid; gap: 12px; }
 .cl-lugar-side .cl-card { padding: 14px; display: grid; gap: 10px; }
-.cl-leyenda-mapa { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .88rem; color: var(--cl-ink2); }
+.cl-leyenda-mapa { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: calc(.88 * var(--u)); color: var(--cl-ink2); }
 .cl-leyenda-mapa span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; background: var(--c); }
 .cl-ficha-placa { display: grid; gap: 6px; justify-items: start; }
-.cl-ficha-placa h3 { font-size: 1.3rem; }
+.cl-ficha-placa h3 { font-size: calc(1.3 * var(--u)); }
 .cl-tabs { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 
 /* ═══ Colección · cl-buscador + cl-mosaico (empacador de LinNeo) ═══ */
 .cl-coleccion { display: grid; gap: 14px; }
 .cl-col-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: end; }
-.cl-col-head h1 { font-size: clamp(1.8rem, 4.5vw, 2.6rem); }
+.cl-col-head h1 { font-size: clamp(calc(1.8 * var(--u)), 4.5vw, calc(2.6 * var(--u))); }
 .cl-progreso { display: grid; gap: 6px; min-width: min(320px, 100%); }
 .cl-progreso .cl-barra-p { height: 10px; border-radius: 5px; background: var(--cl-line); overflow: hidden; display: flex; }
 .cl-progreso .cl-barra-p i { display: block; height: 100%; background: var(--cl-fill); }
-.cl-progreso p { font-size: .92rem; color: var(--cl-ink2); }
+.cl-progreso p { font-size: calc(.92 * var(--u)); color: var(--cl-ink2); }
 .cl-progreso b { color: var(--cl-ink); font-variant-numeric: tabular-nums; }
 .cl-col-tools { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; }
 .cl-mosaico { display: grid; grid-template-columns: repeat(var(--cols, 8), minmax(0, 1fr)); grid-auto-rows: var(--cell, 84px); gap: 4px; }
 .cl .cl-mos-c { position: relative; display: block; overflow: hidden; border-radius: 4px; background: var(--cl-wash); text-decoration: none; color: inherit; }
 .cl-mos-c img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.cl-mos-c.cl-lbl::after { content: attr(data-nombre); position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 6px 4px; font-size: .78rem; line-height: 1.15; font-family: var(--cl-font-sb); font-weight: 600; text-align: left;
+.cl-mos-c.cl-lbl::after { content: attr(data-nombre); position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 6px 4px; font-size: calc(.78 * var(--u)); line-height: 1.15; font-family: var(--cl-font-sb); font-weight: 600; text-align: left;
   color: #f4f7f6; background: linear-gradient(transparent, rgba(8, 20, 28, .82)); }
-.cl .cl-mos-c.cl-falta { background: var(--cl-sf); border: 1.5px dashed var(--cl-ink2); display: grid; place-content: center; padding: 6px; text-align: center; font-size: .78rem; line-height: 1.15; color: var(--cl-ink2); }
-.cl-mos-c.cl-falta b { display: block; font-size: 1.1rem; color: var(--cl-acc); }
+.cl .cl-mos-c.cl-falta { background: var(--cl-sf); border: 1.5px dashed var(--cl-ink2); display: grid; place-content: center; padding: 6px; text-align: center; font-size: calc(.78 * var(--u)); line-height: 1.15; color: var(--cl-ink2); }
+.cl-mos-c.cl-falta b { display: block; font-size: calc(1.1 * var(--u)); color: var(--cl-acc); }
 .cl-mosaico { position: relative; }
 /* Contorno por especie (capa SVG encima; ver contornos() en cl-kit.js). El trazo va recortado a la pieza: se ve la mitad, adentro */
 .cl-mos-svg { position: absolute; left: 0; top: 0; z-index: 1; pointer-events: none; overflow: visible; }

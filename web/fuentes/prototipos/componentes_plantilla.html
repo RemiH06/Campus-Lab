@@ -9,6 +9,7 @@ body { background: var(--page); }
 
 /* ═══ cl-base.css (la misma del prototipo de plantillas) ═══ */
 .cl {
+  --u: clamp(16px, 10.8px + .36vw, 22px); /* tamaño base: 16 px hasta ~1440 px de ancho, crece hasta 22 px en monitores anchos (2560-3440) */
   color-scheme: light dark; /* sigue al dispositivo; data-modo (elección guardada) manda encima. CSS y JS coinciden: no parpadea */
   --cl-bg: light-dark(#f3f6f5, #0c171e); --cl-sf: light-dark(#fbfcfc, #13222b); --cl-ink: light-dark(#12283a, #e3ece9);
   --cl-ink2: light-dark(#4a5d69, #9db0b5); --cl-line: light-dark(#d2dcdb, #29404a);
@@ -16,7 +17,7 @@ body { background: var(--page); }
   --cl-wash: color-mix(in srgb, var(--f1) 14%, var(--cl-sf)); --cl-leaf: var(--f2);
   --cl-font: "Degular", "Figtree", system-ui, sans-serif; --cl-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
   --cl-r: 8px; --cl-ease: cubic-bezier(0.23, 1, 0.32, 1); --cl-ease-io: cubic-bezier(0.77, 0, 0.175, 1);
-  background: var(--cl-bg); color: var(--cl-ink); font: 16px/1.5 var(--cl-font); min-height: 100vh;
+  background: var(--cl-bg); color: var(--cl-ink); font: var(--u)/1.5 var(--cl-font); min-height: 100vh;
 }
 .cl[data-modo="claro"] { color-scheme: light; } .cl[data-modo="oscuro"] { color-scheme: dark; }
 :root[data-theme="dark"] .cl:not([data-modo]) { color-scheme: dark; } :root[data-theme="light"] .cl:not([data-modo]) { color-scheme: light; }
@@ -48,7 +49,7 @@ body { background: var(--page); }
 /* ═══ Página de muestras ═══ */
 .shell { padding-block: 18px 64px; padding-left: max(clamp(16px, 5vw, 120px), env(safe-area-inset-left, 0px)); padding-right: max(clamp(16px, 5vw, 120px), env(safe-area-inset-right, 0px)); display: grid; gap: 28px; } /* todo el ancho disponible (pedido de Maya, 20-oct) */
 .top { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: end; justify-content: space-between; }
-.top h1 { font-size: clamp(1.9rem, 4.6vw, 2.7rem); font-weight: 700; }
+.top h1 { font-size: clamp(calc(1.9 * var(--u)), 4.6vw, calc(2.7 * var(--u))); font-weight: 700; }
 .top p { max-width: 62ch; color: var(--cl-ink2); margin-top: 6px; }
 .tools { display: flex; gap: 8px; flex-wrap: wrap; }
 .flor-pick { position: relative; }
@@ -56,19 +57,20 @@ body { background: var(--page); }
 .flor-pick::before { content: ""; position: absolute; left: 11px; top: 50%; translate: 0 -50%; width: 12px; height: 12px; border-radius: 50%; background: var(--f1); box-shadow: 4px 0 0 -1px var(--f2); pointer-events: none; }
 .flor-pick::after { content: ""; position: absolute; right: 13px; top: 50%; width: 7px; height: 7px; border-right: 1.5px solid var(--cl-ink2); border-bottom: 1.5px solid var(--cl-ink2); translate: 0 -70%; rotate: 45deg; pointer-events: none; }
 .grupo { display: grid; gap: 14px; }
-.grupo + .grupo { margin-top: 22px; } /* el título de sección se lee con sus tarjetas, no con las de arriba */
-.grupo > h2 { font-size: 1.35rem; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
-.grupo > h2 small { font-size: .95rem; font-weight: 400; color: var(--cl-ink2); }
-.demos { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 14px; }
+.grupo + .grupo { margin-top: 0; } /* el título de sección se lee con sus tarjetas, no con las de arriba */
+.grupo > h2 { font-size: calc(1.35 * var(--u)); display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.grupo > h2 small { font-size: calc(.95 * var(--u)); font-weight: 400; color: var(--cl-ink2); }
+#grupos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(80 * var(--u))), 1fr)); gap: 22px 28px; align-items: start; } /* dos grupos por renglón desde ~3000 px */
+.demos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(25 * var(--u))), 1fr)); gap: 14px; } /* auto-fit: las tarjetas llenan el renglón, sin columnas vacías */
 .demo { display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; }
 .demo .stage { position: relative; min-height: 230px; display: grid; place-items: center; padding: 18px; background: var(--cl-bg); border-bottom: 1px solid var(--cl-line); overflow: hidden; }
 .demo .info { padding: 14px 16px; display: grid; gap: 6px; align-content: start; }
-.demo h3 { font-size: 1.08rem; display: flex; gap: 10px; align-items: baseline; }
+.demo h3 { font-size: calc(1.08 * var(--u)); display: flex; gap: 10px; align-items: baseline; }
 .demo h3 .n { font-variant-numeric: tabular-nums; color: var(--cl-acc); font-weight: 700; }
-.demo .info p { color: var(--cl-ink2); font-size: .94rem; }
+.demo .info p { color: var(--cl-ink2); font-size: calc(.94 * var(--u)); }
 .demo .info p b { color: var(--cl-ink); font-weight: 600; }
 .demo .pie { display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 0 16px 14px; }
-.peso { font-size: .82rem; color: var(--cl-ink2); padding: 2px 10px; border-radius: 999px; border: 1px solid var(--cl-line); }
+.peso { font-size: calc(.82 * var(--u)); color: var(--cl-ink2); padding: 2px 10px; border-radius: 999px; border: 1px solid var(--cl-line); }
 
 /* 1 · Revelado de foto */
 .rev { width: min(100%, 360px); aspect-ratio: 4 / 3; border-radius: var(--cl-r); overflow: hidden; }
@@ -81,18 +83,25 @@ body { background: var(--page); }
 /* 2 · Cifras */
 .cifras { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; width: 100%; }
 .cifra { display: grid; gap: 2px; text-align: center; }
-.cifra b { font-size: clamp(1.8rem, 5vw, 2.6rem); font-weight: 700; font-variant-numeric: tabular-nums; color: var(--cl-acc); line-height: 1; }
-.cifra span { font-size: .9rem; color: var(--cl-ink2); }
+.cifra b { font-size: clamp(calc(1.8 * var(--u)), 5vw, calc(2.6 * var(--u))); font-weight: 700; font-variant-numeric: tabular-nums; color: var(--cl-acc); line-height: 1; }
+.cifra span { font-size: calc(.9 * var(--u)); color: var(--cl-ink2); }
 
 /* 3 · Anillos que crecen */
+/* cada anillo es una banda (corona entre dos radios, evenodd): no tapa a los de adentro y cada uno se toca solo */
+.grow { display: grid; justify-items: center; gap: 6px; }
 .grow svg { width: 200px; height: 200px; overflow: visible; }
-.grow path { fill: none; stroke-width: 9; stroke-linecap: round; }
-.grow .has { stroke: color-mix(in srgb, var(--f1) var(--mix), var(--cl-sf)); }
-.grow .no { stroke: var(--cl-line); stroke-width: 2; stroke-dasharray: .012 .02; }
-.grow.go .has { animation: draw 900ms var(--cl-ease) both; animation-delay: var(--d); }
-@keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
-.grow .has { stroke-dasharray: 1 1; }
-.grow text { fill: var(--cl-ink); font-weight: 700; font-size: 22px; text-anchor: middle; dominant-baseline: central; }
+.grow .ring { cursor: pointer; transform-origin: 100px 100px; }
+.grow .ring:focus { outline: none; }
+.grow .ring path { fill-rule: evenodd; stroke: var(--cl-sf); stroke-width: 1.5; }
+.grow .has path { fill: color-mix(in srgb, var(--f1) var(--mix), var(--cl-sf)); }
+.grow .no path { fill: var(--cl-sf); stroke: var(--cl-ink2); stroke-width: 1.2; stroke-dasharray: 3 4; }
+.grow .ring:hover path, .grow .ring:focus-visible path { stroke: var(--cl-ink); stroke-width: 2; }
+.grow .ring[aria-pressed="true"] path { stroke: var(--cl-ink); stroke-width: 2.4; stroke-dasharray: none; }
+.grow.pre .ring { transform: scale(.3); opacity: 0; }
+.grow.go .ring { transition: transform 800ms var(--cl-ease), opacity 400ms ease; transition-delay: var(--d); }
+.grow .medula { fill: var(--cl-fill); pointer-events: none; }
+.grow text { fill: var(--cl-on-fill); font-weight: 700; font-size: 15px; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+.grow output { min-height: 1.4em; font-size: calc(.92 * var(--u)); color: var(--cl-ink2); }
 
 /* 4 · Comparador */
 .cmp { position: relative; width: min(100%, 380px); aspect-ratio: 4 / 3; border-radius: var(--cl-r); overflow: hidden; }
@@ -101,7 +110,7 @@ body { background: var(--page); }
 .cmp .linea { position: absolute; top: 0; bottom: 0; left: var(--x, 50%); width: 2px; translate: -1px 0; background: var(--cl-sf); pointer-events: none; }
 .cmp .linea::after { content: ""; position: absolute; top: 50%; left: 50%; width: 30px; height: 30px; translate: -50% -50%; border-radius: 50%; background: var(--cl-sf); border: 2px solid var(--cl-fill); }
 .cmp input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; margin: 0; }
-.cmp .et { position: absolute; bottom: 8px; font-size: .8rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--cl-sf); color: var(--cl-ink); }
+.cmp .et { position: absolute; bottom: 8px; font-size: calc(.8 * var(--u)); font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--cl-sf); color: var(--cl-ink); }
 .cmp .et.l { left: 8px; } .cmp .et.r { right: 8px; }
 .cmp:has(input:focus-visible) { outline: 2px solid var(--cl-acc); outline-offset: 2px; }
 
@@ -111,7 +120,7 @@ body { background: var(--page); }
 .carr-track::-webkit-scrollbar { display: none; }
 .carr-track figure { scroll-snap-align: center; display: grid; gap: 4px; }
 .carr-track img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--cl-r); display: block; }
-.carr-track figcaption { font-size: .85rem; color: var(--cl-ink2); text-align: center; }
+.carr-track figcaption { font-size: calc(.85 * var(--u)); color: var(--cl-ink2); text-align: center; }
 .carr-nav { display: flex; justify-content: center; gap: 8px; align-items: center; }
 .carr-dots { display: flex; gap: 6px; }
 .carr-dots button { width: 24px; height: 24px; border: 0; background: none; padding: 0; cursor: pointer; display: grid; place-items: center; }
@@ -125,15 +134,15 @@ body { background: var(--page); }
 .flip .cara { position: absolute; inset: 0; backface-visibility: hidden; border-radius: var(--cl-r); overflow: hidden; border: 1px solid var(--cl-line); background: var(--cl-sf); display: grid; text-align: left; }
 .flip .cara img { width: 100%; height: 100%; object-fit: cover; }
 .flip .frente span { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 10px 8px; font-weight: 700; color: #f4f7f6; background: linear-gradient(transparent, rgba(8, 20, 28, .85)); }
-.flip .dorso { transform: rotateY(180deg); padding: 14px; align-content: start; gap: 6px; font-size: .9rem; }
-.flip .dorso b { font-size: 1.1rem; }
+.flip .dorso { transform: rotateY(180deg); padding: 14px; align-content: start; gap: 6px; font-size: calc(.9 * var(--u)); }
+.flip .dorso b { font-size: calc(1.1 * var(--u)); }
 .flip .dorso .dots { display: flex; gap: 4px; margin-top: 4px; }
 .flip .dorso .dots i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--cl-ink2); }
 .flip .dorso .dots i.on { background: var(--cl-fill); border-color: var(--cl-fill); }
 
 /* 7 · Autocompletado */
 .ac { width: min(100%, 380px); position: relative; align-self: start; }
-.ac-pista { margin: 10px 0 0; font-size: .9rem; color: var(--cl-ink2); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.ac-pista { margin: 10px 0 0; font-size: calc(.9 * var(--u)); color: var(--cl-ink2); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .ac-pista button { font: inherit; color: var(--cl-acc); background: none; border: 1.5px solid var(--cl-line); border-radius: 999px; padding: 2px 10px; cursor: pointer; }
 .ac ul:not([hidden]) ~ .ac-pista { display: none; }
 .ac ul { list-style: none; margin: 6px 0 0; padding: 4px; border-radius: var(--cl-r); border: 1px solid var(--cl-line); background: var(--cl-sf); max-height: 190px; overflow: auto; }
@@ -147,13 +156,13 @@ body { background: var(--page); }
 .flipgrid { width: 100%; display: grid; gap: 10px; align-self: start; }
 .fg-chips { display: flex; gap: 6px; flex-wrap: wrap; }
 .fg { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 6px; }
-.fg > * { aspect-ratio: 1; border-radius: 6px; overflow: hidden; background: var(--cl-sf); border: 1.5px dashed var(--cl-ink2); display: grid; place-items: center; font-size: .72rem; text-align: center; color: var(--cl-ink2); padding: 2px; }
+.fg > * { aspect-ratio: 1; border-radius: 6px; overflow: hidden; background: var(--cl-sf); border: 1.5px dashed var(--cl-ink2); display: grid; place-items: center; font-size: calc(.72 * var(--u)); text-align: center; color: var(--cl-ink2); padding: 2px; }
 .fg > .f { border: 0; padding: 0; }
 .fg img { width: 100%; height: 100%; object-fit: cover; }
 
 /* 9 · Placa tipo tablero */
 .flap { display: flex; gap: 4px; perspective: 400px; }
-.flap .d { position: relative; width: 44px; height: 62px; border-radius: 6px; background: var(--cl-ink); color: var(--cl-bg); font-size: 2.3rem; font-weight: 700; font-variant-numeric: tabular-nums; display: grid; place-items: center; overflow: hidden; }
+.flap .d { position: relative; width: 44px; height: 62px; border-radius: 6px; background: var(--cl-ink); color: var(--cl-bg); font-size: calc(2.3 * var(--u)); font-weight: 700; font-variant-numeric: tabular-nums; display: grid; place-items: center; overflow: hidden; }
 .flap .d::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: color-mix(in srgb, var(--cl-bg) 40%, transparent); }
 .flap .d.go span { animation: flapin 260ms var(--cl-ease) both; animation-delay: var(--d); }
 @keyframes flapin { from { transform: rotateX(-88deg); opacity: .2; } to { transform: none; opacity: 1; } }
@@ -174,13 +183,13 @@ body { background: var(--page); }
 /* 11 · Temporada (canvas) */
 .temp { position: relative; width: 100%; height: 230px; border-radius: var(--cl-r); overflow: hidden; background: var(--cl-wash); }
 .temp canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-.temp p { position: absolute; left: 14px; bottom: 12px; font-weight: 700; font-size: 1.3rem; }
+.temp p { position: absolute; left: 14px; bottom: 12px; font-weight: 700; font-size: calc(1.3 * var(--u)); }
 
 /* 12 · Recorrido del año */
 .anio { width: 100%; display: grid; gap: 12px; }
 .anio-ficha { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 12px; align-items: center; padding: 12px; border-radius: var(--cl-r); background: var(--cl-sf); border: 1px solid var(--cl-line); }
 .anio-ficha .sw { width: 90px; height: 90px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, var(--f1) 0 45%, var(--f2) 46%); transition: background 600ms ease; }
-.anio-ficha b { font-size: 1.3rem; color: var(--cl-acc); transition: color 600ms ease; }
+.anio-ficha b { font-size: calc(1.3 * var(--u)); color: var(--cl-acc); transition: color 600ms ease; }
 .anio .meses { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 3px; }
 .anio .meses span { height: 8px; border-radius: 4px; background: var(--cl-line); transition: background-color 300ms ease; }
 .anio .meses span.on { background: var(--cl-fill); }
@@ -198,8 +207,8 @@ body { background: var(--page); }
 
 /* 14 · Copiar enlace + aviso */
 .share { display: grid; gap: 10px; justify-items: center; }
-.share code { font-family: var(--cl-mono); font-size: .8rem; color: var(--cl-ink2); overflow-wrap: anywhere; text-align: center; }
-.toast { position: absolute; left: 50%; bottom: 16px; translate: -50% 0; padding: 8px 16px; border-radius: 999px; background: var(--cl-ink); color: var(--cl-bg); font-weight: 600; font-size: .92rem; opacity: 0; transform: translateY(12px); transition: opacity 200ms ease, transform 200ms var(--cl-ease); pointer-events: none; }
+.share code { font-family: var(--cl-mono); font-size: calc(.8 * var(--u)); color: var(--cl-ink2); overflow-wrap: anywhere; text-align: center; }
+.toast { position: absolute; left: 50%; bottom: 16px; translate: -50% 0; padding: 8px 16px; border-radius: 999px; background: var(--cl-ink); color: var(--cl-bg); font-weight: 600; font-size: calc(.92 * var(--u)); opacity: 0; transform: translateY(12px); transition: opacity 200ms ease, transform 200ms var(--cl-ease); pointer-events: none; }
 .toast.on { opacity: 1; transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -261,7 +270,7 @@ body { background: var(--page); }
     ["Entrada y scroll", "aparecen cuando llegas a ellas", [
       [1, "Revelado de foto", "La foto se descubre de abajo hacia arriba con un acercamiento suave.", "Foto principal de la ficha, portada de cada jardín.", "Solo CSS", "rev"],
       [2, "Cifras que cuentan", "Los números suben desde cero al verse.", "Portada del Itesodex, página de Campus Lab.", "CSS + JS mínimo", "cifras"],
-      [3, "Anillos que crecen", "Los anillos del tronco se dibujan uno por uno, del centro hacia afuera.", "Ficha de especie, al abrirla.", "Solo CSS (SVG)", "grow"]
+      [3, "Anillos que crecen", "Los anillos del tronco crecen uno por uno, del centro hacia afuera. Toca un anillo para ver qué parte es.", "Ficha de especie, al abrirla.", "Solo CSS (SVG)", "grow"]
     ]],
     ["Fotos", "para ver más de una especie", [
       [4, "Comparador", "Arrastra la línea para pasar de una foto a otra.", "Árbol completo contra flor; secas contra lluvias; antes y después de una poda.", "CSS + JS mínimo", "cmp"],
@@ -304,10 +313,20 @@ body { background: var(--page); }
   };
   /* 3 */ M.grow = function (el) {
     var e = by["pseudobombax-ellipticum"], mix = { fruto: "92%", flor: "76%", hoja: "60%", tronco: "44%", arbol_completo: "30%" }, orden = ["fruto", "flor", "hoja", "tronco", "arbol_completo"];
-    var circ = function (r) { return "M" + (100 + r) + ",100 A" + r + "," + r + " 0 1,1 " + (100 - r) + ",100 A" + r + "," + r + " 0 1,1 " + (100 + r) + ",100"; };
-    el.innerHTML = '<div class="grow"><svg viewBox="0 0 200 200" role="img" aria-label="Anillos de ' + esc(e.com) + ": " + Object.keys(e.fo).length + ' de 5 partes con foto">' +
-      orden.map(function (p, i) { var has = !!e.fo[p]; return '<path class="' + (has ? "has" : "no") + '" pathLength="1" d="' + circ(28 + i * 15) + '" style="--mix:' + mix[p] + ";--d:" + i * 90 + 'ms"/>'; }).join("") + '<text x="100" y="100">' + Object.keys(e.fo).length + "/5</text></svg></div>";
-    var g = el.firstChild; requestAnimationFrame(function () { g.classList.add("go"); });
+    /* contorno ondulado de tronco, el mismo para todos los anillos (no se cruzan) y fijo por especie */
+    var h = 2166136261; for (var k = 0; k < e.id.length; k++) { h ^= e.id.charCodeAt(k); h = Math.imul(h, 16777619); }
+    var R = function () { h = Math.imul(h ^ h >>> 15, 2246822507) + 0x6D2B79F5 | 0; return (h >>> 0) / 4294967296; };
+    var ondas = [2, 3, 5].map(function (f) { return { f: f, ph: R() * 6.28, a: 0.8 + R() * 1.4 }; });
+    var curva = function (r) { var d = ""; for (var i = 0; i <= 72; i++) { var a = i / 72 * Math.PI * 2, rr = r + ondas.reduce(function (s, o) { return s + o.a * (r / 90) * Math.sin(o.f * a + o.ph); }, 0); d += (i ? "L" : "M") + (100 + rr * Math.cos(a)).toFixed(1) + "," + (100 + rr * Math.sin(a)).toFixed(1); } return d + "Z"; };
+    var r0 = 22, dr = 15, n = Object.keys(e.fo).length;
+    el.innerHTML = '<div class="grow' + (reduce.matches ? "" : " pre") + '"><svg viewBox="0 0 200 200" role="group" aria-label="Anillos de ' + esc(e.com) + ": " + n + ' de 5 partes con foto">' +
+      orden.map(function (p, i) { var has = !!e.fo[p]; return '<g class="ring ' + (has ? "has" : "no") + '" role="button" tabindex="0" aria-pressed="false" data-parte="' + p + '" aria-label="' + NOM[p] + (has ? ", con foto" : ", falta foto") + '" style="--mix:' + mix[p] + ";--d:" + i * 110 + 'ms"><path d="' + curva(r0 + dr * (i + 1)) + curva(r0 + dr * i) + '"/></g>'; }).join("") +
+      '<path class="medula" d="' + curva(r0) + '"/><text x="100" y="100">' + n + '/5</text></svg><output aria-live="polite">Toca un anillo</output></div>';
+    var g = el.firstChild, out = g.querySelector("output");
+    var elige = function (r) { g.querySelectorAll(".ring").forEach(function (x) { x.setAttribute("aria-pressed", String(x === r)); }); out.textContent = NOM[r.dataset.parte] + (e.fo[r.dataset.parte] ? " · con foto" : " · falta foto"); };
+    g.onclick = function (ev) { var r = ev.target.closest(".ring"); if (r) elige(r); };
+    g.onkeydown = function (ev) { var r = ev.target.closest(".ring"); if (r && (ev.key === "Enter" || ev.key === " ")) { ev.preventDefault(); elige(r); } };
+    if (!reduce.matches) { g.getBoundingClientRect(); requestAnimationFrame(function () { g.classList.add("go"); g.classList.remove("pre"); }); }
   };
   /* 4 */ M.cmp = function (el) {
     el.innerHTML = '<div class="cmp" style="--x:50%"><img src="' + ceiba.fo.arbol_completo + '" alt="Ceiba brasileña, árbol completo"><img class="b" src="' + ceiba.fo.flor + '" alt="Ceiba brasileña, flor"><span class="linea"></span><span class="et l">Árbol</span><span class="et r">Flor</span>' +

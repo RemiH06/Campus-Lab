@@ -35,7 +35,7 @@ window.CL_PROTO = function () {
     ["Entrada y scroll", "aparecen cuando llegas a ellas", [
       [1, "Revelado de foto", "La foto se descubre de abajo hacia arriba con un acercamiento suave.", "Foto principal de la ficha, portada de cada jard\u00edn.", "Solo CSS", "rev"],
       [2, "Cifras que cuentan", "Los n\u00fameros suben desde cero al verse.", "Portada del Itesodex, p\u00e1gina de Campus Lab.", "CSS + JS m\u00ednimo", "cifras"],
-      [3, "Anillos que crecen", "Los anillos del tronco se dibujan uno por uno, del centro hacia afuera.", "Ficha de especie, al abrirla.", "Solo CSS (SVG)", "grow"]
+      [3, "Anillos que crecen", "Los anillos del tronco crecen uno por uno, del centro hacia afuera. Toca un anillo para ver qu\u00e9 parte es.", "Ficha de especie, al abrirla.", "Solo CSS (SVG)", "grow"]
     ]],
     ["Fotos", "para ver m\u00e1s de una especie", [
       [4, "Comparador", "Arrastra la l\u00ednea para pasar de una foto a otra.", "\u00c1rbol completo contra flor; secas contra lluvias; antes y despu\u00e9s de una poda.", "CSS + JS m\u00ednimo", "cmp"],
@@ -78,10 +78,20 @@ window.CL_PROTO = function () {
   };
   /* 3 */ M.grow = function (el) {
     var e = by["pseudobombax-ellipticum"], mix = { fruto: "92%", flor: "76%", hoja: "60%", tronco: "44%", arbol_completo: "30%" }, orden = ["fruto", "flor", "hoja", "tronco", "arbol_completo"];
-    var circ = function (r) { return "M" + (100 + r) + ",100 A" + r + "," + r + " 0 1,1 " + (100 - r) + ",100 A" + r + "," + r + " 0 1,1 " + (100 + r) + ",100"; };
-    el["inner" + "HTML"] = '<div class="grow"><svg viewBox="0 0 200 200" role="img" aria-label="Anillos de ' + esc(e.com) + ": " + Object.keys(e.fo).length + ' de 5 partes con foto">' +
-      orden.map(function (p, i) { var has = !!e.fo[p]; return '<path class="' + (has ? "has" : "no") + '" pathLength="1" d="' + circ(28 + i * 15) + '" style="--mix:' + mix[p] + ";--d:" + i * 90 + 'ms"/>'; }).join("") + '<text x="100" y="100">' + Object.keys(e.fo).length + "/5</text></svg></div>";
-    var g = el.firstChild; requestAnimationFrame(function () { g.classList.add("go"); });
+    /* contorno ondulado de tronco, el mismo para todos los anillos (no se cruzan) y fijo por especie */
+    var h = 2166136261; for (var k = 0; k < e.id.length; k++) { h ^= e.id.charCodeAt(k); h = Math.imul(h, 16777619); }
+    var R = function () { h = Math.imul(h ^ h >>> 15, 2246822507) + 0x6D2B79F5 | 0; return (h >>> 0) / 4294967296; };
+    var ondas = [2, 3, 5].map(function (f) { return { f: f, ph: R() * 6.28, a: 0.8 + R() * 1.4 }; });
+    var curva = function (r) { var d = ""; for (var i = 0; i <= 72; i++) { var a = i / 72 * Math.PI * 2, rr = r + ondas.reduce(function (s, o) { return s + o.a * (r / 90) * Math.sin(o.f * a + o.ph); }, 0); d += (i ? "L" : "M") + (100 + rr * Math.cos(a)).toFixed(1) + "," + (100 + rr * Math.sin(a)).toFixed(1); } return d + "Z"; };
+    var r0 = 22, dr = 15, n = Object.keys(e.fo).length;
+    el["inner" + "HTML"] = '<div class="grow' + (reduce.matches ? "" : " pre") + '"><svg viewBox="0 0 200 200" role="group" aria-label="Anillos de ' + esc(e.com) + ": " + n + ' de 5 partes con foto">' +
+      orden.map(function (p, i) { var has = !!e.fo[p]; return '<g class="ring ' + (has ? "has" : "no") + '" role="button" tabindex="0" aria-pressed="false" data-parte="' + p + '" aria-label="' + NOM[p] + (has ? ", con foto" : ", falta foto") + '" style="--mix:' + mix[p] + ";--d:" + i * 110 + 'ms"><path d="' + curva(r0 + dr * (i + 1)) + curva(r0 + dr * i) + '"/></g>'; }).join("") +
+      '<path class="medula" d="' + curva(r0) + '"/><text x="100" y="100">' + n + '/5</text></svg><output aria-live="polite">Toca un anillo</output></div>';
+    var g = el.firstChild, out = g.querySelector("output");
+    var elige = function (r) { g.querySelectorAll(".ring").forEach(function (x) { x.setAttribute("aria-pressed", String(x === r)); }); out.textContent = NOM[r.dataset.parte] + (e.fo[r.dataset.parte] ? " \u00b7 con foto" : " \u00b7 falta foto"); };
+    g.onclick = function (ev) { var r = ev.target.closest(".ring"); if (r) elige(r); };
+    g.onkeydown = function (ev) { var r = ev.target.closest(".ring"); if (r && (ev.key === "Enter" || ev.key === " ")) { ev.preventDefault(); elige(r); } };
+    if (!reduce.matches) { g.getBoundingClientRect(); requestAnimationFrame(function () { g.classList.add("go"); g.classList.remove("pre"); }); }
   };
   /* 4 */ M.cmp = function (el) {
     el["inner" + "HTML"] = '<div class="cmp" style="--x:50%"><img src="' + ceiba.fo.arbol_completo + '" alt="Ceiba brasile\u00f1a, \u00e1rbol completo"><img class="b" src="' + ceiba.fo.flor + '" alt="Ceiba brasile\u00f1a, flor"><span class="linea"></span><span class="et l">\u00c1rbol</span><span class="et r">Flor</span>' +

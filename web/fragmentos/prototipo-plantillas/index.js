@@ -79,7 +79,7 @@ window.CL_PROTO = function () {
         var grains = ""; for (var g = 1; g <= 2; g++) grains += '<path class="grain" d="' + curva(ri + dr * g / 3) + '"/>';
         svg += '<g class="ring ' + (has ? "has" : "no") + (p === sel ? " sel" : "") + '" style="--mix:' + MIX[p] + '" data-parte="' + p + '"' +
           (has ? ' role="button" tabindex="0" aria-label="Ver foto de ' + NOM[p].toLowerCase() + '"' : ' aria-hidden="true"') + ">" +
-          '<path class="band" d="' + curva(ro) + '"/>' + (has ? grains : "") + '<path class="edge" d="' + curva(ro) + '"/></g>';
+          '<path class="band" d="' + curva(ro) + curva(ri) + '"/>' + (has ? grains : "") + '<path class="edge" d="' + curva(ro) + '"/></g>';
       }
       svg += '<path class="medula" d="' + curva(r0) + '"/><text class="medula-t" x="' + cx + '" y="' + cy + '">' + e.partes.length + "/5</text>";
       var leg = PARTES.slice().reverse().map(function (p) {
@@ -194,7 +194,7 @@ window.CL_PROTO = function () {
   }
   var mosaico = {
     mount: function (el, items) {
-      var w = el.clientWidth || 800, cell = w < 520 ? 68 : Math.round(Math.min(120, Math.max(86, w / 16))), /* casillas m\u00e1s grandes en pantallas anchas */ cols = Math.max(4, Math.floor((w + 4) / (cell + 4))), lado = (w - (cols - 1) * 4) / cols;
+      var w = el.clientWidth || 800, u = parseFloat(getComputedStyle(el).fontSize) / 16 || 1, cell = w < 520 ? 68 : Math.round(Math.min(120 * u, Math.max(86, w / 16))), /* casillas m\u00e1s grandes en pantallas anchas, al paso del texto (--u) */ cols = Math.max(4, Math.floor((w + 4) / (cell + 4))), lado = (w - (cols - 1) * 4) / cols;
       el.style.setProperty("--cols", cols); el.style.setProperty("--cell", lado.toFixed(1) + "px");
       if (!el.dataset.pieza) { el.dataset.pieza = "1"; resaltarPieza(el); }
       if (!items.length) { el["inner" + "HTML"] = '<p class="mos-vacio">Ninguna especie coincide. Prueba con el nombre com\u00fan, la familia o un jard\u00edn.</p>'; return; }
@@ -242,7 +242,7 @@ window.CL_PROTO = function () {
     main["inner" + "HTML"] = '<article class="v-especie"><div class="esp-head"><p class="url">campuslab.iteso.mx/web/campuslab/especie?id=<b>' + esc(e.id) + '</b></p><p class="eyebrow">' + esc(e.fam || "Familia por confirmar") + "</p><h1>" + esc(e.com) + '</h1><p class="sci">' + esc(e.sci) + "</p></div>" +
       '<div class="esp-main"><figure class="esp-photo"><div class="frame" id="cl-foto"></div><figcaption id="cl-pie"></figcaption></figure>' +
       '<div class="esp-side"><div class="cl-card anillos" id="cl-anillos"></div><dl class="cl-card datos"><dt>Origen</dt><dd>' + esc(e.ori || "Sin dato todav\u00eda") + "</dd>" + ras + "</dl></div></div>" +
-      '<section class="cl-card esp-donde"><div><h2 style="font-size:1.15rem;margin-bottom:8px">' + e.n + " " + (e.n === 1 ? "\u00e1rbol" : "\u00e1rboles") + " en el campus</h2><ul>" + jar.map(function (j) { return "<li><span>" + esc(j) + "</span><b>" + e.jar[j] + "</b></li>"; }).join("") +
+      '<section class="cl-card esp-donde"><div><h2 style="font-size:calc(1.15 * var(--u));margin-bottom:8px">' + e.n + " " + (e.n === 1 ? "\u00e1rbol" : "\u00e1rboles") + " en el campus</h2><ul>" + jar.map(function (j) { return "<li><span>" + esc(j) + "</span><b>" + e.jar[j] + "</b></li>"; }).join("") +
       '</ul><p style="margin-top:10px"><button class="cl-btn" type="button" data-ir="lugar">Ver en el mapa</button></p></div><div id="cl-mini"></div></section></article>';
     var foto = function () {
       var f = document.getElementById("cl-foto"), pie = document.getElementById("cl-pie");
@@ -265,7 +265,7 @@ window.CL_PROTO = function () {
       (pe ? '<div class="ficha-placa"><span class="placa">' + pl[0] + "<small>placa</small></span><h3>" + esc(pe.com) + '</h3><p class="sci cl-muted">' + esc(pe.sci) + '</p><p><button class="cl-btn cl-solid" type="button" data-abre="' + pe.id + '">Ver ficha</button></p></div>' : "") + "</div>" +
       '<div class="cl-card"><b>Qu\u00e9 se marca</b><div class="cl-tabs" role="group" aria-label="Marcar en el mapa"><button class="cl-btn" type="button" data-faltan="0" aria-pressed="' + !S.faltan + '">' + esc(e.com) + '</button><button class="cl-btn" type="button" data-faltan="1" aria-pressed="' + S.faltan + '">Sin foto todav\u00eda</button></div>' +
       '<div class="leyenda-mapa"><span style="--c:var(--cl-fill)">' + (S.faltan ? nFalt + " \u00e1rboles de especies sin foto" : esc(e.com) + " (" + e.n + ")") + '</span><span style="--c:color-mix(in srgb, var(--cl-ink2) 30%, var(--cl-sf))">Otros \u00e1rboles</span></div>' +
-      '<p class="cl-muted" style="font-size:.9rem">Toca un punto para ver su placa. ' + (S.faltan ? "\u00datil para salir a fotografiar: cada punto es un \u00e1rbol cuya especie a\u00fan no tiene foto." : "") + "</p></div></aside></section>";
+      '<p class="cl-muted" style="font-size:calc(.9 * var(--u))">Toca un punto para ver su placa. ' + (S.faltan ? "\u00datil para salir a fotografiar: cada punto es un \u00e1rbol cuya especie a\u00fan no tiene foto." : "") + "</p></div></aside></section>";
     mapa.mount(document.getElementById("cl-mapa"), { hi: hi, foco: true, zoom: pl ? "placa" : "hi", placa: pl ? S.placa : null, controles: true, ar: innerWidth < 600 ? 1.1 : 1.5, label: "Mapa de \u00e1rboles del campus",
       onPick: function (placa) { S.placa = String(placa); vLugar(); guardar("push"); } });
   }
