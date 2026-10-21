@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mapa del sitio · rework</title>
+<link rel="stylesheet" href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f3f6f5; --sf: #fbfcfc; --ink: #14232c; --ink2: #4a5a63; --line: #d5dfdc;
+  --pp: #297b49; --pp-w: #e3f1e8;      /* Plantilla de página: página única */
+  --pv: #3a6a9a; --pv-w: #e2ecf6;      /* Plantilla de visualización: se repite por cada Contenido Web */
+  --te: #6b6f73; --te-w: #ececec;      /* lo pone el tema / sistema */
+  --acc: #b8428c;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  color-scheme: dark;
+  --bg: #0c171e; --sf: #13222b; --ink: #e4ecef; --ink2: #9fb1ba; --line: #2a3b45;
+  --pp: #6fd296; --pp-w: #173226; --pv: #8fbbe8; --pv-w: #172a3c; --te: #a9adb1; --te-w: #22292e; --acc: #f08cc8;
+} }
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0c171e; --sf: #13222b; --ink: #e4ecef; --ink2: #9fb1ba; --line: #2a3b45;
+  --pp: #6fd296; --pp-w: #173226; --pv: #8fbbe8; --pv-w: #172a3c; --te: #a9adb1; --te-w: #22292e; --acc: #f08cc8;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 "Figtree", system-ui, sans-serif; }
+main { padding: 28px max(16px, 4vw) 64px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; max-width: 1500px; margin: 0 auto; }
+h1, h2, h3, p { margin: 0; }
+h1 { font-size: clamp(1.7rem, 4vw, 2.4rem); line-height: 1.1; }
+h2 { font-size: 1.3rem; margin-bottom: 10px; }
+h3 { font-size: 1rem; }
+.lead { color: var(--ink2); max-width: 72ch; margin-top: 8px; }
+.card { background: var(--sf); border: 1px solid var(--line); border-radius: 10px; }
+code { font-size: .88em; background: var(--te-w); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.muted { color: var(--ink2); }
+
+/* leyenda */
+.leyenda { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: .92rem; margin-top: 14px; }
+.leyenda span { display: inline-flex; align-items: center; gap: 8px; }
+.leyenda i { width: 16px; height: 16px; border-radius: 4px; border: 2px solid; display: inline-block; }
+.i-pp { background: var(--pp-w); border-color: var(--pp) !important; }
+.i-pv { background: var(--pv-w); border-color: var(--pv) !important; }
+.i-te { background: var(--te-w); border-color: var(--te) !important; }
+.i-fu { background: none; border-style: dashed !important; border-color: var(--ink2) !important; }
+
+/* diagrama */
+.mapa { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 360px); gap: 16px; align-items: start; }
+.lienzo { overflow-x: auto; padding: 12px; }
+.lienzo svg { display: block; min-width: 760px; width: 100%; height: auto; } /* en celular el diagrama se desliza dentro de su tarjeta */
+.nodo { cursor: pointer; }
+.nodo rect { stroke-width: 1.6; }
+.nodo.pp rect { fill: var(--pp-w); stroke: var(--pp); }
+.nodo.pv rect { fill: var(--pv-w); stroke: var(--pv); stroke-width: 2.4; }
+.nodo.te rect { fill: var(--te-w); stroke: var(--te); }
+.nodo.fu rect { fill: var(--sf); stroke: var(--ink2); stroke-dasharray: 5 4; }
+.nodo text { fill: var(--ink); font-size: 14px; font-weight: 600; }
+.nodo text.url { fill: var(--ink2); font-size: 11.5px; font-weight: 400; }
+.nodo text.tag { font-size: 10.5px; font-weight: 700; letter-spacing: .04em; }
+.nodo.pp text.tag { fill: var(--pp); } .nodo.pv text.tag { fill: var(--pv); } .nodo.te text.tag, .nodo.fu text.tag { fill: var(--ink2); }
+.nodo:hover rect, .nodo:focus-visible rect { stroke-width: 3; }
+.nodo:focus { outline: none; }
+.nodo.sel rect { stroke: var(--acc); stroke-width: 3.2; }
+.nodo.atenua { opacity: .35; }
+.arista { fill: none; stroke: var(--line); stroke-width: 1.6; }
+.arista.pv { stroke: color-mix(in srgb, var(--pv) 45%, var(--line)); }
+.arista.extra { stroke: var(--acc); stroke-width: 1.8; stroke-dasharray: 5 4; opacity: 0; }
+.arista.on { stroke: var(--acc); stroke-width: 2.4; }
+.arista.extra.on { opacity: 1; }
+.colt { fill: var(--ink2); font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
+
+/* panel */
+.panel { padding: 16px; display: grid; gap: 12px; position: sticky; top: 12px; }
+.panel dl { margin: 0; display: grid; gap: 10px; }
+.panel dt { font-size: .8rem; font-weight: 700; color: var(--ink2); text-transform: uppercase; letter-spacing: .04em; }
+.panel dd { margin: 2px 0 0; }
+.panel ul { margin: 2px 0 0; padding-left: 18px; }
+.chip { display: inline-block; font-size: .8rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; border: 1.5px solid; }
+.chip.pp { color: var(--pp); } .chip.pv { color: var(--pv); } .chip.te, .chip.fu { color: var(--ink2); }
+
+/* juego */
+.juego { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 14px; }
+.juego .card { padding: 16px; display: grid; gap: 8px; align-content: start; }
+.juego ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.juego li b { font-weight: 600; }
+.cuenta { font-size: .85rem; color: var(--ink2); font-weight: 400; }
+
+/* tabla */
+.tabla { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .94rem; min-width: 640px; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+th { font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; color: var(--ink2); }
+td.acc { white-space: nowrap; font-weight: 600; }
+.decidir { padding: 16px 18px; display: grid; gap: 12px; border-left: 4px solid var(--acc); }
+.decidir ol { margin: 0; padding-left: 20px; display: grid; gap: 10px; }
+.modo { position: fixed; right: 14px; top: 14px; font: inherit; font-size: .88rem; padding: 6px 12px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--sf); color: var(--ink); cursor: pointer; }
+@media (max-width: 900px) { .mapa { grid-template-columns: minmax(0, 1fr); } .panel { position: static; } main { padding-top: 64px; } }
+</style>
+</head>
+<body>
+<button class="modo" type="button" id="modo">Modo oscuro</button>
+<main>
+  <header>
+    <h1>Mapa del sitio después del rework</h1>
+    <p class="lead">Propuesta para validar antes de construir. Cada caja es una página real de Liferay y dice con qué se arma. Toca una caja para ver qué páginas actuales reemplaza, qué Estructura y fragmentos usa y con qué páginas se conecta (en rosa; las punteadas son enlaces extra, fuera del menú).</p>
+    <div class="leyenda">
+      <span><i class="i-pp"></i>Plantilla de página: página única, sus textos vienen de un Contenido Web</span>
+      <span><i class="i-pv"></i>Plantilla de página de visualización: una página por cada Contenido Web de su Estructura</span>
+      <span><i class="i-te"></i>La pone el tema de ITESO</span>
+      <span><i class="i-fu"></i>Después (punto 0d)</span>
+    </div>
+  </header>
+
+  <section class="mapa">
+    <div class="card lienzo"><svg id="svg" role="group" aria-label="Diagrama de páginas del sitio"></svg></div>
+    <aside class="card panel" id="panel" aria-live="polite"></aside>
+  </section>
+
+  <section>
+    <h2>El juego a construir</h2>
+    <div class="juego" id="juego"></div>
+  </section>
+
+  <section>
+    <h2>Qué pasa con cada página actual</h2>
+    <div class="card tabla"><table id="tabla"><thead><tr><th>Hoy</th><th>Pasa a</th><th>Acción</th></tr></thead><tbody></tbody></table></div>
+    <p class="muted" style="margin-top:10px">Las páginas viejas no se borran: su Contenido Web cambia a un aviso corto con un botón a la página nueva, así los enlaces que ya circulan (QR, redes, correos) siguen sirviendo. Las versiones <code>/en/…</code> son las mismas páginas en el idioma inglés y se resuelven solas. Los enlaces del pie de página (Rector, Modelo educativo, etc.) son de iteso.mx y no se tocan.</p>
+  </section>
+
+  <section class="card decidir">
+    <h2 style="margin:0">Para decidir antes de construir</h2>
+    <ol>
+      <li><b>Especies como Contenidos Web.</b> Para que una persona sin formación técnica agregue o corrija una especie, cada especie tiene que ser un Contenido Web con la Estructura "Especie" (son ~400: 255 árboles, 48 orquídeas, aves, suculentas y flores). A mano no es viable: la propuesta es cargarlos una vez por la API de Liferay con tu sesión, desde un script con plan en seco. Hay que confirmar que tu usuario puede crear Contenidos Web por la API. Si no se puede, la Colección seguiría leyendo el JSON de Documentos y Medios (lo que ya hace el prototipo), pero entonces agregar una especie dependería de regenerar ese archivo.</li>
+      <li><b>URLs nuevas.</b> Las fichas quedarían en <code>campuslab.iteso.mx/w/&lt;especie&gt;</code> (Liferay 7.4 pone ahí las páginas de visualización; hay que confirmarlo en el sitio) y las páginas sin el sufijo "-iteso" o "-de-casa" (<code>/aves</code>, <code>/orquideas</code>). ¿Te parecen bien o prefieres conservar las de hoy?</li>
+      <li><b>Las aves ganan ficha propia.</b> Hoy no tienen ficha: viven como texto dentro del artículo de 230 KB. Con la Plantilla "Especie" tendrían la misma ficha que árboles y orquídeas (foto, estatus, canto en xeno-canto). ¿Va?</li>
+    </ol>
+  </section>
+</main>
+
+<script type="application/json" id="datos">
+{
+  "columnas": ["Entrada", "Secciones", "Páginas", "Se repiten"],
+  "nodos": [
+    {"id": "portada", "t": "Portada", "url": "/", "col": 0, "fila": 4, "tipo": "pp", "plantilla": "Portada",
+     "estructura": "Tarjeta (una por tarjeta de las galerías y el carrusel)",
+     "fragmentos": ["Marco", "Galería de tarjetas", "Carrusel de tarjetas", "Agenda (sigue leyendo el servicio de eventos de ITESO)", "Destacado con contacto"],
+     "reemplaza": ["/ (se conserva la distribución y las figuras: es la identidad del sitio)"],
+     "nota": "Las tarjetas se vuelven Contenidos Web \"Tarjeta\" en una Colección manual: cambiar una tarjeta es editar un formulario."},
+    {"id": "campuslab", "t": "Qué es Campus Lab", "url": "/campus-lab", "col": 1, "fila": 0, "tipo": "pp", "plantilla": "Página informativa",
+     "estructura": "Página informativa", "fragmentos": ["Marco", "Sección (texto con foto)"], "reemplaza": ["Ficha 1808902 \"Campus Lab ITESO\""]},
+    {"id": "biodiversidad", "t": "Biodiversidad", "url": "/biodiversidad", "col": 1, "fila": 2.6, "tipo": "pp", "plantilla": "Sección",
+     "estructura": "Página informativa (la introducción) + Tarjeta (las de abajo)", "fragmentos": ["Marco", "Sección", "Rejilla de tarjetas"],
+     "reemplaza": ["/biodiversidad-iteso", "Ficha 1809927 \"Biodiversidad ITESO\" (su texto largo pasa a la introducción)"]},
+    {"id": "mapas", "t": "Mapas", "url": "/mapas", "col": 1, "fila": 5.1, "tipo": "pp", "plantilla": "Mapas",
+     "estructura": "Página informativa (textos)", "fragmentos": ["Marco", "Mapa 2D por placa", "Mapa de ArcGIS (el iframe de hoy)", "Mapa 3D de los territorios"],
+     "reemplaza": ["Ficha 1799675 \"Mapas ITESO\"", "El iframe de ArcGIS de /arboles_casa"],
+     "nota": "Los tres mapas se complementan: el 2D busca un árbol por placa, ArcGIS es el inventario oficial y el 3D muestra campus, Casa Clavigero y predios del Bosque."},
+    {"id": "experiencias", "t": "Experiencias en el campus", "url": "/experiencias", "col": 1, "fila": 7.6, "tipo": "pp", "plantilla": "Sección",
+     "estructura": "Página informativa + Tarjeta", "fragmentos": ["Marco", "Sección", "Rejilla de tarjetas"],
+     "reemplaza": ["/experiencias-en-el-campus", "Ficha 1809516 \"Experiencias en el campus\""]},
+    {"id": "explorador", "t": "Explorador de especies", "url": "/explorar", "col": 1, "fila": 9.2, "tipo": "fu", "plantilla": "Explorador (después)",
+     "estructura": "Usa las Especies", "fragmentos": ["Árbol taxonómico navegable (GBIF)"], "reemplaza": [], "nota": "Punto 0d: se construye al final."},
+
+    {"id": "arboles", "t": "Árboles", "url": "/arboles", "col": 2, "fila": 0, "tipo": "pp", "plantilla": "Colección de especies",
+     "estructura": "Especie (filtrada por la categoría Grupo = Árboles)", "fragmentos": ["Marco", "Sección", "Mosaico de especies con buscador"],
+     "reemplaza": ["/arboles (hoy vacía)", "/arboles_casa (título + mapa)", "Listado 8514082 \"Listado de Árboles de Casa\" (sin enlazar)"]},
+    {"id": "aves", "t": "Aves", "url": "/aves", "col": 2, "fila": 1, "tipo": "pp", "plantilla": "Colección de especies",
+     "estructura": "Especie (Grupo = Aves)", "fragmentos": ["Marco", "Sección", "Mosaico de especies con buscador", "Sección (guía de avistamiento)"],
+     "reemplaza": ["/aves-iteso", "/cl_aves_iteso (duplicado)", "Ficha 8456891 \"Guía de avistamiento: Aves de Casa\""]},
+    {"id": "orquideas", "t": "Orquídeas", "url": "/orquideas", "col": 2, "fila": 2, "tipo": "pp", "plantilla": "Colección de especies",
+     "estructura": "Especie (Grupo = Orquídeas)", "fragmentos": ["Marco", "Sección", "Mosaico de especies con buscador"], "reemplaza": ["/orquideas-de-casa"]},
+    {"id": "suculentas", "t": "Suculentas", "url": "/suculentas", "col": 2, "fila": 3, "tipo": "pp", "plantilla": "Colección de especies",
+     "estructura": "Especie (Grupo = Suculentas)", "fragmentos": ["Marco", "Sección", "Mosaico de especies con buscador"],
+     "reemplaza": ["Las tarjetas de especies de /jardinsuculentas"]},
+    {"id": "flores", "t": "Flores silvestres", "url": "/flores-silvestres", "col": 2, "fila": 4, "tipo": "pp", "plantilla": "Colección de especies",
+     "estructura": "Especie (Grupo = Flores de La Primavera)", "fragmentos": ["Marco", "Sección", "Mosaico de especies con buscador"],
+     "reemplaza": ["Ficha 1811074 \"Flores silvestres de La Primavera\""]},
+    {"id": "jardines", "t": "Jardines", "url": "/jardines", "col": 2, "fila": 5, "tipo": "pp", "plantilla": "Sección",
+     "estructura": "Página informativa + lista de Jardines", "fragmentos": ["Marco", "Sección", "Rejilla de tarjetas"],
+     "reemplaza": ["/arboretum (hoy nadie la enlaza)"]},
+    {"id": "agua", "t": "Agua", "url": "/agua", "col": 2, "fila": 6, "tipo": "pp", "plantilla": "Página informativa",
+     "estructura": "Página informativa", "fragmentos": ["Marco", "Sección"], "reemplaza": ["Ficha 1810291 \"Agua\""]},
+    {"id": "naturalista", "t": "Naturalista ITESO", "url": "/naturalista", "col": 2, "fila": 7.3, "tipo": "pp", "plantilla": "Landing Naturalista",
+     "estructura": "Página informativa (textos) + Edición del concurso (galerías y ganadores)",
+     "fragmentos": ["Marco", "Sección", "Tres pasos", "Fechas", "Preguntas frecuentes", "Galería", "Destacado con contacto"],
+     "reemplaza": ["Ficha 1777149 \"Naturalistas\"", "Ficha 8457292 \"Convocatoria Naturalista ITESO 2025\"", "Enlaza a la página del CPC en iteso.mx (22128620), que no es nuestra"],
+     "nota": "La propuesta para Mayra (punto 0b) y el piloto de edición sin código."},
+    {"id": "avistamientos", "t": "Avistamientos y recorridos", "url": "/avistamientos", "col": 2, "fila": 8.4, "tipo": "pp", "plantilla": "Página informativa",
+     "estructura": "Página informativa", "fragmentos": ["Marco", "Sección"], "reemplaza": ["Ficha 1775611 \"Avistamientos y recorridos\""]},
+
+    {"id": "especie", "t": "Ficha de especie", "url": "/w/<especie>", "col": 3, "fila": 2, "tipo": "pv", "plantilla": "Especie (visualización)",
+     "estructura": "Especie", "fragmentos": ["Marco", "Foto por partes", "Anillos del tronco", "Datos de la especie", "Mapa chico (dónde está)", "Floración por mes"],
+     "reemplaza": ["255 fichas de árbol, 48 de orquídea y 6 de otro formato en /web/general/detalle?group_id=…", "Las aves, que hoy no tienen ficha"],
+     "nota": "Una sola plantilla para ~400 páginas. Agregar una especie = crear un Contenido Web \"Especie\"."},
+    {"id": "jardin", "t": "Ficha de jardín", "url": "/w/<jardín>", "col": 3, "fila": 5, "tipo": "pv", "plantilla": "Jardín (visualización)",
+     "estructura": "Jardín", "fragmentos": ["Marco", "Sección", "Mosaico de especies del jardín", "Mapa chico"],
+     "reemplaza": ["Arboretum Oriente: \"Historia\" 22626706 e \"Información importante\" 22626853", "Arboretum Sur: 22691141 y 22691122", "Jardín de Suculentas (o de Xerófilo): 2945336 y 2945262"]},
+    {"id": "edicion", "t": "Edición del concurso", "url": "/w/naturalista-<año>", "col": 3, "fila": 7.3, "tipo": "pv", "plantilla": "Edición del concurso (visualización)",
+     "estructura": "Edición del concurso", "fragmentos": ["Marco", "Sección", "Ganadores", "Galería", "Fechas"],
+     "reemplaza": ["Las galerías 2023 y 2025 que hoy solo están en Facebook"], "nota": "Cada edición nueva (2027…) es un Contenido Web más."},
+    {"id": "buscar", "t": "Buscar", "url": "/search", "col": 3, "fila": 9.2, "tipo": "te", "plantilla": "La del tema", "estructura": "—", "fragmentos": ["Buscador de ITESO"], "reemplaza": ["/search (se queda igual)"]}
+  ],
+  "aristas": [
+    ["portada", "campuslab"], ["portada", "biodiversidad"], ["portada", "mapas"], ["portada", "experiencias"], ["portada", "explorador"],
+    ["biodiversidad", "arboles"], ["biodiversidad", "aves"], ["biodiversidad", "orquideas"], ["biodiversidad", "suculentas"], ["biodiversidad", "flores"], ["biodiversidad", "jardines"], ["biodiversidad", "agua"],
+    ["experiencias", "naturalista"], ["experiencias", "avistamientos"],
+    ["arboles", "especie"], ["aves", "especie"], ["orquideas", "especie"], ["suculentas", "especie"], ["flores", "especie"],
+    ["jardines", "jardin"], ["naturalista", "edicion"]
+  ],
+  "extras": [
+    ["portada", "aves"], ["portada", "naturalista"], ["portada", "flores"],
+    ["especie", "mapas"], ["especie", "jardin"], ["jardin", "especie"], ["jardin", "mapas"], ["mapas", "especie"], ["arboles", "mapas"],
+    ["aves", "avistamientos"], ["explorador", "especie"], ["edicion", "naturalista"]
+  ],
+  "juego": [
+    {"t": "Master Page", "items": [["Campus Lab", "tema ITESO-4 + Marco hasta arriba + zona de contenido. Todas las páginas la usan."]]},
+    {"t": "Estructuras", "items": [
+      ["Página informativa", "antetítulo, título, cuerpo, foto, botón (texto y enlace)"],
+      ["Tarjeta", "título, texto corto, foto, enlace"],
+      ["Especie", "nombre común y científico, familia, grupo, origen, descripción, foto por parte (árbol, tronco, hoja, flor, fruto), meses de floración, estatus, enlace a iNaturalist, placas"],
+      ["Jardín", "nombre, historia, información importante, foto, zona del mapa"],
+      ["Edición del concurso", "año, fechas, convocatoria, ganadores, galería"]]},
+    {"t": "Plantillas de página de visualización", "items": [["Especie", "una página por especie"], ["Jardín", "Arboretum Oriente y Sur, Suculentas"], ["Edición del concurso", "2023, 2025, 2027…"]]},
+    {"t": "Plantillas de página", "items": [["Portada", ""], ["Sección", "Biodiversidad, Experiencias, Jardines"], ["Colección de especies", "Árboles, Aves, Orquídeas, Suculentas, Flores (cambia el filtro)"], ["Página informativa", "Qué es Campus Lab, Agua, Avistamientos"], ["Mapas", ""], ["Landing Naturalista", ""]]},
+    {"t": "Categorías y Colecciones", "items": [["Vocabulario Grupo", "Árboles, Aves, Orquídeas, Suculentas, Flores de La Primavera"], ["Vocabulario Jardín", "para ligar especies con su jardín"], ["Colecciones", "especies por grupo y por jardín (dinámicas), tarjetas de la portada (manual)"]]},
+    {"t": "Fragmentos atómicos", "items": [["Ya hechos", "Marco, Sección, Mapa 3D"], ["Por hacer", "Tarjeta y rejilla, Galería, Carrusel, Agenda, Destacado, Mosaico de especies, Foto por partes, Anillos, Datos de especie, Mapa chico, Mapa 2D, Mapa de ArcGIS, Floración, Tres pasos, Fechas, Preguntas frecuentes, Ganadores, Aviso de página mudada"]]}
+  ],
+  "tabla": [
+    ["/", "Portada", "Se queda"],
+    ["/biodiversidad-iteso + ficha 1809927", "Biodiversidad", "Se fusionan"],
+    ["/experiencias-en-el-campus + ficha 1809516", "Experiencias en el campus", "Se fusionan"],
+    ["/arboles (vacía) + /arboles_casa + listado 8514082", "Árboles; el mapa de ArcGIS pasa a Mapas", "Se fusionan"],
+    ["/aves-iteso + /cl_aves_iteso + ficha 8456891", "Aves + una ficha por ave", "Se fusionan"],
+    ["/orquideas-de-casa", "Orquídeas", "Cambia de plantilla"],
+    ["/jardinsuculentas + fichas 2945262 y 2945336", "Suculentas (especies) + Ficha de jardín", "Se divide"],
+    ["/arboretum + fichas 22626706, 22626853, 22691122, 22691141", "Jardines + dos Fichas de jardín", "Se fusionan"],
+    ["Ficha 1808902 Campus Lab ITESO", "Qué es Campus Lab", "Cambia de plantilla"],
+    ["Ficha 1810291 Agua", "Agua", "Cambia de plantilla"],
+    ["Ficha 1811074 Flores silvestres", "Flores silvestres (colección)", "Cambia de plantilla"],
+    ["Ficha 1775611 Avistamientos y recorridos", "Avistamientos y recorridos", "Cambia de plantilla"],
+    ["Fichas 1777149 y 8457292 (Naturalista)", "Naturalista ITESO + Edición del concurso", "Se fusionan"],
+    ["Ficha 1799675 Mapas ITESO", "Mapas", "Cambia de plantilla"],
+    ["309 fichas de especie (detalle?group_id=…)", "Ficha de especie", "Aviso + botón"],
+    ["/search", "Buscar", "Se queda"]
+  ]
+}
+</script>
+<script>
+(function () {
+  "use strict";
+  var D = JSON.parse(document.getElementById("datos").textContent);
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+  var by = {}; D.nodos.forEach(function (n) { by[n.id] = n; });
+  var TAG = { pp: "PLANTILLA DE PÁGINA", pv: "VISUALIZACIÓN", te: "TEMA", fu: "DESPUÉS" };
+
+  /* ── diagrama: columnas de izquierda a derecha, filas fijas en los datos ── */
+  var W = 210, H = 54, X0 = 16, DX = 262, Y0 = 44, DY = 64;
+  var pos = function (n) { return { x: X0 + n.col * DX, y: Y0 + n.fila * DY }; };
+  var alto = Y0 + 10 * DY + 6, ancho = X0 + 3 * DX + W + 16;
+  var curva = function (a, b) {
+    var p = pos(a), q = pos(b), x1, y1, x2, y2;
+    if (a.col === b.col) { x1 = p.x + W / 2; y1 = p.y + (q.y > p.y ? H : 0); x2 = q.x + W / 2; y2 = q.y + (q.y > p.y ? 0 : H); return "M" + x1 + "," + y1 + " L" + x2 + "," + y2; }
+    var dir = q.x > p.x ? 1 : -1;
+    x1 = p.x + (dir > 0 ? W : 0); y1 = p.y + H / 2; x2 = q.x + (dir > 0 ? 0 : W); y2 = q.y + H / 2;
+    var m = (x1 + x2) / 2; return "M" + x1 + "," + y1 + " C" + m + "," + y1 + " " + m + "," + y2 + " " + x2 + "," + y2;
+  };
+  var svg = document.getElementById("svg");
+  svg.setAttribute("viewBox", "0 0 " + ancho + " " + alto);
+  var h = D.columnas.map(function (c, i) { return '<text class="colt" x="' + (X0 + i * DX) + '" y="22">' + esc(c) + "</text>"; }).join("");
+  h += D.aristas.map(function (e) { return '<path class="arista' + (by[e[1]].tipo === "pv" ? " pv" : "") + '" data-a="' + e[0] + '" data-b="' + e[1] + '" d="' + curva(by[e[0]], by[e[1]]) + '"/>'; }).join("");
+  h += D.extras.map(function (e) { return '<path class="arista extra" data-a="' + e[0] + '" data-b="' + e[1] + '" d="' + curva(by[e[0]], by[e[1]]) + '"/>'; }).join("");
+  h += D.nodos.map(function (n) {
+    var p = pos(n);
+    return '<g class="nodo ' + n.tipo + '" data-id="' + n.id + '" role="button" tabindex="0" aria-label="' + esc(n.t + ", " + n.url) + '" transform="translate(' + p.x + "," + p.y + ')">' +
+      '<rect width="' + W + '" height="' + H + '" rx="8"/><text class="tag" x="12" y="15">' + TAG[n.tipo] + '</text><text x="12" y="32">' + esc(n.t) + '</text><text class="url" x="12" y="47">' + esc(n.url) + "</text></g>";
+  }).join("");
+  svg.innerHTML = h;
+
+  /* ── panel de detalle ── */
+  var panel = document.getElementById("panel");
+  var lista = function (xs) { return xs.length ? "<ul>" + xs.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul>" : '<span class="muted">Nada: es nueva.</span>'; };
+  var vecinos = function (id) {
+    var s = {}; D.aristas.concat(D.extras).forEach(function (e) { if (e[0] === id) s[e[1]] = 1; if (e[1] === id && D.aristas.some(function (a) { return a[0] === e[0] && a[1] === e[1]; })) s[e[0]] = 1; });
+    return Object.keys(s);
+  };
+  var elige = function (id) {
+    var n = by[id], vs = vecinos(id);
+    svg.querySelectorAll(".nodo").forEach(function (g) { g.classList.toggle("sel", g.dataset.id === id); g.classList.toggle("atenua", g.dataset.id !== id && vs.indexOf(g.dataset.id) < 0); });
+    svg.querySelectorAll(".arista").forEach(function (a) { a.classList.toggle("on", a.dataset.a === id || (a.dataset.b === id && !a.classList.contains("extra"))); });
+    panel.innerHTML = '<div><span class="chip ' + n.tipo + '">' + TAG[n.tipo] + '</span></div><h2 style="margin:0">' + esc(n.t) + '</h2><code>campuslab.iteso.mx' + esc(n.url) + "</code>" +
+      "<dl><div><dt>Se arma con</dt><dd>" + esc(n.plantilla) + "</dd></div><div><dt>Estructura</dt><dd>" + esc(n.estructura) + "</dd></div>" +
+      "<div><dt>Fragmentos</dt><dd>" + lista(n.fragmentos) + "</dd></div><div><dt>Reemplaza</dt><dd>" + lista(n.reemplaza) + "</dd></div>" +
+      "<div><dt>Conectada con</dt><dd>" + lista(vs.filter(function (v) { return v !== id; }).map(function (v) { return by[v].t; })) + "</dd></div>" +
+      (n.nota ? '<div><dt>Nota</dt><dd>' + esc(n.nota) + "</dd></div>" : "") + "</dl>";
+  };
+  svg.addEventListener("click", function (ev) { var g = ev.target.closest(".nodo"); if (g) elige(g.dataset.id); });
+  svg.addEventListener("keydown", function (ev) { var g = ev.target.closest(".nodo"); if (g && (ev.key === "Enter" || ev.key === " ")) { ev.preventDefault(); elige(g.dataset.id); } });
+  elige("especie");
+
+  /* ── juego y tabla ── */
+  document.getElementById("juego").innerHTML = D.juego.map(function (j) {
+    return '<div class="card"><h3>' + esc(j.t) + ' <span class="cuenta">· ' + j.items.length + "</span></h3><ul>" + j.items.map(function (i) { return "<li><b>" + esc(i[0]) + "</b>" + (i[1] ? ": " + esc(i[1]) : "") + "</li>"; }).join("") + "</ul></div>";
+  }).join("");
+  document.querySelector("#tabla tbody").innerHTML = D.tabla.map(function (r) { return "<tr><td>" + esc(r[0]) + "</td><td>" + esc(r[1]) + '</td><td class="acc">' + esc(r[2]) + "</td></tr>"; }).join("");
+
+  /* ── modo ── */
+  var b = document.getElementById("modo"), de = document.documentElement;
+  var oscuro = function () { return de.dataset.theme ? de.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; };
+  var pinta = function () { b.textContent = oscuro() ? "Modo claro" : "Modo oscuro"; };
+  b.onclick = function () { de.dataset.theme = oscuro() ? "light" : "dark"; pinta(); };
+  pinta();
+})();
+</script>
+</body>
+</html>
