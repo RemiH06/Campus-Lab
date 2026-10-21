@@ -36,9 +36,10 @@
   .foto img{width:100%;height:200px;object-fit:cover;border-radius:5px;background:#e0e0e0;display:block;cursor:pointer;}
   .foto .id{font-size:.72rem;color:var(--texto-suave);margin:3px 0;display:flex;justify-content:space-between;}
   .foto .id a{color:inherit;}
-  .botones{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;}
+  .botones{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;}
   .botones button{font-size:.7rem;padding:4px 2px;border:1px solid var(--borde);border-radius:4px;background:#fff;cursor:pointer;color:var(--texto);}
   .botones button.on{background:var(--azul);color:#f6f8fa;border-color:var(--azul);}
+  .botones button.estrella.on{background:var(--sel);border-color:var(--sel);color:var(--texto);}
   .mas{margin-top:10px;font-size:.8rem;background:none;border:1px dashed var(--borde);border-radius:6px;padding:5px 10px;cursor:pointer;color:var(--azul);}
   .vacio{text-align:center;padding:60px 20px;color:var(--texto-suave);}
   @media (max-width:700px){ .layout{flex-direction:column;} aside{width:auto;max-height:40vh;position:static;} .foto{width:calc(50% - 6px);} .foto img{height:150px;} }
@@ -47,7 +48,7 @@
 <body>
 <header>
   <h1>Partes de árbol</h1>
-  <span class="ayuda">Clic o ← → para elegir foto · 1 completo · 2 tronco · 3 hoja · 4 flor · 5 fruto · 6 otro · 0 borrar · clic en la imagen la abre grande</span>
+  <span class="ayuda">Clic o ← → para elegir foto · 1 completo · 2 tronco · 3 hoja · 4 flor · 5 fruto · 6 otro · 7 detalle · E ★ destacada · 0 borrar · clic en la imagen la abre grande</span>
 </header>
 <div class="layout">
   <aside>
@@ -62,8 +63,10 @@
 
 var PARTES = [
   ["arbol_completo", "Completo"], ["tronco", "Tronco"], ["hoja", "Hoja"],
-  ["flor", "Flor"], ["fruto", "Fruto"], ["otro", "Otro"]
+  ["flor", "Flor"], ["fruto", "Fruto"], ["otro", "Otro"], ["detalle", "Detalle"]
 ];
+// las partes que van en los anillos de la ficha (5 que pidió Maya + detalle, 21-oct); "otro" no cuenta
+var ANILLOS = ["arbol_completo", "tronco", "hoja", "flor", "fruto", "detalle"];
 var MOSTRAR_POR_GRUPO = 4;
 var especies = [];
 var actual = null;      // datos de la especie abierta
@@ -72,9 +75,8 @@ var seleccion = null;   // foto_id seleccionada
 function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
 
 function puntosHtml(partes) {
-  // las 5 partes que pidió Maya; "otro" no cuenta
-  return '<span class="puntos" title="completo, tronco, hoja, flor, fruto">' +
-    PARTES.slice(0, 5).map(function (p) { return '<i class="' + (partes[p[0]] ? "si" : "") + '"></i>'; }).join("") +
+  return '<span class="puntos" title="completo, tronco, hoja, flor, fruto, detalle">' +
+    ANILLOS.map(function (p) { return '<i class="' + (partes[p] ? "si" : "") + '"></i>'; }).join("") +
     "</span>";
 }
 
@@ -87,7 +89,8 @@ function pintarLista() {
   }).map(function (e) {
     return '<div class="esp' + (actual && actual.especie_id === e.especie_id ? " activa" : "") + '" data-id="' + e.especie_id + '">' +
       '<div class="cien">' + esc(e.nombre_cientifico) + "</div>" +
-      '<div class="sub">' + esc(e.nombre_comun || "") + " · " + e.etiquetadas + "/" + e.total + " " + puntosHtml(e.partes) + "</div>" +
+      '<div class="sub">' + esc(e.nombre_comun || "") + " · " + e.etiquetadas + "/" + e.total + " " + puntosHtml(e.partes) +
+        (e.destacadas ? " ★" + e.destacadas : "") + "</div>" +
       "</div>";
   }).join("");
   document.getElementById("lista").innerHTML = html || '<div class="vacio">Nada coincide.</div>';
@@ -109,17 +112,18 @@ function fotoHtml(f) {
       (f.disponible ? "" : "<span>sin red/espejo</span>") + "</div>" +
     '<div class="botones">' + PARTES.map(function (p, i) {
       return '<button data-parte="' + p[0] + '" class="' + (f.parte === p[0] ? "on" : "") + '" title="tecla ' + (i + 1) + '">' + p[1] + "</button>";
-    }).join("") + "</div></div>";
+    }).join("") + '<button data-estrella class="estrella' + (f.destacada ? " on" : "") + '" title="destacada (tecla E)">★</button>' +
+    "</div></div>";
 }
 
 function pintarEspecie() {
-  var conteo = {};
-  actual.grupos.forEach(function (g) { g.fotos.forEach(function (f) { if (f.parte) conteo[f.parte] = (conteo[f.parte] || 0) + 1; }); });
+  var conteo = {}, estrellas = 0;
+  actual.grupos.forEach(function (g) { g.fotos.forEach(function (f) { if (f.parte) conteo[f.parte] = (conteo[f.parte] || 0) + 1; if (f.destacada) estrellas++; }); });
   var html = '<div class="cabecera"><h2><i>' + esc(actual.nombre_cientifico) + "</i></h2>" +
     '<div class="meta">' + esc(actual.nombre_comun || "") + "</div></div>" +
     '<div class="resumen">' + PARTES.map(function (p) {
       return '<span class="chip' + (conteo[p[0]] ? " si" : "") + '">' + p[1] + ": " + (conteo[p[0]] || 0) + "</span>";
-    }).join("") + "</div>";
+    }).join("") + '<span class="chip' + (estrellas ? " si" : "") + '">★ ' + estrellas + "</span></div>";
   actual.grupos.forEach(function (g, gi) {
     var visibles = g.expandido ? g.fotos : g.fotos.slice(0, MOSTRAR_POR_GRUPO);
     html += '<div class="grupo"><h3>' + (g.grupo_id === null ? "Sin grupo de espécimen" : "Grupo " + g.grupo_id) +
@@ -193,6 +197,24 @@ function etiquetar(id, parte, avanzar) {
   }).catch(function () { alert("No se pudo guardar la etiqueta de la foto #" + id); });
 }
 
+function destacar(id) {
+  var f = buscarFoto(id);
+  if (!f) return;
+  var nueva = !f.destacada;
+  fetch("/api/destacada", {
+    method: "POST", headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({foto_id: id, destacada: nueva})
+  }).then(function (r) {
+    if (!r.ok) throw new Error("fallo");
+    f.destacada = nueva;
+    var e = especies.find(function (x) { return x.especie_id === actual.especie_id; });
+    if (e) e.destacadas += nueva ? 1 : -1;
+    pintarEspecie();
+    pintarLista();
+    seleccionar(id);
+  }).catch(function () { alert("No se pudo marcar la foto #" + id); });
+}
+
 document.getElementById("lista").addEventListener("click", function (ev) {
   var el = ev.target.closest(".esp");
   if (el) abrirEspecie(parseInt(el.dataset.id, 10));
@@ -208,6 +230,7 @@ document.getElementById("contenido").addEventListener("click", function (ev) {
   var id = parseInt(tarjeta.dataset.foto, 10);
   var boton = ev.target.closest("button[data-parte]");
   if (boton) { etiquetar(id, boton.dataset.parte, false); return; }
+  if (ev.target.closest("button[data-estrella]")) { destacar(id); return; }
   if (ev.target.tagName === "IMG" && seleccion === id) { window.open("/api/foto/" + id + "/imagen?tam=1400", "_blank"); return; }
   seleccionar(id);
 });
@@ -224,7 +247,8 @@ document.addEventListener("keydown", function (ev) {
   }
   if (seleccion === null) return;
   var n = parseInt(ev.key, 10);
-  if (n >= 1 && n <= 6) etiquetar(seleccion, PARTES[n - 1][0], true);
+  if (ev.key === "e" || ev.key === "E" || ev.key === "*") destacar(seleccion);
+  else if (n >= 1 && n <= PARTES.length) etiquetar(seleccion, PARTES[n - 1][0], true);
   else if (n === 0 && buscarFoto(seleccion).parte) etiquetar(seleccion, buscarFoto(seleccion).parte, false);
 });
 

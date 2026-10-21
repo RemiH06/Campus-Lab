@@ -176,17 +176,17 @@
 .cl-col-tools { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; }
 .cl-mos-caja { container-type: inline-size; } /* casillas, huecos y contornos se miden en cqi (ancho de la caja): al cambiar el ancho o el zoom escalan juntos */
 .cl-mosaico { display: grid; grid-template-columns: repeat(var(--cols, 8), minmax(0, 1fr)); grid-auto-rows: calc(var(--cr, .1) * 100cqi); gap: calc(var(--gr, .004) * 100cqi); }
-.cl .cl-mos-c { position: relative; box-sizing: border-box; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(8, 20, 28, .22); display: block; overflow: hidden; border-radius: 3px; background: var(--cl-wash); text-decoration: none; color: inherit; }
+.cl .cl-mos-c { position: relative; z-index: 1; box-sizing: border-box; border: 0; display: block; overflow: hidden; border-radius: 2px; background: var(--cl-wash); text-decoration: none; color: inherit; }
 .cl-mos-c img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .cl-mos-c.cl-lbl::after { content: attr(data-nombre); position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 6px 4px; font-size: calc(.78 * var(--u)); line-height: 1.15; font-family: var(--cl-font-sb); font-weight: 600; text-align: left;
   color: #f4f7f6; background: linear-gradient(transparent, rgba(8, 20, 28, .82)); }
 .cl .cl-mos-c.cl-falta { background: var(--cl-sf); border: 1.5px dashed var(--cl-ink2); display: grid; place-content: center; padding: 6px; text-align: center; font-size: calc(.78 * var(--u)); line-height: 1.15; color: var(--cl-ink2); }
 .cl-mos-c.cl-falta b { display: block; font-size: calc(1.1 * var(--u)); color: var(--cl-acc); }
-.cl-mosaico { position: relative; }
-/* Contorno por especie al pasar el mouse (capa SVG encima; ver contornos() en cl-kit.js). El trazo va recortado a la pieza: se ve la mitad, adentro */
-.cl-mos-svg { position: absolute; left: 0; top: 0; width: 100%; height: auto; z-index: 1; pointer-events: none; overflow: visible; }
-.cl-mos-svg .cl-borde { fill: none; stroke: none; stroke-width: 6; stroke-linecap: square; }
-.cl-mos-svg g.cl-on .cl-borde { stroke: var(--cl-ink); }
+.cl-mosaico { position: relative; --mo: 2px; --m: calc(var(--gr, .004) * 50cqi - 1px); --mi: calc(-1 * var(--m)); } /* --m: la mitad del hueco menos 1 px, así dos fotos vecinas dejan una junta de 2 px */
+/* Paspartú blanco por especie (capa SVG debajo de las fotos; ver contornos() en cl-kit.js). Al pasar el mouse se oscurece la pieza completa */
+.cl-mos-svg { position: absolute; left: 0; top: 0; width: 100%; height: auto; z-index: 0; pointer-events: none; overflow: visible; }
+.cl-mos-svg .cl-mat { fill: #fff; filter: drop-shadow(0 1px 2px rgba(8, 20, 28, .22)); transition: fill 120ms var(--cl-ease); }
+.cl-mos-svg g.cl-on .cl-mat { fill: var(--cl-ink); }
 .cl-mos-vacio { padding: 24px; text-align: center; color: var(--cl-ink2); }
 
 @media (max-width: 860px) {

@@ -198,14 +198,15 @@
     });
     return out;
   }
-  /* Contorno de cada especie (solo se ve al pasar el mouse). Sus casillas están separadas por huecos, así que se unen en
-     una retícula doble (casilla, hueco, casilla…): entra cada casilla, el hueco entre dos vecinas y el centro de un bloque
-     de 2×2. Se trazan solo los lados que dan hacia afuera y el trazo se recorta a la pieza para que quede todo adentro */
-  var nPieza = 0;
+  /* Paspartú de cada especie: una pieza blanca (capa SVG debajo de las fotos) con la forma del tetrominó. Las casillas
+     están separadas por huecos, así que la pieza se arma en una retícula doble (casilla, hueco, casilla…): entra cada
+     casilla, el hueco entre dos vecinas y el centro de un bloque de 2×2. Las fotos de una misma especie se estiran sobre
+     el hueco hasta dejar una junta de 2 px y por fuera se meten 2 px (ver margenes()): el blanco que asoma es el marco,
+     y entre especies queda el hueco completo */
   function contornos(piezas, cell, gap) {
     var px = function (j) { return (Math.floor(j / 2) * (cell + gap) + (j % 2 ? cell : 0)).toFixed(1); };
     return piezas.filter(function (b) { return b.e.partes.length; }).map(function (b) {
-      var c = {}, L = {}, d = "", area = "", id = "cl-pz" + (nPieza++);
+      var c = {}, L = {}, area = "";
       b.sh.forEach(function (s) { c[(b.x + s[0]) + "," + (b.y + s[1])] = 1; });
       var en = function (x, y) { return c[x + "," + y]; };
       Object.keys(c).forEach(function (k) {
@@ -216,17 +217,28 @@
         if (en(x + 1, y) && en(x, y + 1) && en(x + 1, y + 1)) L[(2 * x + 1) + "," + (2 * y + 1)] = 1;
       });
       Object.keys(L).forEach(function (k) {
-        var i = +k.split(",")[0], j = +k.split(",")[1], x0 = px(i), x1 = px(i + 1), y0 = px(j), y1 = px(j + 1);
-        var r = "M" + x0 + " " + y0 + "H" + x1 + "V" + y1 + "H" + x0 + "Z";
-        area += r;
-        if (!L[i + "," + (j - 1)]) d += "M" + x0 + " " + y0 + "H" + x1;
-        if (!L[i + "," + (j + 1)]) d += "M" + x0 + " " + y1 + "H" + x1;
-        if (!L[(i - 1) + "," + j]) d += "M" + x0 + " " + y0 + "V" + y1;
-        if (!L[(i + 1) + "," + j]) d += "M" + x1 + " " + y0 + "V" + y1;
+        var i = +k.split(",")[0], j = +k.split(",")[1];
+        area += "M" + px(i) + " " + px(j) + "H" + px(i + 1) + "V" + px(j + 1) + "H" + px(i) + "Z";
       });
-      return '<g data-id="' + esc(b.e.id) + '"><clipPath id="' + id + '"><path d="' + area + '"/></clipPath>' +
-        '<path class="cl-borde" clip-path="url(#' + id + ')" d="' + d + '"/></g>';
+      return '<g data-id="' + esc(b.e.id) + '"><path class="cl-mat" d="' + area + '"/></g>';
     }).join("");
+  }
+  /* Margen de cada foto: hacia una casilla de su misma especie se estira (--mi), hacia afuera se mete (--mo). Si se
+     estira hacia dos lados y la casilla en diagonal no es de la especie (la esquina de adentro de una L), se le recorta
+     esa esquina para que no se asome al hueco */
+  function margenes(b, cub) {
+    var suya = {}, mia = {};
+    b.sh.forEach(function (s) { suya[(b.x + s[0]) + "," + (b.y + s[1])] = 1; });
+    cub.forEach(function (c) { mia[c[0] + "," + c[1]] = 1; });
+    var hacia = function (dx, dy) { return cub.some(function (c) { var k = (c[0] + dx) + "," + (c[1] + dy); return suya[k] && !mia[k]; }); };
+    var ar = hacia(0, -1), de = hacia(1, 0), ab = hacia(0, 1), iz = hacia(-1, 0), x = cub[0][0], y = cub[0][1];
+    var corta = function (a, b2, dx, dy) { return cub.length === 1 && a && b2 && !suya[(x + dx) + "," + (y + dy)]; };
+    var m = "var(--m)", n = "calc(100% - var(--m))", s = function (v) { return v ? "var(--mi)" : "var(--mo)"; };
+    var pts = [].concat(corta(ar, iz, -1, -1) ? ["0 " + m, m + " " + m, m + " 0"] : ["0 0"],
+      corta(ar, de, 1, -1) ? [n + " 0", n + " " + m, "100% " + m] : ["100% 0"],
+      corta(ab, de, 1, 1) ? ["100% " + n, n + " " + n, n + " 100%"] : ["100% 100%"],
+      corta(ab, iz, -1, 1) ? [m + " 100%", m + " " + n, "0 " + n] : ["0 100%"]);
+    return "margin:" + s(ar) + " " + s(de) + " " + s(ab) + " " + s(iz) + (pts.length > 4 ? ";clip-path:polygon(" + pts.join(",") + ")" : "");
   }
   /* Al pasar el mouse o llegar con el teclado a cualquier foto, se resalta la pieza completa de su especie */
   function resaltarPieza(el) {
@@ -260,8 +272,9 @@
         if (!e.partes.length) return '<a class="cl-mos-c cl-falta" href="' + href + '" data-id="' + esc(e.id) + '" style="grid-area:' + (b.y + 1) + "/" + (b.x + 1) + '" aria-label="' + nombre + ', sin fotos todavía"><b>?</b>' + nombre + "</a>";
         var cells = b.sh.length === e.partes.length ? b.sh : b.sh.slice(0, 1);
         return cells.map(function (c, i) {
-          var p = e.partes[i] || e.partes[0], area = (b.y + c[1] + 1) + "/" + (b.x + c[0] + 1) + (b.sh.length === 4 && e.partes.length === 1 ? "/span 2/span 2" : ""), first = i === 0;
-          return '<a class="cl-mos-c' + (first ? " cl-lbl" : "") + '" href="' + href + '" data-id="' + esc(e.id) + '" data-nombre="' + (first ? nombre : "") + '" style="grid-area:' + area + '"' +
+          var p = e.partes[i] || e.partes[0], area = (b.y + c[1] + 1) + "/" + (b.x + c[0] + 1) + (b.sh.length === 4 && e.partes.length === 1 ? "/span 2/span 2" : "");
+          var first = i === 0, x = b.x + c[0], y = b.y + c[1], cub = /span/.test(area) ? [[x, y], [x + 1, y], [x, y + 1], [x + 1, y + 1]] : [[x, y]];
+          return '<a class="cl-mos-c' + (first ? " cl-lbl" : "") + '" href="' + href + '" data-id="' + esc(e.id) + '" data-nombre="' + (first ? nombre : "") + '" style="grid-area:' + area + ";" + margenes(b, cub) + '"' +
             (first ? ' aria-label="' + nombre + ", " + e.partes.length + ' de 5 partes"' : ' tabindex="-1" aria-hidden="true"') + '><img loading="lazy" src="' + esc(foto(cfg, e.fotos[p].f, "chica")) + '" alt=""></a>';
         }).join("");
       }).join("");
