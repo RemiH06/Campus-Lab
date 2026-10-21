@@ -17,7 +17,9 @@ Se gira, se acerca y se mueve; al pasar sobre un árbol aparece su especie, plac
 | `index.html`, `index.css`, `index.js`, `configuration.json` | Pestañas del fragmento (Diseño > Fragmentos > conjunto Campus Lab) |
 | `web/fuentes/mapa3d/dist/cl-mapa3d.js` (602 KB) | Documentos y Medios, con el nombre `cl-mapa3d.js` |
 | `territorio-campus.json`, `territorio-clavigero.json`, `territorio-primavera.json` | Documentos y Medios (se generan en `catalogo/salida/liferay_subir/mapa3d/`) |
-| `arboles.json` | Ya está en Documentos y Medios (el mismo del catálogo de árboles) |
+| `arboles.json` | Documentos y Medios (está en `catalogo/salida/liferay_subir/arboles/`; es el mismo que usará el catálogo de árboles) |
+
+Los cinco archivos van en Documentos y Medios del sitio, con permiso de ver para Invitado (público), y con esos nombres: la URL corta queda `/documents/d/campuslab/<nombre sin extensión>`. Si falta alguno o no es público, quien tiene sesión iniciada ve en el mapa cuál falta; quien visita solo ve "El mapa 3D no está disponible por ahora".
 
 El fragmento pide `cl-mapa3d.js` como texto y lo importa desde la memoria del navegador, así que funciona aunque Documentos y Medios no lo sirva con tipo de JavaScript. Si el navegador no tiene WebGL, se ve un aviso con liga al mapa 2D.
 

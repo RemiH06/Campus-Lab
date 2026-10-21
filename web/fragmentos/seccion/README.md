@@ -19,7 +19,9 @@ Un bloque de título, texto, botón y foto que cualquier persona edita **desde e
 | Foto | Clic en la foto > elegir una de Documentos y Medios (o subir una) |
 | Paleta de floración, mostrar foto o botón, lado de la foto | Seleccionar el fragmento > pestaña de Configuración (listas y casillas) |
 
-"La del mes" cambia sola la paleta según la floración del calendario.
+"La del sitio" usa la floración que la persona eligió en cualquier selector del sitio (el de los prototipos, el del catálogo) y, si no eligió ninguna, la del mes según el calendario. Las demás opciones fijan una paleta para esta sección.
+
+El modo claro/oscuro lo pone el **Marco** (hay que tenerlo en la página o en la Master Page): la sección lo sigue sola, también cuando alguien usa el botón de modo del Marco o el de un prototipo.
 
 ## Editar el texto desde un Contenido Web (opcional)
 

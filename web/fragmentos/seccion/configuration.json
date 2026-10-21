@@ -10,7 +10,7 @@
           "dataType": "string",
           "typeOptions": {
             "validValues": [
-              { "value": "auto", "label": "La del mes (cambia sola)" },
+              { "value": "auto", "label": "La del sitio (la del mes o la que elija quien visita)" },
               { "value": "clavellina", "label": "Clavellina (dic-ene)" },
               { "value": "rosa-morada", "label": "Rosa morada (feb)" },
               { "value": "jacaranda", "label": "Jacaranda (mar)" },

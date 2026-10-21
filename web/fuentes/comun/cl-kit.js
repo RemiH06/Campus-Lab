@@ -107,7 +107,8 @@
       var sel = el.querySelector("select"), b = el.querySelector("button");
       var pinta = function () { var o = modoActual() === "oscuro"; b.textContent = o ? "Modo claro" : "Modo oscuro"; b.setAttribute("aria-label", o ? "Cambiar a modo claro" : "Cambiar a modo oscuro"); };
       sel.value = store.get("cl-flor") || "auto";
-      sel.onchange = function () { store.set("cl-flor", sel.value); aplicarColor(); };
+      sel.onchange = function () { store.set("cl-flor", sel.value); aplicarColor(); document.dispatchEvent(new CustomEvent("cl-flor")); };
+      document.addEventListener("cl-flor", function () { sel.value = store.get("cl-flor") || "auto"; aplicarColor(); }); /* la floración vale para todo el sitio (Sección también la sigue) */
       b.onclick = function () { store.set("cl-modo", modoActual() === "oscuro" ? "claro" : "oscuro"); aplicarColor(); pinta(); document.dispatchEvent(new CustomEvent("cl-modo")); };
       document.addEventListener("cl-modo", function () { aplicarColor(); pinta(); }); /* el botón del Marco también avisa */
       pinta();

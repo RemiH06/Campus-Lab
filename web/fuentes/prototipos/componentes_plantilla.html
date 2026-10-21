@@ -256,13 +256,16 @@ body { background: var(--page); }
     var actual = function () { var m = root.dataset.modo; if (m) return m; var t = document.documentElement.dataset.theme; if (t) return t === "dark" ? "oscuro" : "claro"; return matchMedia("(prefers-color-scheme: dark)").matches ? "oscuro" : "claro"; };
     if (s) root.dataset.modo = s; /* sin elección guardada, el del dispositivo */
     var pinta = function () { var o = actual() === "oscuro"; b.textContent = o ? "Modo claro" : "Modo oscuro"; b.setAttribute("aria-label", o ? "Cambiar a modo claro" : "Cambiar a modo oscuro"); };
-    b.onclick = function () { var n = actual() === "oscuro" ? "claro" : "oscuro"; root.dataset.modo = n; store.set("cl-modo", n); pinta(); document.dispatchEvent(new Event("cl:color")); };
+    b.onclick = function () { var n = actual() === "oscuro" ? "claro" : "oscuro"; root.dataset.modo = n; store.set("cl-modo", n); pinta(); document.dispatchEvent(new CustomEvent("cl-modo")); };
+    /* "cl-modo": el Marco y los demás fragmentos avisan cuando alguien cambia el modo; todos leen la misma elección guardada */
+    document.addEventListener("cl-modo", function () { var s = store.get("cl-modo"); if (s) root.dataset.modo = s; else delete root.dataset.modo; pinta(); document.dispatchEvent(new Event("cl:color")); });
     pinta();
     var sel = document.getElementById("flor"), auto = florMes(new Date().getMonth() + 1);
     sel.innerHTML = '<option value="auto">Floración del mes (' + auto[1] + ")</option>" + FLOR.map(function (f) { return '<option value="' + f[0] + '">' + f[1] + "</option>"; }).join("");
     var ap = function (v) { root.dataset.floracion = v === "auto" ? auto[0] : v; document.dispatchEvent(new Event("cl:color")); };
     sel.value = store.get("cl-flor") || "auto"; ap(sel.value);
-    sel.onchange = function () { store.set("cl-flor", sel.value); ap(sel.value); };
+    sel.onchange = function () { store.set("cl-flor", sel.value); ap(sel.value); document.dispatchEvent(new CustomEvent("cl-flor")); };
+    document.addEventListener("cl-flor", function () { sel.value = store.get("cl-flor") || "auto"; ap(sel.value); }); /* la floración vale para todo el sitio */
   })();
 
   /* ── catálogo de muestras ── */

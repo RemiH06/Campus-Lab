@@ -9,7 +9,13 @@
   /* "{t}" en la URL se cambia por el territorio; si no lo trae, se agrega al final (URL corta de Documentos y Medios) */
   var url = function (t) { var d = cfg.datos || "/documents/d/campuslab/territorio-"; return d.indexOf("{t}") >= 0 ? d.replace("{t}", t) : d + t; };
 
-  function aviso() { $(".m3d-aviso").hidden = false; $(".m3d-herr").hidden = true; $(".m3d-pista").hidden = true; $(".m3d-estado").textContent = ""; }
+  /* quien edita el sitio (con sesión) ve qué archivo falta; quien visita, solo que el mapa no está disponible */
+  var conSesion = function () { try { return !!(window.themeDisplay && themeDisplay.isSignedIn()); } catch (e) { return false; } };
+  function aviso(motivo) {
+    var a = $(".m3d-aviso");
+    if (motivo) a.textContent = "El mapa 3D no está disponible por ahora." + (conSesion() ? " " + motivo : "");
+    a.hidden = false; $(".m3d-herr").hidden = true; $(".m3d-pista").hidden = true; $(".m3d-estado").textContent = "";
+  }
   function enUrl(modo) {
     try {
       var u = new URL(location.href);
@@ -38,11 +44,15 @@
       $("#m3d-placa").value = placa || "";
       if (placa) mapa.irAPlaca(placa);
       leyenda(); if (modo) enUrl(modo);
-    }).catch(function (e) { $(".m3d-estado").textContent = "No se pudo cargar el territorio (" + e.message + ")."; });
+    }).catch(function (e) {
+      $(".m3d-estado").textContent = "No se pudo cargar el territorio." + (conSesion() ? " Revisa que " + url(t) + " y " + (cfg.arboles || "/documents/d/campuslab/arboles") +
+        " estén en Documentos y Medios y sean públicos (" + e.message + ")." : "");
+    });
   }
 
   fetch(cfg.script || "/documents/d/campuslab/cl-mapa3d", { credentials: "same-origin" })
-    .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
+    /* si el archivo no existe o no es público, Liferay redirige a la portada (302 → 200 con HTML): eso también es "falta" */
+    .then(function (r) { if (!r.ok || r.redirected) throw new Error("falta"); return r.text(); })
     .then(function (codigo) { var u = URL.createObjectURL(new Blob([codigo], { type: "text/javascript" })); return import(u); })
     .then(function (m) { return m.montar(raiz, { ficha: cfg.ficha || "especie" }); })
     .then(function (m) {
@@ -60,5 +70,5 @@
       window.addEventListener("popstate", function (ev) { var s = ev.state && ev.state.m3d; if (s) ir(s.t, null, s.p); });
       document.addEventListener("cl-modo", function () { setTimeout(leyenda, 30); });
     })
-    .catch(function () { aviso(); });
+    .catch(function () { aviso("Falta " + (cfg.script || "/documents/d/campuslab/cl-mapa3d") + " en Documentos y Medios, o no es público."); });
 })();

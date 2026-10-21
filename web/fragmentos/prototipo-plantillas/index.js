@@ -48,7 +48,9 @@ window.CL_PROTO = function () {
     var actual = function () { var m = root.dataset.modo; if (m) return m; var t = document.documentElement.dataset.theme; if (t === "dark" || t === "light") return t === "dark" ? "oscuro" : "claro"; return matchMedia("(prefers-color-scheme: dark)").matches ? "oscuro" : "claro"; };
     if (saved) root.dataset.modo = saved; /* sin elecci\u00f3n guardada, el del dispositivo */
     var pinta = function () { var o = actual() === "oscuro"; b.textContent = o ? "Modo claro" : "Modo oscuro"; b.setAttribute("aria-label", o ? "Cambiar a modo claro" : "Cambiar a modo oscuro"); };
-    b.addEventListener("click", function () { var n = actual() === "oscuro" ? "claro" : "oscuro"; root.dataset.modo = n; store.set("cl-modo", n); pinta(); });
+    b.addEventListener("click", function () { var n = actual() === "oscuro" ? "claro" : "oscuro"; root.dataset.modo = n; store.set("cl-modo", n); pinta(); document.dispatchEvent(new CustomEvent("cl-modo")); });
+    /* "cl-modo": el Marco y los dem\u00e1s fragmentos avisan cuando alguien cambia el modo; todos leen la misma elecci\u00f3n guardada */
+    document.addEventListener("cl-modo", function () { var s = store.get("cl-modo"); if (s) root.dataset.modo = s; else delete root.dataset.modo; pinta(); });
     pinta();
   }
   function initFlor() {
@@ -57,7 +59,8 @@ window.CL_PROTO = function () {
       FLOR.map(function (f) { return '<option value="' + f.id + '">' + f.nom + "</option>"; }).join("");
     var aplica = function (v) { root.dataset.floracion = v === "auto" ? auto : v; };
     var saved = store.get("cl-flor") || "auto"; sel.value = saved; aplica(saved);
-    sel.addEventListener("change", function () { store.set("cl-flor", sel.value); aplica(sel.value); });
+    sel.addEventListener("change", function () { store.set("cl-flor", sel.value); aplica(sel.value); document.dispatchEvent(new CustomEvent("cl-flor")); });
+    document.addEventListener("cl-flor", function () { sel.value = store.get("cl-flor") || "auto"; aplica(sel.value); }); /* la floraci\u00f3n vale para todo el sitio */
     var m = new Date().getMonth() + 1;
     document.getElementById("cl-cal")["inner" + "HTML"] = MES.map(function (n, i) {
       var f = FLOR.filter(function (x) { return x.meses.indexOf(i + 1) >= 0; })[0];
