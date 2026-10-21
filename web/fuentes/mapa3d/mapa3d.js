@@ -1,7 +1,9 @@
 /* ══════════════════════════════════════════════════════════════════════════════════════════════════════
    Mapa 3D de los territorios del ITESO · Three.js r186 (MIT), WebGLRenderer.
    Se empaqueta con esbuild junto con Three en un solo archivo (cl-mapa3d.js) que vive en Documentos y Medios;
-   el fragmento lo carga solo en la página del mapa. Datos: web/scripts/generar_territorios_3d.py.
+   el fragmento lo carga solo en la página del mapa, cuando el mapa está por entrar en pantalla.
+   Datos: la geografía viene del JSON del territorio (web/scripts/generar_territorios_3d.py); los árboles, del
+   inventario en CSV que se edita en Excel, y las observaciones, de iNaturalist en vivo (ver datos.js).
    Una maqueta: edificios extruidos, calles, áreas verdes, relieve (bosque), cada árbol del inventario a su
    altura y copa reales (los que florecen este mes, en su color) y lo observado en Naturalista.
    Se dibuja solo cuando algo cambia. Sin WebGL, montar() devuelve null y el fragmento deja su aviso.
@@ -9,6 +11,7 @@
 import * as THREE from "three";
 import { MapControls } from "three/addons/controls/MapControls.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+import { bajarCSV, arbolesDe, observaciones } from "./datos.js";
 
 /* Floraciones del campus: especie → meses (las mismas paletas del kit) */
 const FLORACION = [
@@ -100,7 +103,7 @@ export async function montar(el, op) {
   const raiz = new THREE.Group(); scene.add(raiz);
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
   const tip = el.querySelector(".m3d-tip"), estado = el.querySelector(".m3d-estado");
-  let D = null, E = [], copas = null, troncos = null, puntos = null, anillo = null, capas = { arb: true, obs: true }, oscuro = false;
+  let D = null, E = [], csv = {}, copas = null, troncos = null, puntos = null, anillo = null, capas = { arb: true, obs: true }, oscuro = false;
   const mes = new Date().getMonth() + 1;
   const flor = new Map(); FLORACION.forEach((f) => f.meses.includes(mes) && flor.set(f.sci, f));
 
@@ -147,6 +150,21 @@ export async function montar(el, op) {
   function limpiar() {
     raiz.traverse((o) => { if (o.geometry) o.geometry.dispose(); if (o.material) [].concat(o.material).forEach((m) => m.dispose()); });
     raiz.clear(); copas = troncos = puntos = anillo = null;
+  }
+
+  /* observaciones de iNaturalist: pines del color de su grupo. Aparte de construir() porque llegan después (en vivo)
+     y rehacer todo borraría la marca de una placa buscada */
+  function ponerObs() {
+    if (puntos) { raiz.remove(puntos); puntos.geometry.dispose(); puntos.material.dispose(); puntos = null; }
+    if (!D.obs.length) return;
+    const ter = D.ter, g = new THREE.ConeGeometry(1, 2.6, 8).rotateX(Math.PI).translate(0, 1.3, 0);
+    puntos = new THREE.InstancedMesh(g, new THREE.MeshLambertMaterial(), D.obs.length);
+    const m4 = new THREE.Matrix4(), c = new THREE.Color(), k = ter ? 9 : 1.4;
+    D.obs.forEach(([x, z, gr], i) => {
+      const y = alturaEn(ter, x, z) + (ter ? 4 : 2.2);
+      puntos.setMatrixAt(i, m4.makeScale(k, k, k).setPosition(x, y, z)); puntos.setColorAt(i, c.set((GRUPO[gr] || GRUPO.otro)[oscuro ? 1 : 0]));
+    });
+    puntos.computeBoundingSphere(); puntos.visible = capas.obs; raiz.add(puntos);
   }
 
   function construir() {
@@ -218,17 +236,7 @@ export async function montar(el, op) {
       troncos.computeBoundingSphere(); copas.computeBoundingSphere();
       troncos.visible = copas.visible = capas.arb; raiz.add(troncos, copas);
     }
-    /* observaciones de iNaturalist: pines del color de su grupo */
-    if (D.obs.length) {
-      const g = new THREE.ConeGeometry(1, 2.6, 8).rotateX(Math.PI).translate(0, 1.3, 0);
-      puntos = new THREE.InstancedMesh(g, new THREE.MeshLambertMaterial(), D.obs.length);
-      const m4 = new THREE.Matrix4(), c = new THREE.Color(), k = ter ? 9 : 1.4;
-      D.obs.forEach(([x, z, gr], i) => {
-        const y = alturaEn(ter, x, z) + (ter ? 4 : 2.2);
-        puntos.setMatrixAt(i, m4.makeScale(k, k, k).setPosition(x, y, z)); puntos.setColorAt(i, c.set((GRUPO[gr] || GRUPO.otro)[oscuro ? 1 : 0]));
-      });
-      puntos.computeBoundingSphere(); puntos.visible = capas.obs; raiz.add(puntos);
-    }
+    ponerObs();
     /* sol y sombras ajustados al tamaño del territorio */
     const R = Math.max(W, H) * 0.6, topY = ter ? Math.max(...ter.y) : 30;
     sol.position.set(cx - R * 0.6, R * 0.9 + topY, cz - R * 0.4); sol.target.position.set(cx, 0, cz);
@@ -288,11 +296,11 @@ export async function montar(el, op) {
     if (!h) { tip.hidden = true; delete tip.dataset.h; canvas.style.cursor = ""; return; }
     if (h.tipo === "arb") {
       const [placa, , , alto, copa] = h.a;
-      tip.innerHTML = `<b>${esc(h.e ? h.e.com || h.e.sci : "Especie sin registrar")}</b>${h.e ? `<i>${esc(h.e.sci)}</i>` : ""}<span>Placa ${placa} · ${alto} m de alto · copa de ${copa} m</span>` +
-        (h.e && op.ficha ? `<span class="m3d-tip-accion">Toca para ver la ficha</span>` : "");
+      tip.innerHTML = `<b>${esc(h.e ? h.e.com || h.e.sci : "Especie sin registrar")}</b>${h.e && h.e.sci ? `<i>${esc(h.e.sci)}</i>` : ""}<span>Placa ${placa} · ${alto} m de alto · copa de ${copa} m</span>` +
+        (h.e && h.e.id && op.ficha ? `<span class="m3d-tip-accion">Toca para ver la ficha</span>` : "");
     } else {
-      const [, , gr, nombre] = h.o;
-      tip.innerHTML = `<b>${esc(nombre || "Sin identificar")}</b><span>${esc(NOMBRE_GRUPO[gr] || "Otros")} · observado en Naturalista</span><span class="m3d-tip-accion">Toca para verlo en iNaturalist</span>`;
+      const [, , gr, nombre, , comun] = h.o;
+      tip.innerHTML = `<b>${esc(comun || nombre || "Sin identificar")}</b>${comun && nombre ? `<i>${esc(nombre)}</i>` : ""}<span>${esc(NOMBRE_GRUPO[gr] || "Otros")} · observado en Naturalista</span><span class="m3d-tip-accion">Toca para verlo en iNaturalist</span>`;
     }
     tip.dataset.h = JSON.stringify(h); tip.hidden = false; canvas.style.cursor = "pointer";
     const v = canvas.getBoundingClientRect(); tip.style.left = Math.min(h.x + 14, v.width - tip.offsetWidth - 8) + "px"; tip.style.top = Math.max(8, h.y - tip.offsetHeight - 12) + "px";
@@ -308,7 +316,7 @@ export async function montar(el, op) {
   });
   tip.addEventListener("click", () => tip.dataset.h && abrir(JSON.parse(tip.dataset.h)));
   function abrir(h) {
-    if (h.tipo === "arb" && h.e && op.ficha) location.href = op.ficha + (op.ficha.includes("?") ? "&" : "?") + "id=" + encodeURIComponent(h.e.id);
+    if (h.tipo === "arb" && h.e && h.e.id && op.ficha) location.href = op.ficha + (op.ficha.includes("?") ? "&" : "?") + "id=" + encodeURIComponent(h.e.id);
     if (h.tipo === "obs") window.open("https://www.inaturalist.org/observations/" + h.o[4], "_blank", "noopener");
   }
 
@@ -324,18 +332,31 @@ export async function montar(el, op) {
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => setTimeout(aplicarModo, 0));
 
   return {
-    async cargar(datos, arboles) {
+    /* datos: URL del JSON del territorio; inventario: URL del CSV de árboles (se baja una vez y sirve a los tres territorios).
+       Las observaciones guardadas en el JSON se ven de inmediato; las vivas de iNaturalist las reemplazan al llegar */
+    async cargar(datos, inventario) {
       estado.textContent = "Cargando el territorio…";
-      const [d, a] = await Promise.all([fetch(datos, { credentials: "same-origin" }).then((r) => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); }),
-        arboles ? fetch(arboles, { credentials: "same-origin" }).then((r) => (r.ok ? r.json() : null)).catch(() => null) : null]);
-      D = d; E = (a && a.especies) || E; oscuro = leerModo(); mostrarTip(null);
+      if (inventario && !csv[inventario]) csv[inventario] = bajarCSV(inventario);
+      const [d, filas] = await Promise.all([fetch(datos, { credentials: "same-origin" }).then((r) => { if (!r.ok || r.redirected) throw new Error("no se encontró " + datos); return r.json(); }),
+        inventario ? csv[inventario].catch((e) => ({ error: e.message })) : null]);
+      d.avisos = {};
+      if (filas && !filas.error) { const a = arbolesDe(filas, d); d.arb = a.arb; E = a.E; d.avisos.malas = a.malas; }
+      else { d.arb = d.arb || []; E = []; if (filas) d.avisos.csv = filas.error; }
+      d.obs = d.obs || [];
+      D = d; oscuro = leerModo(); mostrarTip(null);
       construir(); armarEtiquetas(); encuadre(true); pedir();
-      estado.textContent = ""; return D;
+      estado.textContent = "";
+      observaciones(d).then((obs) => {
+        if (D !== d) return; /* ya se cambió de territorio */
+        d.obs = obs; ponerObs(); pedir(); el.dispatchEvent(new CustomEvent("m3d-datos"));
+      }).catch((e) => { d.avisos.inat = e.message; el.dispatchEvent(new CustomEvent("m3d-datos")); });
+      return D;
     },
     capa(nombre, visible) { capas[nombre] = visible; if (nombre === "arb" && copas) copas.visible = troncos.visible = visible; if (nombre === "obs" && puntos) puntos.visible = visible; pedir(); },
     irAPlaca, inicio: () => encuadre(false),
     zoom(f) { const v = camera.position.clone().sub(controls.target).multiplyScalar(f); if (v.length() > controls.minDistance && v.length() < controls.maxDistance) { camera.position.copy(controls.target).add(v); pedir(); } },
     girar(grados) { const v = camera.position.clone().sub(controls.target).applyAxisAngle(new THREE.Vector3(0, 1, 0), THREE.MathUtils.degToRad(grados)); camera.position.copy(controls.target).add(v); pedir(); },
+    avisos: () => (D && D.avisos) || {},
     resumen() {
       const g = {}; (D.obs || []).forEach((o) => { g[o[2]] = (g[o[2]] || 0) + 1; });
       const fl = (D.arb || []).filter((a) => E[a[5]] && flor.get(E[a[5]].sci.toLowerCase()));

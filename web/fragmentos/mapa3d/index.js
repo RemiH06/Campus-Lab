@@ -1,6 +1,7 @@
 /* Mapa 3D de los territorios del ITESO. El motor (Three.js + escena) es cl-mapa3d.js, un solo archivo en Documentos y
-   Medios que se carga aquí, solo en esta página. Se pide como texto y se importa desde un Blob: así funciona aunque
-   Documentos y Medios no lo sirva con tipo de JavaScript. Territorio y placa viven en la URL (flechas del navegador). */
+   Medios (600 KB) que se descarga solo cuando el mapa está por entrar en pantalla. Se pide como texto y se importa desde
+   un Blob: así funciona aunque Documentos y Medios no lo sirva con tipo de JavaScript. Los árboles salen del inventario
+   en CSV (se edita en Excel) y las observaciones, de iNaturalist. Territorio y placa viven en la URL. */
 (function () {
   var raiz = fragmentElement.querySelector(".cl-m3d"); if (!raiz) return;
   var cfg = typeof configuration !== "undefined" ? configuration : {};
@@ -17,6 +18,7 @@
   window.addEventListener("storage", function (e) { if (e.key === "cl-flor") paleta(); });
   /* "{t}" en la URL se cambia por el territorio; si no lo trae, se agrega al final (URL corta de Documentos y Medios) */
   var url = function (t) { var d = cfg.datos || "/documents/d/campuslab/territorio-"; return d.indexOf("{t}") >= 0 ? d.replace("{t}", t) : d + t; };
+  var inventario = cfg.inventario || "/documents/d/campuslab/inventario-arboles";
 
   /* quien edita el sitio (con sesión) ve qué archivo falta; quien visita, solo que el mapa no está disponible */
   var conSesion = function () { try { return !!(window.themeDisplay && themeDisplay.isSignedIn()); } catch (e) { return false; } };
@@ -37,6 +39,12 @@
     var r = mapa.resumen(), h = "";
     if (r.florecen.length) h += '<span class="m3d-ley"><i style="--c:' + r.colores[0] + '"></i>Florecen este mes: ' + r.florecen.slice(0, 4).join(", ") + "</span>";
     if (r.arboles) h += '<span class="m3d-ley"><i class="m3d-ley-arbol"></i>' + r.arboles.toLocaleString("es-MX") + " árboles con placa, a su altura y copa reales</span>";
+    var a = mapa.avisos ? mapa.avisos() : {}, av = []; /* solo quien edita el sitio (con sesión) ve qué corregir */
+    if (a.csv) av.push("No se pudo leer el inventario de árboles (" + inventario + "): " + a.csv + ".");
+    if (a.malas && a.malas.length) av.push("Inventario: " + a.malas.length + " filas de este territorio sin placa o sin coordenada válida, o con la placa repetida (filas " + a.malas.slice(0, 12).join(", ") + (a.malas.length > 12 ? "…" : "") + ").");
+    if (a.inat) av.push("No se pudieron traer las observaciones de iNaturalist (" + a.inat + "); se muestran las guardadas.");
+    var p = $(".m3d-avisos"); if (!p) { p = document.createElement("p"); p.className = "m3d-avisos"; $(".m3d-estado").after(p); }
+    p.textContent = conSesion() ? av.join(" ") : ""; p.hidden = !p.textContent;
     Object.keys(r.obs).sort(function (a, b) { return r.obs[b] - r.obs[a]; }).forEach(function (g) {
       h += '<span class="m3d-ley"><i style="--c:' + r.grupos[g][r.oscuro ? 1 : 0] + '"></i>' + r.nombres[g] + " (" + r.obs[g] + ")</span>";
     });
@@ -46,7 +54,7 @@
     if (TERR.indexOf(t) < 0) t = "campus";
     actual = t; raiz.dataset.territorio = t;
     $$(".m3d-tabs button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.t === t)); });
-    return mapa.cargar(url(t), cfg.arboles || "/documents/d/campuslab/arboles").then(function (D) {
+    return mapa.cargar(url(t), inventario).then(function (D) {
       $(".m3d-nombre").textContent = D.nombre; $(".m3d-sub").textContent = D.sub; $(".m3d-creditos").textContent = D.creditos;
       $(".m3d-buscar").hidden = !(D.arb && D.arb.length); $('[data-capa="arb"]').closest("label").hidden = !(D.arb && D.arb.length);
       $$("[data-capa]").forEach(function (c) { mapa.capa(c.dataset.capa, c.checked); });
@@ -59,6 +67,8 @@
     });
   }
 
+  /* el motor y los datos se descargan solo cuando el mapa está por entrar en pantalla (600 px antes) */
+  function arrancar() {
   fetch(cfg.script || "/documents/d/campuslab/cl-mapa3d", { credentials: "same-origin" })
     /* si el archivo no existe o no es público, Liferay redirige a la portada (302 → 200 con HTML): eso también es "falta" */
     .then(function (r) { if (!r.ok || r.redirected) throw new Error("falta"); return r.text(); })
@@ -78,6 +88,11 @@
       $$("[data-capa]").forEach(function (c) { c.addEventListener("change", function () { mapa.capa(c.dataset.capa, c.checked); }); });
       window.addEventListener("popstate", function (ev) { var s = ev.state && ev.state.m3d; if (s) ir(s.t, null, s.p); });
       document.addEventListener("cl-modo", function () { setTimeout(leyenda, 30); });
+      raiz.addEventListener("m3d-datos", leyenda); /* llegaron las observaciones de iNaturalist */
     })
     .catch(function () { aviso("Falta " + (cfg.script || "/documents/d/campuslab/cl-mapa3d") + " en Documentos y Medios, o no es público."); });
+  }
+  $(".m3d-estado").textContent = "El mapa se carga al llegar aquí.";
+  if (!window.IntersectionObserver) arrancar();
+  else { var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io.disconnect(); $(".m3d-estado").textContent = "Cargando el mapa…"; arrancar(); } }, { rootMargin: "600px 0px" }); io.observe(raiz); }
 })();

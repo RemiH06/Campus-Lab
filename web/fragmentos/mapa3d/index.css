@@ -66,3 +66,4 @@
   .m3d-vista { height: 70vh; }
   .m3d-herr button { width: 36px; height: 36px; }
 }
+.cl-m3d .m3d-avisos { grid-column: 1 / -1; margin: 0; padding: 8px 12px; border-radius: 8px; border: 1.5px dashed var(--m-ink2); color: var(--m-ink2); font-size: .9rem; } /* solo con sesión iniciada: qué corregir en el inventario */

@@ -10,9 +10,18 @@
           "dataType": "string",
           "typeOptions": {
             "validValues": [
-              { "value": "campus", "label": "Campus" },
-              { "value": "clavigero", "label": "Casa ITESO Clavigero" },
-              { "value": "primavera", "label": "Predios en el Bosque La Primavera" }
+              {
+                "value": "campus",
+                "label": "Campus"
+              },
+              {
+                "value": "clavigero",
+                "label": "Casa ITESO Clavigero"
+              },
+              {
+                "value": "primavera",
+                "label": "Predios en el Bosque La Primavera"
+              }
             ]
           },
           "defaultValue": "campus"
@@ -22,11 +31,36 @@
     {
       "label": "Archivos (Documentos y Medios)",
       "fields": [
-        { "name": "datos", "label": "Inicio de la URL de cada territorio (se le agrega campus, clavigero o primavera)", "type": "text", "defaultValue": "/documents/d/campuslab/territorio-" },
-        { "name": "arboles", "label": "URL de arboles.json", "type": "text", "defaultValue": "/documents/d/campuslab/arboles" },
-        { "name": "script", "label": "URL de cl-mapa3d.js", "type": "text", "defaultValue": "/documents/d/campuslab/cl-mapa3d" },
-        { "name": "ficha", "label": "Página de la ficha de especie", "type": "text", "defaultValue": "especie" },
-        { "name": "mapa2d", "label": "Página del mapa 2D (si el navegador no puede con el 3D)", "type": "text", "defaultValue": "mapa" }
+        {
+          "name": "datos",
+          "label": "Inicio de la URL de cada territorio (se le agrega campus, clavigero o primavera)",
+          "type": "text",
+          "defaultValue": "/documents/d/campuslab/territorio-"
+        },
+        {
+          "name": "inventario",
+          "label": "URL del inventario de árboles (CSV que se edita en Excel)",
+          "type": "text",
+          "defaultValue": "/documents/d/campuslab/inventario-arboles"
+        },
+        {
+          "name": "script",
+          "label": "URL de cl-mapa3d.js",
+          "type": "text",
+          "defaultValue": "/documents/d/campuslab/cl-mapa3d"
+        },
+        {
+          "name": "ficha",
+          "label": "Página de la ficha de especie",
+          "type": "text",
+          "defaultValue": "especie"
+        },
+        {
+          "name": "mapa2d",
+          "label": "Página del mapa 2D (si el navegador no puede con el 3D)",
+          "type": "text",
+          "defaultValue": "mapa"
+        }
       ]
     }
   ]

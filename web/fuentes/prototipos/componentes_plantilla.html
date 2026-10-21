@@ -211,6 +211,14 @@ body { background: var(--page); }
 .toast { position: absolute; left: 50%; bottom: 16px; translate: -50% 0; padding: 8px 16px; border-radius: 999px; background: var(--cl-ink); color: var(--cl-bg); font-weight: 600; font-size: calc(.92 * var(--u)); opacity: 0; transform: translateY(12px); transition: opacity 200ms ease, transform 200ms var(--cl-ease); pointer-events: none; }
 .toast.on { opacity: 1; transform: none; }
 
+/* 15 · Árbol con su QR */
+.qrv { width: min(100%, calc(26 * var(--u))); display: grid; gap: 10px; justify-items: center; }
+.qrv canvas { width: 100%; display: block; cursor: pointer; touch-action: manipulation; }
+.qrv-pista { margin: 0; padding: 3px 12px; border-radius: 999px; border: 1px solid var(--cl-line); font-size: calc(.85 * var(--u)); color: var(--cl-ink2); text-align: center; }
+.qrv-fila { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.qrv-esp button { width: 34px; height: 34px; padding: 0; border-radius: 50%; border: 3px solid var(--cl-sf); background: var(--c); box-shadow: 0 0 0 1.5px var(--cl-line); cursor: pointer; }
+.qrv-esp button[aria-pressed="true"] { box-shadow: 0 0 0 2.5px var(--cl-ink); }
+
 @media (prefers-reduced-motion: reduce) {
   .cl *, .cl *::before, .cl *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
   .rev.pre { clip-path: none; }
@@ -291,6 +299,9 @@ body { background: var(--page); }
     ["Temporada", "cambian con la floración del mes", [
       [11, "Pétalos o lluvia", "Caen pétalos del color de la floración; en lluvias, gotas. Se detiene fuera de pantalla.", "Portada del sitio o encabezado de temporada.", "Canvas, sin librerías", "temp"],
       [12, "Recorrido del año", "Pasa por los doce meses y muestra cómo cambia la paleta.", "Página de Campus Lab o calendario de floración.", "CSS + JS mínimo", "anio"]
+    ]],
+    ["Letreros y placas", "para llevar el sitio al jardín", [
+      [15, "Árbol con su QR", "Un árbol de cubos parado sobre el QR de su ficha. Al tocarlo se pliega y queda el código, listo para escanear o descargar e imprimir.", "Letreros de jardín, placas de árbol y la ficha de especie. Idea de ICQR, de Louis Raillé.", "Canvas, sin librerías", "qr"]
     ]],
     ["Estados", "mientras carga o al compartir", [
       [13, "Esqueleto de carga", "Mientras llega el JSON, se ve la forma de la ficha en vez de un círculo girando.", "Todas las piezas que leen datos.", "Solo CSS", "skel"],
@@ -448,6 +459,214 @@ body { background: var(--page); }
       var sel = function () { var r = document.createRange(); r.selectNodeContents(document.getElementById("sh-url")); var s = getSelection(); s.removeAllRanges(); s.addRange(r); avisa("Enlace seleccionado: cópialo con Ctrl+C"); };
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(function () { avisa("Enlace copiado"); }, sel); else sel();
     };
+  };
+
+  /* Código QR (ISO 18004): modo byte, corrección M, versiones 1 a 10, máscara con menor penalización. Sin librerías */
+  var qrCodigo = function (texto) {
+    var ECC = [0, 10, 16, 26, 18, 24, 16, 18, 22, 22, 26], BLQ = [0, 1, 1, 1, 2, 2, 4, 4, 4, 5, 5];
+    var bytes = [].slice.call(new TextEncoder().encode(texto));
+    var crudos = function (v) { var r = (16 * v + 128) * v + 64; if (v >= 2) { var n = Math.floor(v / 7) + 2; r -= (25 * n - 10) * n - 55; if (v >= 7) r -= 36; } return r; };
+    var ver = 1; while (ver <= 10 && 4 + (ver < 10 ? 8 : 16) + 8 * bytes.length > (Math.floor(crudos(ver) / 8) - ECC[ver] * BLQ[ver]) * 8) ver++;
+    if (ver > 10) throw new Error("texto demasiado largo para el QR");
+    var cap = (Math.floor(crudos(ver) / 8) - ECC[ver] * BLQ[ver]) * 8, bits = [];
+    var pon = function (v, n) { for (var i = n - 1; i >= 0; i--) bits.push((v >>> i) & 1); };
+    pon(4, 4); pon(bytes.length, ver < 10 ? 8 : 16); bytes.forEach(function (b) { pon(b, 8); });
+    pon(0, Math.min(4, cap - bits.length)); pon(0, (8 - bits.length % 8) % 8);
+    for (var p = 0xEC; bits.length < cap; p ^= 0xEC ^ 0x11) pon(p, 8);
+    var datos = []; for (var i = 0; i < bits.length; i += 8) datos.push(parseInt(bits.slice(i, i + 8).join(""), 2));
+    /* Reed-Solomon sobre GF(256), polinomio 0x11D */
+    var mul = function (x, y) { var z = 0; for (var i = 7; i >= 0; i--) { z = (z << 1) ^ ((z >>> 7) * 0x11D); z ^= ((y >>> i) & 1) * x; } return z; };
+    var grado = ECC[ver], div = []; for (i = 0; i < grado - 1; i++) div.push(0); div.push(1);
+    for (var r = 1, k = 0; k < grado; k++) { for (var j = 0; j < div.length; j++) { div[j] = mul(div[j], r); if (j + 1 < div.length) div[j] ^= div[j + 1]; } r = mul(r, 2); }
+    var resto = function (d) { var res = div.map(function () { return 0; }); d.forEach(function (b) { var f = b ^ res.shift(); res.push(0); div.forEach(function (c, i) { res[i] ^= mul(c, f); }); }); return res; };
+    var nb = BLQ[ver], total = Math.floor(crudos(ver) / 8), cortos = nb - total % nb, largoC = Math.floor(total / nb), bloques = [];
+    for (i = 0, k = 0; i < nb; i++) { var d = datos.slice(k, k + largoC - grado + (i < cortos ? 0 : 1)); k += d.length; var e = resto(d); if (i < cortos) d.push(0); bloques.push(d.concat(e)); }
+    var cw = []; for (i = 0; i < bloques[0].length; i++) bloques.forEach(function (b, j) { if (i !== largoC - grado || j >= cortos) cw.push(b[i]); });
+    /* matriz y patrones fijos */
+    var n = ver * 4 + 17, M = [], F = [];
+    for (i = 0; i < n; i++) { M.push(new Array(n).fill(false)); F.push(new Array(n).fill(false)); }
+    var fija = function (x, y, v) { M[y][x] = v; F[y][x] = true; };
+    for (i = 0; i < n; i++) { fija(6, i, i % 2 === 0); fija(i, 6, i % 2 === 0); }
+    [[3, 3], [n - 4, 3], [3, n - 4]].forEach(function (c) { for (var dy = -4; dy <= 4; dy++) for (var dx = -4; dx <= 4; dx++) { var x = c[0] + dx, y = c[1] + dy, m = Math.max(Math.abs(dx), Math.abs(dy)); if (x >= 0 && x < n && y >= 0 && y < n) fija(x, y, m !== 2 && m !== 4); } });
+    var al = [];
+    if (ver > 1) { var na = Math.floor(ver / 7) + 2, paso = Math.ceil((ver * 4 + 4) / (na * 2 - 2)) * 2; al = [6]; for (var q = n - 7; al.length < na; q -= paso) al.splice(1, 0, q); }
+    al.forEach(function (a, ia) { al.forEach(function (b, ib) {
+      if ((ia === 0 && ib === 0) || (ia === 0 && ib === al.length - 1) || (ia === al.length - 1 && ib === 0)) return;
+      for (var dy = -2; dy <= 2; dy++) for (var dx = -2; dx <= 2; dx++) fija(a + dx, b + dy, Math.max(Math.abs(dx), Math.abs(dy)) !== 1);
+    }); });
+    var formato = function (mask) {
+      var dd = mask, rem = dd; for (var i = 0; i < 10; i++) rem = (rem << 1) ^ ((rem >>> 9) * 0x537); /* nivel M = 00 */
+      var b = ((dd << 10) | rem) ^ 0x5412, bit = function (i) { return ((b >>> i) & 1) === 1; };
+      for (i = 0; i <= 5; i++) fija(8, i, bit(i)); fija(8, 7, bit(6)); fija(8, 8, bit(7)); fija(7, 8, bit(8));
+      for (i = 9; i < 15; i++) fija(14 - i, 8, bit(i));
+      for (i = 0; i < 8; i++) fija(n - 1 - i, 8, bit(i)); for (i = 8; i < 15; i++) fija(8, n - 15 + i, bit(i)); fija(8, n - 8, true);
+    };
+    formato(0);
+    if (ver >= 7) { var rv = ver; for (i = 0; i < 12; i++) rv = (rv << 1) ^ ((rv >>> 11) * 0x1F25); var vb = (ver << 12) | rv; for (i = 0; i < 18; i++) { var bv = ((vb >>> i) & 1) === 1, a2 = n - 11 + i % 3, b2 = Math.floor(i / 3); fija(a2, b2, bv); fija(b2, a2, bv); } }
+    /* datos en zigzag desde la esquina de abajo a la derecha */
+    for (var der = n - 1, t = 0; der >= 1; der -= 2) {
+      if (der === 6) der = 5;
+      for (var v = 0; v < n; v++) for (j = 0; j < 2; j++) {
+        var x = der - j, y = ((der + 1) & 2) === 0 ? n - 1 - v : v;
+        if (!F[y][x] && t < cw.length * 8) { M[y][x] = ((cw[t >>> 3] >>> (7 - (t & 7))) & 1) === 1; t++; }
+      }
+    }
+    var MASC = [function (x, y) { return (x + y) % 2 === 0; }, function (x, y) { return y % 2 === 0; }, function (x) { return x % 3 === 0; }, function (x, y) { return (x + y) % 3 === 0; },
+      function (x, y) { return (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0; }, function (x, y) { return x * y % 2 + x * y % 3 === 0; },
+      function (x, y) { return (x * y % 2 + x * y % 3) % 2 === 0; }, function (x, y) { return ((x + y) % 2 + x * y % 3) % 2 === 0; }];
+    var aplica = function (m) { for (var y = 0; y < n; y++) for (var x = 0; x < n; x++) if (!F[y][x] && MASC[m](x, y)) M[y][x] = !M[y][x]; };
+    /* penalización (reglas 1, 2 y 4 de la norma): racha de 5+ iguales, bloques 2×2, proporción de oscuros */
+    var castigo = function () {
+      var s = 0, osc = 0, y, x, c;
+      for (y = 0; y < n; y++) for (x = 0, c = 1; x < n; x++) { if (M[y][x]) osc++; if (x && M[y][x] === M[y][x - 1]) { c++; if (c === 5) s += 3; else if (c > 5) s++; } else c = 1; }
+      for (x = 0; x < n; x++) for (y = 0, c = 1; y < n; y++) { if (y && M[y][x] === M[y - 1][x]) { c++; if (c === 5) s += 3; else if (c > 5) s++; } else c = 1; }
+      for (y = 0; y < n - 1; y++) for (x = 0; x < n - 1; x++) if (M[y][x] === M[y][x + 1] && M[y][x] === M[y + 1][x] && M[y][x] === M[y + 1][x + 1]) s += 3;
+      return s + Math.floor(Math.abs(osc * 20 - n * n * 10) / (n * n)) * 10;
+    };
+    var mejor = 0, menor = Infinity;
+    for (var m = 0; m < 8; m++) { aplica(m); formato(m); var c2 = castigo(); if (c2 < menor) { menor = c2; mejor = m; } aplica(m); }
+    aplica(mejor); formato(mejor);
+    return M;
+  };
+  /* 15 */ M.qr = function (el) {
+    /* especies que florecen en el campus: [id de la ficha, nombre, color de la flor, meses] */
+    var ESP = [["tabebuia-rosea", "Rosa morada", "#e46fb2", [2]], ["jacaranda-mimosifolia", "Jacaranda", "#8d6ee0", [3]], ["roseodendron-donnell-smithii", "Primavera", "#f5c02a", [4]],
+      ["delonix-regia", "Tabachín", "#ea4b23", [5, 6]], ["spathodea-campanulata", "Galeana", "#f2862a", [11]], ["pseudobombax-ellipticum", "Clavellina", "#ef6f95", [12, 1]]];
+    var TEMP = [["flor", "Floración"], ["lluvias", "Lluvias"], ["secas", "Secas"]];
+    var mes = new Date().getMonth() + 1, S = { e: 0, temp: mes >= 7 && mes <= 10 ? "lluvias" : "flor", t: 0 };
+    ESP.forEach(function (x, i) { if (x[3].indexOf(mes) >= 0) S.e = i; });
+    el.innerHTML = '<div class="qrv"><canvas></canvas><p class="qrv-pista" aria-live="polite"></p>' +
+      '<div class="qrv-fila qrv-esp" role="group" aria-label="Especie">' + ESP.map(function (x, i) { return '<button type="button" data-e="' + i + '" aria-pressed="' + (i === S.e) + '" style="--c:' + x[2] + '" title="' + x[1] + '"><span class="sr">' + x[1] + "</span></button>"; }).join("") + "</div>" +
+      '<div class="qrv-fila" role="group" aria-label="Temporada">' + TEMP.map(function (x) { return '<button class="btn" type="button" data-t="' + x[0] + '" aria-pressed="' + (x[0] === S.temp) + '">' + x[1] + "</button>"; }).join("") + "</div>" +
+      '<div class="qrv-fila"><button class="btn" type="button" data-accion="ver">Ver su QR</button><button class="btn solid" type="button" data-accion="bajar">Descargar QR</button></div></div>';
+    var cv = el.querySelector("canvas"), pista = el.querySelector(".qrv-pista"), fondo = document.createElement("canvas");
+    var cajas = [], n = 0, url = "", alto = 0, techo = 0, W = 0, H = 0, dpr = 1, vista = null;
+    var sem = function (s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return function () { h = Math.imul(h ^ h >>> 15, 2246822507) + 0x6D2B79F5 | 0; return (h >>> 0) / 4294967296; }; };
+    var rgb = function (h) { return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)]; };
+    var tono = function (c, k) { return "rgb(" + Math.round(Math.min(255, c[0] * k)) + "," + Math.round(Math.min(255, c[1] * k)) + "," + Math.round(Math.min(255, c[2] * k)) + ")"; };
+    var caja = function (x, y, z, w, h, d, c, arbol) { cajas.push({ x: x, y: y, z: z, w: w, h: h, d: d, arbol: arbol, f: [tono(c, 1), tono(c, .84), tono(c, .7)] }); };
+
+    /* la escena: el suelo es el QR (pasto = módulo oscuro, piedra = claro, con 2 de margen) y encima el árbol de cubos */
+    function construir() {
+      var es = ESP[S.e], R = sem(es[0] + S.temp), secas = S.temp === "secas", Q, x, y, z;
+      url = "https://campuslab.iteso.mx/w/" + es[0]; Q = qrCodigo(url); n = Q.length + 4; cajas = [];
+      var pasto = secas ? ["#55622a", "#4d5a26", "#5e6b2f"] : ["#2f7a3c", "#2a6f36", "#378443"], piedra = ["#efe9dc", "#e7e0d1", "#f4efe6"];
+      for (z = 0; z < n; z++) for (x = 0; x < n; x++) {
+        var osc = x >= 2 && z >= 2 && x < n - 2 && z < n - 2 && Q[z - 2][x - 2];
+        caja(x, 0, z, 1, osc ? .55 : .3, 1, rgb((osc ? pasto : piedra)[Math.floor(R() * 3)]), false);
+      }
+      var c0 = n / 2 - .5, corteza = rgb("#6b4a32"); alto = Math.round(n * .34);
+      for (y = 0; y < alto; y++) caja(c0, .3 + y, c0, 1, 1, 1, corteza, true);
+      [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (d, i) { for (var k = 1; k <= 3; k++) caja(c0 + d[0] * k, alto - 3.7 + k + i % 2, c0 + d[1] * k, 1, 1, 1, corteza, true); });
+      var rx = n * (secas ? .26 : .31), ry = n * (secas ? .19 : .23), cy = alto + ry * .55, flor = rgb(es[2]), lleno = {};
+      var verdes = (secas ? ["#a8802f", "#b8913a", "#8f6a2a", "#c9a24a", "#7a5a2e", "#6f8a3a"] /* en secas, copa más chica y ocre */ : ["#3f9a4c", "#4aa857", "#358a42", "#5bb866"]).map(rgb);
+      var en = function (x, y, z) { return lleno[x + "," + y + "," + z]; };
+      for (x = Math.floor(c0 - rx); x <= Math.ceil(c0 + rx); x++) for (y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y++) for (z = Math.floor(c0 - rx); z <= Math.ceil(c0 + rx); z++)
+        if (Math.pow((x - c0) / rx, 2) + Math.pow((y - cy) / ry, 2) + Math.pow((z - c0) / rx, 2) + (R() - .5) * .35 < 1) lleno[x + "," + y + "," + z] = 1;
+      techo = 0;
+      Object.keys(lleno).forEach(function (k) {
+        var p = k.split(",").map(Number), x = p[0], y = p[1], z = p[2];
+        if (en(x + 1, y, z) && en(x - 1, y, z) && en(x, y + 1, z) && en(x, y - 1, z) && en(x, y, z + 1) && en(x, y, z - 1)) return; /* por dentro no se ve */
+        var c = S.temp === "flor" && R() < .82 ? flor : verdes[Math.floor(R() * verdes.length)], k2 = .88 + R() * .24;
+        caja(x, y, z, 1, 1, 1, c.map(function (v) { return v * k2; }), true); techo = Math.max(techo, y + 1);
+      });
+    }
+
+    /* proyección: de isométrica (giro 45°, inclinación 32°) a cenital (0°, 90°); el árbol se pliega hacia el suelo antes de llegar */
+    var suave = function (t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+    function pintar(t) {
+      var e = suave(t), th = (45 - 45 * e) * Math.PI / 180, ph = (32 + 58 * e) * Math.PI / 180, s = Math.max(0, 1 - e * 1.3);
+      var ct = Math.cos(th), st = Math.sin(th), cp = Math.cos(ph), sp = Math.sin(ph), c0 = n / 2, base = .3;
+      var P = function (x, y, z) { x -= c0; z -= c0; var x1 = x * ct - z * st, z1 = x * st + z * ct; return [x1, -y * cp + z1 * sp, z1 * cp + y * sp]; };
+      var lista = [];
+      cajas.forEach(function (b) {
+        var x = b.x, y = b.y, z = b.z, w = b.w, h = b.h, d = b.d;
+        if (b.arbol) { if (s < .03) return; var mx = x + w / 2, mz = z + d / 2; w *= s; h *= s; d *= s; x = c0 + (mx - c0) * s - w / 2; z = c0 + (mz - c0) * s - d / 2; y = base + (y - base) * s; }
+        lista.push([P(x + w / 2, y + h / 2, z + d / 2)[2], x, y, z, w, h, d, b.f]);
+      });
+      lista.sort(function (a, b) { return a[0] - b[0]; });
+      /* encuadre: la losa y la copa caben con margen; al final el QR llena el lienzo */
+      var pts = [], r = n * .3 * s, top = base + (techo - base) * s;
+      [0, n].forEach(function (x) { [0, n].forEach(function (z) { pts.push(P(x, -1.4, z), P(x, .55, z)); }); });
+      if (s > .03) [[c0 - r, c0 - r], [c0 + r, c0 - r], [c0 - r, c0 + r], [c0 + r, c0 + r]].forEach(function (q) { pts.push(P(q[0], top, q[1])); });
+      var xs = pts.map(function (p) { return p[0]; }), ys = pts.map(function (p) { return p[1]; });
+      var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
+      var k = Math.min((W - 16) / (x1 - x0), (H - 16) / (y1 - y0)), ox = W / 2 - (x0 + x1) / 2 * k, oy = H / 2 - (y0 + y1) / 2 * k;
+      vista = { P: P, k: k, ox: ox, oy: oy };
+      fondo.width = cv.width; fondo.height = cv.height;
+      var g = fondo.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.lineJoin = "round"; g.lineWidth = .8;
+      var cara = function (q, c) { g.beginPath(); q.forEach(function (p, i) { var X = ox + p[0] * k, Y = oy + p[1] * k; if (i) g.lineTo(X, Y); else g.moveTo(X, Y); }); g.closePath(); g.fillStyle = g.strokeStyle = c; g.fill(); g.stroke(); };
+      /* losa de base, debajo de todo */
+      cara([P(n, -1.4, 0), P(n, .3, 0), P(n, .3, n), P(n, -1.4, n)], "#cdbfa8"); cara([P(0, -1.4, n), P(0, .3, n), P(n, .3, n), P(n, -1.4, n)], "#b6a890");
+      lista.forEach(function (b) {
+        var x = b[1], y = b[2], z = b[3], w = b[4], h = b[5], d = b[6], f = b[7];
+        if (st * cp > .02) cara([P(x + w, y, z), P(x + w, y + h, z), P(x + w, y + h, z + d), P(x + w, y, z + d)], f[1]);
+        if (ct * cp > .02) cara([P(x, y, z + d), P(x, y + h, z + d), P(x + w, y + h, z + d), P(x + w, y, z + d)], f[2]);
+        cara([P(x, y + h, z), P(x + w, y + h, z), P(x + w, y + h, z + d), P(x, y + h, z + d)], f[0]);
+      });
+      componer();
+    }
+
+    /* pétalos (floración) u hojas secas que caen de la copa, encima de la escena ya pintada */
+    var caen = [], visible = false, raf = 0;
+    function componer() {
+      var g = cv.getContext("2d"); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height); g.drawImage(fondo, 0, 0);
+      if (S.t || !caen.length) return;
+      g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      caen.forEach(function (p) {
+        var q = vista.P(p.x, p.y, p.z), l = vista.k * .55;
+        g.save(); g.translate(vista.ox + q[0] * vista.k, vista.oy + q[1] * vista.k); g.rotate(p.r); g.fillStyle = p.c; g.fillRect(-l / 2, -l / 2, l, l * .7); g.restore();
+      });
+    }
+    function sembrar() {
+      var R = sem("caen" + S.e), es = ESP[S.e], c0 = n / 2; caen = [];
+      if (S.temp === "lluvias" || reduce.matches) return;
+      for (var i = 0; i < 16; i++) caen.push({ x: c0 + (R() - .5) * n * .5, y: R() * techo, z: c0 + (R() - .5) * n * .5, v: .025 + R() * .03, r: R() * 6, vr: (R() - .5) * .08, c: S.temp === "flor" ? es[2] : ["#a8802f", "#c9a24a", "#8f6a2a"][i % 3] });
+    }
+    function animar() {
+      raf = 0; if (!visible || S.t || !caen.length) return;
+      caen.forEach(function (p) { p.y -= p.v; p.r += p.vr; p.x += Math.sin(p.y * .7) * .02; if (p.y < .6) p.y = techo * (.55 + Math.random() * .4); });
+      componer(); raf = requestAnimationFrame(animar);
+    }
+    var sigue = function () { if (!raf && visible && !S.t && caen.length) raf = requestAnimationFrame(animar); };
+
+    function medir() { W = cv.clientWidth || 320; H = Math.round(W * 1.02); dpr = Math.min(window.devicePixelRatio || 1, 2); cv.width = W * dpr; cv.height = H * dpr; cv.style.height = H + "px"; }
+    function rotulo() {
+      var es = ESP[S.e];
+      pista.textContent = S.t ? "Escanéalo con la cámara del celular · toca para volver al árbol" : "Toca el árbol para ver el QR de su ficha";
+      el.querySelector('[data-accion="ver"]').textContent = S.t ? "Ver el árbol" : "Ver su QR";
+      cv.setAttribute("role", "img");
+      cv.setAttribute("aria-label", S.t ? "Código QR que lleva a la ficha de " + es[1] + " (" + url.replace("https://", "") + ")" : "Árbol de cubos de " + es[1] + " parado sobre el código QR de su ficha");
+    }
+    var girando = false;
+    function voltear() {
+      if (girando) return; girando = true;
+      var desde = S.t, hacia = S.t ? 0 : 1, t0 = performance.now(), dur = reduce.matches ? 1 : 1100;
+      var paso = function (ahora) { var p = Math.min((ahora - t0) / dur, 1); S.t = desde + (hacia - desde) * p; pintar(S.t); if (p < 1) requestAnimationFrame(paso); else { S.t = hacia; girando = false; rotulo(); sigue(); } };
+      requestAnimationFrame(paso);
+    }
+    function rehacer() { construir(); sembrar(); pintar(S.t); rotulo(); sigue(); }
+    /* QR plano para imprimir: módulos de 16 px, margen de 4 módulos y el nombre debajo */
+    function descargar() {
+      var es = ESP[S.e], Q = qrCodigo(url), m = 16, q = 4, lado = (Q.length + 2 * q) * m, c = document.createElement("canvas"), g = c.getContext("2d"), fam = getComputedStyle(el).fontFamily;
+      c.width = lado; c.height = lado + 70; g.fillStyle = "#ffffff"; g.fillRect(0, 0, c.width, c.height); g.fillStyle = "#1b2a1f";
+      Q.forEach(function (fila, y) { fila.forEach(function (v, x) { if (v) g.fillRect((x + q) * m, (y + q) * m, m, m); }); });
+      g.textAlign = "center"; g.font = "600 30px " + fam; g.fillText(es[1], lado / 2, lado + 18);
+      g.font = "20px " + fam; g.fillStyle = "#4a5d69"; g.fillText(url.replace("https://", ""), lado / 2, lado + 50);
+      c.toBlob(function (b) { var a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "qr-" + es[0] + ".png"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000); });
+    }
+
+    cv.addEventListener("click", voltear);
+    el.querySelector(".qrv").addEventListener("click", function (ev) {
+      var b = ev.target.closest("button"); if (!b) return;
+      if (b.dataset.e) { S.e = +b.dataset.e; el.querySelectorAll("[data-e]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); rehacer(); }
+      if (b.dataset.t) { S.temp = b.dataset.t; el.querySelectorAll("[data-t]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); rehacer(); }
+      if (b.dataset.accion === "ver") voltear();
+      if (b.dataset.accion === "bajar") descargar();
+    });
+    new IntersectionObserver(function (en) { visible = en[0].isIntersecting; sigue(); }).observe(el);
+    var rt; if (window.ResizeObserver) new ResizeObserver(function () { clearTimeout(rt); rt = setTimeout(function () { var w = cv.clientWidth; if (w && Math.abs(w - W) > 1) { medir(); pintar(S.t); } }, 100); }).observe(cv);
+    medir(); rehacer();
   };
 
   /* las que se animan arrancan al verse (una vez); las demás se montan de inmediato */

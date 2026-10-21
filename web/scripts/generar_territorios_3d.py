@@ -8,17 +8,19 @@ Salida (gitignorada): catalogo/salida/liferay_subir/mapa3d/territorio-<id>.json,
 Documentos y Medios. Cada archivo trae, en metros sobre un plano local (x al este, z al sur, origen en el centro):
   lim   contorno del territorio (polígonos)            bld  edificios: [alto, x, z, x, z, ...]
   cam   calles y andadores: [ancho, x, z, ...]         ver  canchas, parques y jardines (polígonos)
-  arb   árboles del inventario: [placa, x, z, alto, copa, especie]  (especie = índice en arboles.json, -1 si no está)
-  obs   observaciones de iNaturalist: [x, z, grupo, nombre, id]
+  obs   observaciones de iNaturalist: [x, z, grupo, nombre, id]  (respaldo: el mapa pide las vivas a iNaturalist)
   etq   etiquetas de lugares con nombre dentro del territorio: [x, z, alto, texto]
   ter   (solo el bosque) relieve: {n, x0, z0, paso, y: [alturas en metros sobre el punto más bajo]}
+
+Los árboles NO van aquí: el mapa los lee del inventario en CSV (inventario-arboles, se edita en Excel), así que
+este script solo se vuelve a correr si cambia la geografía (un edificio nuevo en OpenStreetMap) o para refrescar
+el respaldo de observaciones.
 
 Fuentes (todas abiertas): OpenStreetMap vía Overpass (ODbL: crédito "© colaboradores de OpenStreetMap"); inventario
 ArcGIS 2014-2018 de árboles del ITESO; observaciones de Naturalista ITESO en la base de Campus Lab; polígono de los
 predios del lugar 185911 de iNaturalist; relieve de los Terrain Tiles de AWS (Mapzen; SRTM y otras fuentes públicas).
 Las descargas se guardan en caché junto a la salida: volver a correr no vuelve a pedir nada salvo con --forzar.
 """
-import csv
 import io
 import json
 import math
@@ -34,11 +36,7 @@ from PIL import Image
 REPO = Path(__file__).resolve().parents[2]
 SALIDA = REPO / "catalogo" / "salida" / "liferay_subir" / "mapa3d"
 CACHE = SALIDA / "cache"
-CSV_ARCGIS = REPO / "catalogo" / "salida" / "inventario_arboles" / "arcgis_2014_2018_export.csv"
-ARBOLES = REPO / "catalogo" / "salida" / "liferay_subir" / "arboles" / "arboles.json"
 BD = REPO / "experimentos" / "bd" / "campuslab_volumen.db"
-sys.path.insert(0, str(REPO / "catalogo" / "herramientas" / "rutas_jardines"))
-import guia  # noqa: E402  (binomio(): misma normalización de nombres que el resto del proyecto)
 
 OVERPASS = ("https://overpass-api.de/api/interpreter", "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
             "https://overpass.kumi.systems/api/interpreter", "https://overpass.private.coffee/api/interpreter")
@@ -157,32 +155,6 @@ def capas_osm(elementos, P, ext):
     return bld, cam, ver
 
 
-def especies_idx():
-    esp = json.loads(ARBOLES.read_text(encoding="utf-8"))["especies"]
-    return {e["sci"].lower(): i for i, e in enumerate(esp)}
-
-
-def arboles(cual, P, ext, idx):
-    out = []
-    for r in csv.DictReader(open(CSV_ARCGIS, encoding="utf-8-sig")):
-        es_clavigero = r["ID_J"] == "0"
-        if (cual == "clavigero") != es_clavigero:
-            continue
-        try:
-            lat, lon = float(r["Latitud"]), float(r["Longitud"])
-        except ValueError:
-            continue
-        x, z = P(lat, lon)
-        if not dentro(x, z, ext):
-            continue  # coordenada mala (0,0 o truncada): queda fuera, igual que en el mapa 2D
-        num = lambda v, d: float(v) if v.strip() not in ("", "0") else d  # noqa: E731
-        alto = min(num(r["Altura2018"], 6.0), 40.0)
-        copa = min(num(r["DiamFoli20"], alto * 0.6), 30.0)
-        b = guia.binomio(r["Nom_cien"])
-        out.append([int(r["Placa"]), x, z, round(alto, 1), round(copa, 1), idx.get(b.lower(), -1)])
-    return out
-
-
 def observaciones(P, ext):
     con = sqlite3.connect(BD)
     out = []
@@ -228,7 +200,6 @@ def relieve(P, ext, forzar, n=129, z=15):
 
 def construir(forzar=False):
     SALIDA.mkdir(parents=True, exist_ok=True); CACHE.mkdir(parents=True, exist_ok=True)
-    idx = especies_idx()
     for T in TERRITORIOS:
         print(f"== {T['nombre']}")
         if T.get("osm_lim"):
@@ -263,8 +234,6 @@ def construir(forzar=False):
                  "bld": bld, "cam": cam, "ver": ver, "etq": etq, "obs": observaciones(P, ext),
                  "creditos": "Mapa: © colaboradores de OpenStreetMap (ODbL). Árboles: inventario del ITESO 2014-2018. "
                              "Observaciones: Naturalista ITESO (iNaturalist)."}
-        if T.get("jardines"):
-            datos["arb"] = arboles(T["jardines"], P, ext, idx)
         if T.get("relieve"):
             datos["ter"], base = relieve(P, ext, forzar)
             datos["creditos"] += " Relieve: Terrain Tiles de AWS (Mapzen; SRTM y otras fuentes públicas)."
@@ -272,7 +241,7 @@ def construir(forzar=False):
         f = SALIDA / f"territorio-{T['id']}.json"
         f.write_text(json.dumps(datos, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
         print(f"   etiquetas: {', '.join(e[3] for e in etq)}")
-        print(f"   {len(bld)} edificios, {len(cam)} calles/andadores, {len(ver)} áreas verdes, {len(datos.get('arb', []))} árboles, "
+        print(f"   {len(bld)} edificios, {len(cam)} calles/andadores, {len(ver)} áreas verdes, "
               f"{len(datos['obs'])} observaciones · {round(f.stat().st_size / 1024)} KB · {round(ext[2] - ext[0])} × {round(ext[3] - ext[1])} m")
 
 

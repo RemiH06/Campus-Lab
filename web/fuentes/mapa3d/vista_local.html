@@ -23,7 +23,7 @@
   var configuration = {
     territorio: "campus",
     datos: "../../../catalogo/salida/liferay_subir/mapa3d/territorio-{t}.json",
-    arboles: "../../../catalogo/salida/liferay_subir/arboles/arboles.json",
+    inventario: "../../../catalogo/salida/liferay_subir/arboles/inventario-arboles.csv",
     script: "dist/cl-mapa3d.js", ficha: "../vista_local.html?vista=especie", mapa2d: "../vista_local.html?vista=mapa"
   };
   Promise.all(["index.html", "index.js"].map(function (f) { return fetch("../../fragmentos/mapa3d/" + f).then(function (r) { return r.text(); }); })).then(function (r) {
