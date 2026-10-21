@@ -15,6 +15,9 @@ Ejemplos:
 
 Salida: web/fragmentos/<nombre-fragmento>/ (sin datos, va al repo) y
 catalogo/salida/liferay_subir/prototipos/<nombre-fragmento>.json (con fotos, no va al repo; se sube con ese nombre).
+
+Vista previa local (para ver los cambios sin pegarlos en Liferay): agregar --vista-previa al final. Escribe además
+catalogo/salida/sitio_campuslab/<nombre-fragmento>.html, la plantilla con los datos dentro; se abre con doble clic.
 """
 import json
 import re
@@ -145,7 +148,24 @@ def convertir(plantilla, datos, nombre_json):
     print(f"{dj.relative_to(REPO)}  ({dj.stat().st_size // 1024} KB)")
 
 
+def vista_previa(plantilla, datos, nombre):
+    """La plantilla tal cual, con el JSON en su bloque /*__DATOS__*/: la misma página que el fragmento, sin Liferay."""
+    t = Path(plantilla).read_text(encoding="utf-8")
+    j = Path(datos).read_text(encoding="utf-8").replace("</", "<\\/")
+    assert "/*__DATOS__*/" in t, "no encontré el bloque de datos /*__DATOS__*/"
+    destino = REPO / "catalogo" / "salida" / "sitio_campuslab" / f"{nombre}.html"
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    t = t.replace("/*__DATOS__*/", j, 1)
+    if "charset" not in t[:500].lower():  # sin esto, abierta con doble clic se lee como Windows-1252 y los acentos rompen el JS
+        t = '<meta charset="utf-8">\n' + t
+    destino.write_text(t, encoding="utf-8")
+    print(f"{destino.relative_to(REPO)}  (vista previa con datos)")
+
+
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
+    args = [a for a in sys.argv[1:] if a != "--vista-previa"]
+    if len(args) != 3:
         sys.exit(__doc__)
-    convertir(*sys.argv[1:])
+    convertir(*args)
+    if "--vista-previa" in sys.argv:
+        vista_previa(*args)

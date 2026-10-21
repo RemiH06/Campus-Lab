@@ -1,6 +1,6 @@
 # Fragmento "Mapa 3D de los territorios"
 
-Una maqueta en 3D de cada territorio del ITESO, con selector arriba:
+Una maqueta en 3D de cada territorio del ITESO, con selector arriba. **Complementa a los mapas que ya existen, no los reemplaza:** el mapa 2D del catálogo (búsqueda por placa, árboles sin foto) y el mapa de ArcGIS del inventario siguen siendo los de trabajo; el 3D sirve para explorar y para presentar.
 
 | Territorio | Qué se ve |
 |---|---|
