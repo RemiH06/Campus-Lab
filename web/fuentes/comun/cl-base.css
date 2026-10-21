@@ -106,6 +106,7 @@
 .cl-especie { display: grid; gap: 18px; }
 .cl-esp-head { display: grid; gap: 4px; }
 .cl-esp-head h1 { font-size: clamp(calc(2 * var(--u)), 5vw, calc(3.1 * var(--u))); }
+.cl-esp-head .cl-inat { font-size: calc(.95 * var(--u)); color: var(--cl-acc); text-underline-offset: 3px; }
 .cl-esp-head .cl-sci { font-size: clamp(calc(1.1 * var(--u)), 2.2vw, calc(1.35 * var(--u))); color: var(--cl-ink2); }
 .cl-esp-main { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 20px; align-items: start; }
 .cl-foto { margin: 0; display: grid; gap: 8px; container-type: inline-size; }
@@ -175,22 +176,17 @@
 .cl-col-tools { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; }
 .cl-mos-caja { container-type: inline-size; } /* casillas, huecos y contornos se miden en cqi (ancho de la caja): al cambiar el ancho o el zoom escalan juntos */
 .cl-mosaico { display: grid; grid-template-columns: repeat(var(--cols, 8), minmax(0, 1fr)); grid-auto-rows: calc(var(--cr, .1) * 100cqi); gap: calc(var(--gr, .004) * 100cqi); }
-.cl .cl-mos-c { position: relative; display: block; overflow: hidden; border-radius: 4px; background: var(--cl-wash); text-decoration: none; color: inherit; }
+.cl .cl-mos-c { position: relative; box-sizing: border-box; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(8, 20, 28, .22); display: block; overflow: hidden; border-radius: 3px; background: var(--cl-wash); text-decoration: none; color: inherit; }
 .cl-mos-c img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .cl-mos-c.cl-lbl::after { content: attr(data-nombre); position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 6px 4px; font-size: calc(.78 * var(--u)); line-height: 1.15; font-family: var(--cl-font-sb); font-weight: 600; text-align: left;
   color: #f4f7f6; background: linear-gradient(transparent, rgba(8, 20, 28, .82)); }
 .cl .cl-mos-c.cl-falta { background: var(--cl-sf); border: 1.5px dashed var(--cl-ink2); display: grid; place-content: center; padding: 6px; text-align: center; font-size: calc(.78 * var(--u)); line-height: 1.15; color: var(--cl-ink2); }
 .cl-mos-c.cl-falta b { display: block; font-size: calc(1.1 * var(--u)); color: var(--cl-acc); }
 .cl-mosaico { position: relative; }
-/* Contorno por especie (capa SVG encima; ver contornos() en cl-kit.js). El trazo va recortado a la pieza: se ve la mitad, adentro */
+/* Contorno por especie al pasar el mouse (capa SVG encima; ver contornos() en cl-kit.js). El trazo va recortado a la pieza: se ve la mitad, adentro */
 .cl-mos-svg { position: absolute; left: 0; top: 0; width: 100%; height: auto; z-index: 1; pointer-events: none; overflow: visible; }
-/* seis colores vivos para que cada especie se lea como una pieza; dos piezas que se tocan nunca llevan el mismo */
-.cl-mos-svg .cl-c0 { --pz: light-dark(#1f9d55, #51cf66); } .cl-mos-svg .cl-c1 { --pz: light-dark(#d6336c, #f06595); } .cl-mos-svg .cl-c2 { --pz: light-dark(#7048e8, #9775fa); }
-.cl-mos-svg .cl-c3 { --pz: light-dark(#f0a500, #fcc419); } .cl-mos-svg .cl-c4 { --pz: light-dark(#f0590e, #ff8a4c); } .cl-mos-svg .cl-c5 { --pz: light-dark(#1c7ed6, #4dabf7); }
-.cl-mos-svg .cl-borde { fill: none; stroke: var(--pz, var(--f1)); stroke-width: 6; stroke-linecap: square; transition: stroke-width 120ms var(--cl-ease); }
-.cl-mos-svg .cl-junta { fill: var(--pz, var(--f1)); }
-.cl-mos-svg g.cl-on .cl-borde { stroke: var(--cl-ink); stroke-width: 9; }
-.cl-mos-svg g.cl-on .cl-junta { fill: var(--cl-ink); }
+.cl-mos-svg .cl-borde { fill: none; stroke: none; stroke-width: 6; stroke-linecap: square; }
+.cl-mos-svg g.cl-on .cl-borde { stroke: var(--cl-ink); }
 .cl-mos-vacio { padding: 24px; text-align: center; color: var(--cl-ink2); }
 
 @media (max-width: 860px) {

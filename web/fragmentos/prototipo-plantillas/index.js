@@ -34,6 +34,8 @@ window.CL_PROTO = function () {
   var hash = function (s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
   var rng = function (seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
 
+  /* liga a la especie en iNaturalist: su tax\u00f3n si lo resolvimos (k = "t<id>"), si no, la b\u00fasqueda por nombre */
+  var inat = function (e) { var m = /^t(\d+)$/.exec(e.k || ""); return "https://www.inaturalist.org/taxa/" + (m ? m[1] : "search?q=" + encodeURIComponent(e.sci)); };
   var ESP = D.esp, byId = {}, byKey = {};
   ESP.forEach(function (e) { e.partes = PARTES.filter(function (p) { return e.fo[p]; }); byId[e.id] = e; byKey[e.k] = e; });
   var ptsOf = {}; D.pts.forEach(function (p) { var e = ESP[p[3]]; (ptsOf[e.id] = ptsOf[e.id] || []).push(p); });
@@ -155,30 +157,14 @@ window.CL_PROTO = function () {
     });
     return out;
   }
-  /* Contorno de cada especie. Sus casillas est\u00e1n separadas por huecos de 4 px, as\u00ed que se unen en una ret\u00edcula doble
-     (casilla, hueco, casilla\u2026): entra cada casilla, el hueco entre dos vecinas y el centro de un bloque de 2\u00d72. Se trazan
-     solo los lados que dan hacia afuera (las puntas cuadradas del trazo cierran esquinas y entrantes de las piezas en L)
-     y los huecos internos se rellenan del mismo color, como la junta de un vitral: cada especie se lee como una pieza.
-     El trazo se recorta a la forma de la pieza para que quede todo adentro y el hueco entre especies siga limpio */
+  /* Contorno de cada especie (solo se ve al pasar el mouse). Sus casillas est\u00e1n separadas por huecos, as\u00ed que se unen en
+     una ret\u00edcula doble (casilla, hueco, casilla\u2026): entra cada casilla, el hueco entre dos vecinas y el centro de un bloque
+     de 2\u00d72. Se trazan solo los lados que dan hacia afuera y el trazo se recorta a la pieza para que quede todo adentro */
   var nPieza = 0;
-  function colores(piezas) {
-    var dueno = {}, color = [];
-    piezas.forEach(function (b, n) { b.sh.forEach(function (s) { dueno[(b.x + s[0]) + "," + (b.y + s[1])] = n; }); });
-    piezas.forEach(function (b, n) {
-      var usados = {};
-      b.sh.forEach(function (s) {
-        for (var dx = -1; dx <= 1; dx++) for (var dy = -1; dy <= 1; dy++) { var o = dueno[(b.x + s[0] + dx) + "," + (b.y + s[1] + dy)]; if (o !== undefined && o !== n && color[o] !== undefined) usados[color[o]] = 1; }
-      });
-      var k0 = hash(b.e.id) % 6, c = k0; for (var k = 0; k < 6; k++) { c = (k0 + k) % 6; if (!usados[c]) break; }
-      color[n] = c;
-    });
-    return color;
-  }
   function contornos(piezas, cell, gap) {
-    var px = function (j) { return (Math.floor(j / 2) * (cell + gap) + (j % 2 ? cell : 0)).toFixed(1); }, color = colores(piezas);
-    piezas.forEach(function (b, n) { b.c = color[n]; });
+    var px = function (j) { return (Math.floor(j / 2) * (cell + gap) + (j % 2 ? cell : 0)).toFixed(1); };
     return piezas.filter(function (b) { return b.e.partes.length; }).map(function (b) {
-      var c = {}, L = {}, d = "", junta = "", area = "", id = "cl-pz" + (nPieza++);
+      var c = {}, L = {}, d = "", area = "", id = "cl-pz" + (nPieza++);
       b.sh.forEach(function (s) { c[(b.x + s[0]) + "," + (b.y + s[1])] = 1; });
       var en = function (x, y) { return c[x + "," + y]; };
       Object.keys(c).forEach(function (k) {
@@ -191,13 +177,13 @@ window.CL_PROTO = function () {
       Object.keys(L).forEach(function (k) {
         var i = +k.split(",")[0], j = +k.split(",")[1], x0 = px(i), x1 = px(i + 1), y0 = px(j), y1 = px(j + 1);
         var r = "M" + x0 + " " + y0 + "H" + x1 + "V" + y1 + "H" + x0 + "Z";
-        area += r; if (i % 2 || j % 2) junta += r;
+        area += r;
         if (!L[i + "," + (j - 1)]) d += "M" + x0 + " " + y0 + "H" + x1;
         if (!L[i + "," + (j + 1)]) d += "M" + x0 + " " + y1 + "H" + x1;
         if (!L[(i - 1) + "," + j]) d += "M" + x0 + " " + y0 + "V" + y1;
         if (!L[(i + 1) + "," + j]) d += "M" + x1 + " " + y0 + "V" + y1;
       });
-      return '<g class="c' + b.c + '" data-id="' + esc(b.e.id) + '"><clipPath id="' + id + '"><path d="' + area + '"/></clipPath>' + (junta ? '<path class="junta" d="' + junta + '"/>' : "") +
+      return '<g data-id="' + esc(b.e.id) + '"><clipPath id="' + id + '"><path d="' + area + '"/></clipPath>' +
         '<path class="borde" clip-path="url(#' + id + ')" d="' + d + '"/></g>';
     }).join("");
   }
@@ -209,25 +195,26 @@ window.CL_PROTO = function () {
     };
     el.addEventListener("mouseover", marca); el.addEventListener("focusin", marca); el.addEventListener("mouseleave", marca); el.addEventListener("focusout", marca);
   }
+  var HUECO = 12; /* px entre fotos (Maya, 21-oct: que la vista respire) */
   var mosaico = {
     mount: function (el, items) {
       /* lado m\u00ednimo de la casilla: 149 px (116 en celular, 3 columnas en 390 px) y crece con el texto (--u); las columnas
          llenan el ancho, as\u00ed cada casilla queda entre el m\u00ednimo y el doble. Todo se guarda como fracci\u00f3n del ancho */
       var w = el.clientWidth || 800, u = parseFloat(getComputedStyle(el).fontSize) / 16 || 1, min = (w < 520 ? 116 : 149) * u,
-          cols = Math.max(2, Math.floor((w + 4) / (min + 4))), lado = (w - (cols - 1) * 4) / cols;
-      el.style.setProperty("--cols", cols); el.style.setProperty("--cr", (lado / w).toFixed(5)); el.style.setProperty("--gr", (4 / w).toFixed(5));
+          cols = Math.max(2, Math.floor((w + HUECO) / (min + HUECO))), lado = (w - (cols - 1) * HUECO) / cols;
+      el.style.setProperty("--cols", cols); el.style.setProperty("--cr", (lado / w).toFixed(5)); el.style.setProperty("--gr", (HUECO / w).toFixed(5));
       el._items = items; el._cols = cols;
       if (!el.dataset.pieza) {
         el.dataset.pieza = "1"; resaltarPieza(el);
         /* al cambiar el ancho (ventana, zoom, barra de scroll) solo se rearma si cambia el n\u00famero de columnas; si no, todo escala solo */
         if (window.ResizeObserver) { var t; new ResizeObserver(function () { clearTimeout(t); t = setTimeout(function () {
           var ww = el.clientWidth, mm = (ww < 520 ? 116 : 149) * (parseFloat(getComputedStyle(el).fontSize) / 16 || 1);
-          if (ww && Math.max(2, Math.floor((ww + 4) / (mm + 4))) !== el._cols) mosaico.mount(el, el._items);
+          if (ww && Math.max(2, Math.floor((ww + HUECO) / (mm + HUECO))) !== el._cols) mosaico.mount(el, el._items);
         }, 120); }).observe(el); }
       }
       if (!items.length) { el["inner" + "HTML"] = '<p class="mos-vacio">Ninguna especie coincide. Prueba con el nombre com\u00fan, la familia o un jard\u00edn.</p>'; return; }
       var piezas = empacar(items, cols), filas = piezas.reduce(function (m, b) { return Math.max(m, b.y + Math.max.apply(null, b.sh.map(function (s) { return s[1]; })) + 1); }, 0);
-      el["inner" + "HTML"] = '<svg class="mos-svg" aria-hidden="true" viewBox="0 0 ' + w + " " + (filas * (lado + 4) - 4).toFixed(1) + '">' + contornos(piezas, lado, 4) + "</svg>" + piezas.map(function (b) {
+      el["inner" + "HTML"] = '<svg class="mos-svg" aria-hidden="true" viewBox="0 0 ' + w + " " + (filas * (lado + HUECO) - HUECO).toFixed(1) + '">' + contornos(piezas, lado, HUECO) + "</svg>" + piezas.map(function (b) {
         var e = b.e, nombre = esc(e.com);
         if (!e.partes.length) return '<button type="button" class="mos-c falta" data-id="' + e.id + '" style="grid-area:' + (b.y + 1) + "/" + (b.x + 1) + '" aria-label="' + nombre + ', sin fotos todav\u00eda"><b>?</b>' + nombre + "</button>";
         var cells = b.sh.length === e.partes.length ? b.sh : b.sh.slice(0, 1);
@@ -267,7 +254,7 @@ window.CL_PROTO = function () {
     var e = byId[S.id]; if (!S.parte || !e.fo[S.parte]) S.parte = e.partes[e.partes.length - 1] || null;
     var ras = Object.keys(e.ras).map(function (k) { return "<dt>" + RASGO[k] + "</dt><dd>" + esc(e.ras[k]) + "</dd>"; }).join("");
     var jar = Object.keys(e.jar).sort(function (a, b) { return e.jar[b] - e.jar[a]; });
-    main["inner" + "HTML"] = '<article class="v-especie"><div class="esp-head"><p class="url">campuslab.iteso.mx/web/campuslab/especie?id=<b>' + esc(e.id) + '</b></p><p class="eyebrow">' + esc(e.fam || "Familia por confirmar") + "</p><h1>" + esc(e.com) + '</h1><p class="sci">' + esc(e.sci) + "</p></div>" +
+    main["inner" + "HTML"] = '<article class="v-especie"><div class="esp-head"><p class="url">campuslab.iteso.mx/web/campuslab/especie?id=<b>' + esc(e.id) + '</b></p><p class="eyebrow">' + esc(e.fam || "Familia por confirmar") + "</p><h1>" + esc(e.com) + '</h1><p class="sci">' + esc(e.sci) + '</p><p><a class="inat" href="' + esc(inat(e)) + '" target="_blank" rel="noopener">Ver en iNaturalist<span class="cl-sr"> (se abre en otra pesta\u00f1a)</span> \u2197</a></p></div>' +
       '<div class="esp-main"><figure class="esp-photo"><div class="frame" id="cl-foto"></div><figcaption id="cl-pie"></figcaption></figure>' +
       '<div class="esp-side"><div class="cl-card anillos" id="cl-anillos"></div><dl class="cl-card datos"><dt>Origen</dt><dd>' + esc(e.ori || "Sin dato todav\u00eda") + "</dd>" + ras + "</dl></div></div>" +
       '<section class="cl-card esp-donde"><div><h2 style="font-size:calc(1.15 * var(--u));margin-bottom:8px">' + e.n + " " + (e.n === 1 ? "\u00e1rbol" : "\u00e1rboles") + " en el campus</h2><ul>" + jar.map(function (j) { return "<li><span>" + esc(j) + "</span><b>" + e.jar[j] + "</b></li>"; }).join("") +

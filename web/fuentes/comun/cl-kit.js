@@ -198,31 +198,14 @@
     });
     return out;
   }
-  /* Contorno de cada especie. Sus casillas están separadas por huecos de 4 px, así que se unen en una retícula doble
-     (casilla, hueco, casilla…): entra cada casilla, el hueco entre dos vecinas y el centro de un bloque de 2×2. Se trazan
-     solo los lados que dan hacia afuera (las puntas cuadradas del trazo cierran esquinas y entrantes de las piezas en L)
-     y los huecos internos se rellenan del mismo color, como la junta de un vitral: cada especie se lee como una pieza.
-     El trazo se recorta a la forma de la pieza para que quede todo adentro y el hueco entre especies siga limpio */
+  /* Contorno de cada especie (solo se ve al pasar el mouse). Sus casillas están separadas por huecos, así que se unen en
+     una retícula doble (casilla, hueco, casilla…): entra cada casilla, el hueco entre dos vecinas y el centro de un bloque
+     de 2×2. Se trazan solo los lados que dan hacia afuera y el trazo se recorta a la pieza para que quede todo adentro */
   var nPieza = 0;
-  /* Color de cada pieza: uno de seis, el que le toca por su id salvo que ya lo tenga una vecina (también en diagonal) */
-  function colores(piezas) {
-    var dueno = {}, color = [];
-    piezas.forEach(function (b, n) { b.sh.forEach(function (s) { dueno[(b.x + s[0]) + "," + (b.y + s[1])] = n; }); });
-    piezas.forEach(function (b, n) {
-      var usados = {};
-      b.sh.forEach(function (s) {
-        for (var dx = -1; dx <= 1; dx++) for (var dy = -1; dy <= 1; dy++) { var o = dueno[(b.x + s[0] + dx) + "," + (b.y + s[1] + dy)]; if (o !== undefined && o !== n && color[o] !== undefined) usados[color[o]] = 1; }
-      });
-      var k0 = hash(b.e.id) % 6, c = k0; for (var k = 0; k < 6; k++) { c = (k0 + k) % 6; if (!usados[c]) break; }
-      color[n] = c;
-    });
-    return color;
-  }
   function contornos(piezas, cell, gap) {
-    var px = function (j) { return (Math.floor(j / 2) * (cell + gap) + (j % 2 ? cell : 0)).toFixed(1); }, color = colores(piezas);
-    piezas.forEach(function (b, n) { b.c = color[n]; });
+    var px = function (j) { return (Math.floor(j / 2) * (cell + gap) + (j % 2 ? cell : 0)).toFixed(1); };
     return piezas.filter(function (b) { return b.e.partes.length; }).map(function (b) {
-      var c = {}, L = {}, d = "", junta = "", area = "", id = "cl-pz" + (nPieza++);
+      var c = {}, L = {}, d = "", area = "", id = "cl-pz" + (nPieza++);
       b.sh.forEach(function (s) { c[(b.x + s[0]) + "," + (b.y + s[1])] = 1; });
       var en = function (x, y) { return c[x + "," + y]; };
       Object.keys(c).forEach(function (k) {
@@ -235,13 +218,13 @@
       Object.keys(L).forEach(function (k) {
         var i = +k.split(",")[0], j = +k.split(",")[1], x0 = px(i), x1 = px(i + 1), y0 = px(j), y1 = px(j + 1);
         var r = "M" + x0 + " " + y0 + "H" + x1 + "V" + y1 + "H" + x0 + "Z";
-        area += r; if (i % 2 || j % 2) junta += r;
+        area += r;
         if (!L[i + "," + (j - 1)]) d += "M" + x0 + " " + y0 + "H" + x1;
         if (!L[i + "," + (j + 1)]) d += "M" + x0 + " " + y1 + "H" + x1;
         if (!L[(i - 1) + "," + j]) d += "M" + x0 + " " + y0 + "V" + y1;
         if (!L[(i + 1) + "," + j]) d += "M" + x1 + " " + y0 + "V" + y1;
       });
-      return '<g class="cl-c' + b.c + '" data-id="' + esc(b.e.id) + '"><clipPath id="' + id + '"><path d="' + area + '"/></clipPath>' + (junta ? '<path class="cl-junta" d="' + junta + '"/>' : "") +
+      return '<g data-id="' + esc(b.e.id) + '"><clipPath id="' + id + '"><path d="' + area + '"/></clipPath>' +
         '<path class="cl-borde" clip-path="url(#' + id + ')" d="' + d + '"/></g>';
     }).join("");
   }
@@ -253,25 +236,26 @@
     };
     el.addEventListener("mouseover", marca); el.addEventListener("focusin", marca); el.addEventListener("mouseleave", marca); el.addEventListener("focusout", marca);
   }
+  var HUECO = 12; /* px entre fotos (Maya, 21-oct: que la vista respire) */
   var mosaico = {
     mount: function (el, items, cfg) {
       /* lado mínimo de la casilla: 149 px (116 en celular) y crece con el texto (--u); las columnas llenan el ancho, así cada
          casilla queda entre el mínimo y el doble. Todo se guarda como fracción del ancho */
       var w = el.clientWidth || 800, u = parseFloat(getComputedStyle(el).fontSize) / 16 || 1, min = (w < 520 ? 116 : 149) * u,
-          cols = Math.max(2, Math.floor((w + 4) / (min + 4))), lado = (w - (cols - 1) * 4) / cols;
-      el.style.setProperty("--cols", cols); el.style.setProperty("--cr", (lado / w).toFixed(5)); el.style.setProperty("--gr", (4 / w).toFixed(5));
+          cols = Math.max(2, Math.floor((w + HUECO) / (min + HUECO))), lado = (w - (cols - 1) * HUECO) / cols;
+      el.style.setProperty("--cols", cols); el.style.setProperty("--cr", (lado / w).toFixed(5)); el.style.setProperty("--gr", (HUECO / w).toFixed(5));
       el._args = [items, cfg]; el._cols = cols;
       if (!el.dataset.pieza) {
         el.dataset.pieza = "1"; resaltarPieza(el);
         /* al cambiar el ancho (ventana, zoom, barra de scroll) solo se rearma si cambia el número de columnas; si no, todo escala solo */
         if (window.ResizeObserver) { var t; new ResizeObserver(function () { clearTimeout(t); t = setTimeout(function () {
           var ww = el.clientWidth, mm = (ww < 520 ? 116 : 149) * (parseFloat(getComputedStyle(el).fontSize) / 16 || 1);
-          if (ww && Math.max(2, Math.floor((ww + 4) / (mm + 4))) !== el._cols) mosaico.mount(el, el._args[0], el._args[1]);
+          if (ww && Math.max(2, Math.floor((ww + HUECO) / (mm + HUECO))) !== el._cols) mosaico.mount(el, el._args[0], el._args[1]);
         }, 120); }).observe(el); }
       }
       if (!items.length) { el.innerHTML = '<p class="cl-mos-vacio">Ninguna especie coincide. Prueba con el nombre común, la familia o un jardín.</p>'; return; }
       var piezas = empacar(items, cols), filas = piezas.reduce(function (m, b) { return Math.max(m, b.y + Math.max.apply(null, b.sh.map(function (s) { return s[1]; })) + 1); }, 0);
-      el.innerHTML = '<svg class="cl-mos-svg" aria-hidden="true" viewBox="0 0 ' + w + " " + (filas * (lado + 4) - 4).toFixed(1) + '">' + contornos(piezas, lado, 4) + "</svg>" + piezas.map(function (b) {
+      el.innerHTML = '<svg class="cl-mos-svg" aria-hidden="true" viewBox="0 0 ' + w + " " + (filas * (lado + HUECO) - HUECO).toFixed(1) + '">' + contornos(piezas, lado, HUECO) + "</svg>" + piezas.map(function (b) {
         var e = b.e, nombre = esc(e.com), href = esc(conParam(cfg.ficha, "id", e.id));
         if (!e.partes.length) return '<a class="cl-mos-c cl-falta" href="' + href + '" data-id="' + esc(e.id) + '" style="grid-area:' + (b.y + 1) + "/" + (b.x + 1) + '" aria-label="' + nombre + ', sin fotos todavía"><b>?</b>' + nombre + "</a>";
         var cells = b.sh.length === e.partes.length ? b.sh : b.sh.slice(0, 1);
@@ -304,6 +288,9 @@
     return guardar;
   }
   var deUrl = function (k, porDefecto) { var v = param(k); return v == null ? porDefecto : v === "1" ? true : v === "0" ? false : v; };
+
+  /* liga a la especie en iNaturalist: su taxón si lo resolvimos (campo inat de arboles.json), si no, la búsqueda por nombre */
+  var inat = function (e) { return "https://www.inaturalist.org/taxa/" + (e.inat || "search?q=" + encodeURIComponent(e.sci)); };
 
   function foto(cfg, nombre, tam) { return cfg.fotos + nombre + cfg.ext + (tam === "chica" ? cfg.chica : cfg.grande); }
 
@@ -343,7 +330,7 @@
     var ras = Object.keys(e.ras).map(function (k) { return "<dt>" + RASGO[k] + "</dt><dd>" + esc(e.ras[k]) + "</dd>"; }).join("");
     var jar = Object.keys(e.jar);
     document.title = e.com + " (" + e.sci + ") · Campus Lab";
-    main.innerHTML = '<article class="cl-especie"><div class="cl-esp-head"><p class="cl-eyebrow">' + esc(e.fam || "Familia por confirmar") + "</p><h1>" + esc(e.com) + '</h1><p class="cl-sci">' + esc(e.sci) + "</p></div>" +
+    main.innerHTML = '<article class="cl-especie"><div class="cl-esp-head"><p class="cl-eyebrow">' + esc(e.fam || "Familia por confirmar") + "</p><h1>" + esc(e.com) + '</h1><p class="cl-sci">' + esc(e.sci) + '</p><p><a class="cl-inat" href="' + esc(inat(e)) + '" target="_blank" rel="noopener">Ver en iNaturalist<span class="cl-sr"> (se abre en otra pestaña)</span> ↗</a></p></div>' +
       '<div class="cl-esp-main"><figure class="cl-foto"><div class="cl-frame"></div><figcaption></figcaption></figure>' +
       '<div class="cl-esp-side"><div class="cl-card cl-anillos"></div><dl class="cl-card cl-datos"><dt>Origen</dt><dd>' + esc(e.ori || "Sin dato todavía") + "</dd>" + ras + "</dl></div></div>" +
       '<section class="cl-card cl-donde"><div><h2>' + e.n + " " + (e.n === 1 ? "árbol" : "árboles") + " en el campus</h2><ul>" + jar.map(function (j) { return "<li><span>" + esc(j) + "</span><b>" + e.jar[j] + "</b></li>"; }).join("") +

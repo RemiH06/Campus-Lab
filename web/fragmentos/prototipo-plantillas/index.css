@@ -90,6 +90,8 @@
 .v-especie { display: grid; gap: 18px; }
 .esp-head { display: grid; gap: 4px; }
 .esp-head h1 { font-size: clamp(calc(2 * var(--u)), 5vw, calc(3.1 * var(--u))); font-weight: 700; }
+.esp-head .inat { font-size: calc(.95 * var(--u)); color: var(--cl-acc); text-underline-offset: 3px; }
+.cl-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .esp-head .sci { font-size: clamp(calc(1.1 * var(--u)), 2.2vw, calc(1.35 * var(--u))); color: var(--cl-ink2); }
 .url { font-family: var(--cl-mono); font-size: calc(.76 * var(--u)); color: var(--cl-ink2); overflow-wrap: anywhere; }
 .url b { color: var(--cl-acc); font-weight: 600; }
@@ -158,22 +160,17 @@
 .col-tools { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; }
 .mos-caja { container-type: inline-size; } /* casillas, huecos y contornos se miden en cqi (ancho de la caja): al cambiar el ancho o el zoom escalan juntos */
 .mosaico { display: grid; grid-template-columns: repeat(var(--cols, 8), minmax(0, 1fr)); grid-auto-rows: calc(var(--cr, .1) * 100cqi); gap: calc(var(--gr, .004) * 100cqi); }
-.mos-c { position: relative; overflow: hidden; border-radius: 4px; background: var(--cl-wash); border: 0; padding: 0; cursor: pointer; }
+.mos-c { position: relative; box-sizing: border-box; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(8, 20, 28, .22); overflow: hidden; border-radius: 3px; background: var(--cl-wash); padding: 0; cursor: pointer; }
 .mos-c img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .mos-c.lbl::after { content: attr(data-nombre); position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 6px 4px; font-size: calc(.78 * var(--u)); line-height: 1.15; font-weight: 600; text-align: left;
   color: #f4f7f6; background: linear-gradient(transparent, rgba(8, 20, 28, .82)); }
 .mos-c.falta { background: var(--cl-sf); border: 1.5px dashed var(--cl-ink2); display: grid; place-content: center; padding: 6px; text-align: center; font-size: calc(.78 * var(--u)); line-height: 1.15; color: var(--cl-ink2); }
 .mos-c.falta b { display: block; font-size: calc(1.1 * var(--u)); color: var(--cl-acc); }
 .mosaico { position: relative; }
-/* Contorno por especie (capa SVG encima; ver contornos()). El trazo va recortado a la pieza: se ve la mitad, adentro */
+/* Contorno por especie al pasar el mouse (capa SVG encima; ver contornos()). El trazo va recortado a la pieza: se ve la mitad, adentro */
 .mos-svg { position: absolute; left: 0; top: 0; width: 100%; height: auto; z-index: 1; pointer-events: none; overflow: visible; }
-/* seis colores vivos para que cada especie se lea como una pieza; dos piezas que se tocan nunca llevan el mismo */
-.mos-svg .c0 { --pz: light-dark(#1f9d55, #51cf66); } .mos-svg .c1 { --pz: light-dark(#d6336c, #f06595); } .mos-svg .c2 { --pz: light-dark(#7048e8, #9775fa); }
-.mos-svg .c3 { --pz: light-dark(#f0a500, #fcc419); } .mos-svg .c4 { --pz: light-dark(#f0590e, #ff8a4c); } .mos-svg .c5 { --pz: light-dark(#1c7ed6, #4dabf7); }
-.mos-svg .borde { fill: none; stroke: var(--pz, var(--f1)); stroke-width: 6; stroke-linecap: square; transition: stroke-width 120ms var(--cl-ease); }
-.mos-svg .junta { fill: var(--pz, var(--f1)); }
-.mos-svg g.on .borde { stroke: var(--cl-ink); stroke-width: 9; }
-.mos-svg g.on .junta { fill: var(--cl-ink); }
+.mos-svg .borde { fill: none; stroke: none; stroke-width: 6; stroke-linecap: square; }
+.mos-svg g.on .borde { stroke: var(--cl-ink); }
 .mos-vacio { padding: 24px; text-align: center; color: var(--cl-ink2); }
 
 /* \002550\002550\002550 Notas para Maya \002550\002550\002550 */

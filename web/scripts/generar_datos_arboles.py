@@ -146,7 +146,7 @@ def construir(forzar=False):
             fotos[parte] = {"f": nombre, "a": f["autor"] or ""}
             subida.append([f"{nombre}.jpg", round(destino.stat().st_size / 1024), f["id"], f["autor"] or ""])
         especies.append({
-            "id": ident, "sci": e["sci"],
+            "id": ident, "sci": e["sci"], "inat": int(k[1:]) if k[0] == "t" and k[1:].isdigit() else None,
             "com": (c.get("nombre_comun") or max(e["comunes"], key=e["comunes"].get) or "").strip(),
             "fam": (c.get("familia") or "").split(" ")[0], "ori": c.get("lugar_de_origen", ""),
             "ras": {r: c[r] for r in guia.RASGOS if c.get(r)},
