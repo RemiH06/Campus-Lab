@@ -1,0 +1,16 @@
+{
+  "fieldSets": [
+    {
+      "label": "iNaturalist",
+      "fields": [
+        {
+          "name": "proyecto",
+          "label": "Número del proyecto en iNaturalist (Naturalista ITESO es 146508)",
+          "type": "text",
+          "dataType": "string",
+          "defaultValue": "146508"
+        }
+      ]
+    }
+  ]
+}

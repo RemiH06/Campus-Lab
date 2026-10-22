@@ -1,0 +1,78 @@
+<section class="cl-f cl-con" id="concurso" data-etapa="${configuration.etapa}" data-apertura="${configuration.apertura}" data-cierre="${configuration.cierre}">
+  <div class="cl-envoltura cl-con-caja">
+    <div class="cl-con-texto">
+      <p class="cl-ante" data-lfr-editable-id="antetitulo" data-lfr-editable-type="text">Concurso de fotografía · cada dos años</p>
+      [#if configuration.etapa == "abierta"]
+      <p class="cl-con-estado cl-con-vivo">Convocatoria abierta</p>
+      <h2 class="cl-h2" data-lfr-editable-id="abierta-titulo" data-lfr-editable-type="text">Naturalista ITESO 2027</h2>
+      <div class="cl-lead" data-lfr-editable-id="abierta-texto" data-lfr-editable-type="rich-text"><p>Manda hasta 3 fotos por categoría. Cada foto se registra por separado, en dos pasos:</p></div>
+      <ol class="cl-con-registro">
+        <li><b>Súbela a iNaturalist</b> con un seudónimo, la especie (hasta donde sepas), la fecha y el lugar.</li>
+        <li><b>Llena el formulario</b> con la liga a tu observación y la liga para descargar la foto en alta resolución.</li>
+      </ol>
+      <p class="cl-con-acciones">
+        <a class="cl-btn cl-solid cl-con-cta" href="https://forms.office.com/r/BnS1NGdmYk" data-lfr-editable-id="abierta-formulario" data-lfr-editable-type="link">Registrar mi foto</a>
+        <a class="cl-btn" href="https://mexico.inaturalist.org/projects/naturalista-iteso" data-lfr-editable-id="abierta-inat" data-lfr-editable-type="link">Subir a iNaturalist</a>
+      </p>
+      [#elseif configuration.etapa == "jurado"]
+      <p class="cl-con-estado">El jurado está revisando</p>
+      <h2 class="cl-h2" data-lfr-editable-id="jurado-titulo" data-lfr-editable-type="text">Gracias por participar</h2>
+      <div class="cl-lead" data-lfr-editable-id="jurado-texto" data-lfr-editable-type="rich-text"><p>La convocatoria ya cerró. Avisaremos a quienes queden como finalistas por correo y en las redes del ITESO. Mientras, puedes seguir registrando especies en iNaturalist.</p></div>
+      [#elseif configuration.etapa == "resultados"]
+      <p class="cl-con-estado">Resultados</p>
+      <h2 class="cl-h2" data-lfr-editable-id="resultados-titulo" data-lfr-editable-type="text">Ya tenemos ganadores</h2>
+      <div class="cl-lead" data-lfr-editable-id="resultados-texto" data-lfr-editable-type="rich-text"><p>Conoce las fotos premiadas, las menciones honoríficas y las finalistas de esta edición.</p></div>
+      <p class="cl-con-acciones"><a class="cl-btn cl-solid" href="#galeria" data-lfr-editable-id="resultados-boton" data-lfr-editable-type="link">Ver la galería</a></p>
+      [#else]
+      <p class="cl-con-estado">Próxima edición</p>
+      <h2 class="cl-h2" data-lfr-editable-id="proxima-titulo" data-lfr-editable-type="text">Naturalista ITESO 2027</h2>
+      <div class="cl-lead" data-lfr-editable-id="proxima-texto" data-lfr-editable-type="rich-text"><p>La convocatoria se publica en noviembre de 2026. Puedes concursar con fotos que ya tengas, siempre que sepas la fecha y el lugar exactos: empieza a subirlas a iNaturalist desde hoy.</p></div>
+      <p class="cl-con-acciones">
+        <a class="cl-btn cl-solid" href="https://mexico.inaturalist.org/projects/naturalista-iteso" data-lfr-editable-id="proxima-boton" data-lfr-editable-type="link">Registra especies desde ya</a>
+        <a class="cl-btn" href="#bases">Lee las bases de 2025</a>
+      </p>
+      [/#if]
+      <p class="cl-con-cuenta" aria-live="polite"></p>
+    </div>
+    <dl class="cl-con-ficha">
+      <div><dt>Quién participa</dt><dd data-lfr-editable-id="ficha-quien" data-lfr-editable-type="text">Estudiantes, egresados, profesores, personal del ITESO y sus familias</dd></div>
+      <div><dt>Dónde</dt><dd data-lfr-editable-id="ficha-donde" data-lfr-editable-type="text">Campus, Casa ITESO Clavigero y los predios del Bosque La Primavera</dd></div>
+      <div><dt>Categorías</dt><dd data-lfr-editable-id="ficha-categorias" data-lfr-editable-type="text">Semiprofesional y celular</dd></div>
+      <div><dt>Fotos</dt><dd data-lfr-editable-id="ficha-fotos" data-lfr-editable-type="text">Hasta 3 por categoría</dd></div>
+    </dl>
+  </div>
+  <div class="cl-envoltura cl-con-pie">
+    <details class="cl-con-bases" id="bases">
+      <summary data-lfr-editable-id="bases-titulo" data-lfr-editable-type="text">Bases completas (edición 2025)</summary>
+      <div class="cl-con-bases-texto" data-lfr-editable-id="bases-texto" data-lfr-editable-type="rich-text">
+        <h3>Quién puede participar</h3>
+        <p>Miembros de la comunidad ITESO: estudiantes, egresados, profesores, personal y sus familiares, con experiencia profesional o sin ella. Solo se otorga un premio por persona.</p>
+        <h3>Dónde se toman las fotos</h3>
+        <p>Solo en espacios del ITESO: el campus (incluidos el parque tecnológico y el huerto universitario), la Casa ITESO Clavigero y los predios a resguardo del ITESO en el Bosque La Primavera. Se aceptan fotos anteriores a la convocatoria si se conocen la fecha y el lugar exactos.</p>
+        <h3>Categorías y requisitos de la foto</h3>
+        <ul>
+          <li><strong>Semiprofesional:</strong> formato horizontal, 300 dpi y 4,000 píxeles por el lado más largo.</li>
+          <li><strong>Celular:</strong> formato libre, 300 dpi.</li>
+          <li>Hasta 3 fotos por categoría, cada una registrada por separado.</li>
+        </ul>
+        <h3>Cómo registrar cada foto</h3>
+        <ol>
+          <li>Súbela al proyecto <a href="https://mexico.inaturalist.org/projects/naturalista-iteso">Naturalista ITESO</a> en iNaturalist (si no tienes cuenta, ábrela): con un seudónimo mientras dure el concurso, la especie hasta donde sea posible, la fecha y el lugar. En el celular, desactiva la geoprivacidad al registrar.</li>
+          <li>Llena el formulario de registro: datos de contacto, título de la foto, liga a la observación en iNaturalist, firma del código de honor y liga para descargar el archivo en alta resolución.</li>
+        </ol>
+        <h3>Características de las fotografías</h3>
+        <ul>
+          <li>Muestran con exactitud la especie: no se consideran paisajes ni fotos donde la presencia humana sea protagonista.</li>
+          <li>Originales, sin firma, marca de agua ni sello del autor.</li>
+          <li>Se permite recortar, quitar polvo y ajustar exposición, color y contraste; otras alteraciones digitales descalifican la foto.</li>
+          <li>No se permite el uso de inteligencia artificial con ningún propósito.</li>
+          <li>Sin compromiso institucional ni comercial con ninguna organización.</li>
+        </ul>
+        <h3>Evaluación y premios</h3>
+        <p>El jurado, de especialistas y miembros de la comunidad universitaria, considera la calidad fotográfica, los detalles biológicos de la especie y la propuesta expresiva. Puede otorgar menciones honoríficas por originalidad, diversidad biológica y expresión del conocimiento científico. Se premian primero y segundo lugar de cada categoría. El fallo del jurado es inapelable; lo no previsto lo resuelve el Comité Organizador.</p>
+        <h3>Fechas de 2025</h3>
+        <p>Convocatoria del 25 de noviembre de 2024 al 14 de marzo de 2025 (ampliada del 3 de marzo). Finalistas: 7 de abril. Premiación: 22 de abril de 2025, 15:00 horas.</p>
+      </div>
+    </details>
+  </div>
+</section>

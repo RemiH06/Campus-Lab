@@ -1,0 +1,32 @@
+/* Línea de tiempo: un renglón por edición (año grande a la izquierda) y sus etapas sobre una vía horizontal.
+   Pasado = punto relleno y vía continua; lo que viene = punto hueco y vía punteada (lo que falta por observar).
+   En celular cada edición se apila y sus etapas bajan en vertical */
+.cl-lt-ediciones { list-style: none; margin: clamp(28px, 4vw, 48px) 0 0; padding: 0; display: grid; gap: 8px; }
+.cl-lt-cargando { color: var(--cl-ink2); padding: 16px 0; }
+.cl-lt-ed { display: grid; grid-template-columns: clamp(96px, 9vw, 150px) minmax(0, 1fr); gap: clamp(16px, 3vw, 40px); padding: 22px 0; border-top: 1px solid var(--cl-line); }
+.cl-f .cl-lt-anio { font-size: clamp(2rem, 1.4rem + 2vw, 3.2rem); line-height: 1; color: var(--cl-ink2); font-variant-numeric: tabular-nums; }
+.cl-lt-ed[data-estado="actual"] .cl-lt-anio, .cl-lt-ed[data-estado="proxima"] .cl-lt-anio { color: var(--cl-acc); }
+.cl-lt-etapas { list-style: none; margin: 0; padding: 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 16px; }
+.cl-lt-etapa, .cl-lt-hoy { position: relative; display: grid; gap: 2px; align-content: start; padding-top: 30px; font-size: .95rem; color: var(--cl-ink2); }
+.cl-lt-etapa b, .cl-lt-hoy b { color: var(--cl-ink); font-size: 1.05rem; }
+.cl-lt-fecha { font-family: var(--cl-mono); font-size: .82rem; color: var(--cl-ink2); }
+/* la vía: de cada punto hacia el siguiente */
+.cl-lt-etapa::after, .cl-lt-hoy::after { content: ""; position: absolute; top: 8px; left: 18px; right: -16px; border-top: 2.5px solid var(--cl-ink2); opacity: .55; }
+.cl-lt-etapas > :last-child::after { right: 0; }
+.cl-lt-etapa[data-estado="futuro"]::after { border-top-style: dashed; opacity: .45; }
+.cl-lt-etapa::before { content: ""; position: absolute; top: 0; left: 0; width: 18px; height: 18px; border-radius: 50%; background: var(--cl-fill); border: 2.5px solid var(--cl-fill); z-index: 1; }
+.cl-lt-etapa[data-estado="futuro"]::before { background: var(--cl-bg); border-color: var(--cl-ink2); border-style: dashed; }
+.cl-lt-etapa[data-estado="ahora"]::before { box-shadow: 0 0 0 5px color-mix(in srgb, var(--f1) 30%, transparent); }
+.cl-lt-ahora { display: inline-block; margin-left: 4px; padding: 0 8px; border-radius: 999px; background: var(--cl-fill); color: var(--cl-on-fill); font-size: .8rem; vertical-align: 2px; }
+/* hoy: una banderita en la vía */
+.cl-lt-hoy::before { content: ""; position: absolute; top: -6px; left: 7px; width: 3px; height: 28px; border-radius: 2px; background: var(--cl-acc); z-index: 1; }
+.cl-lt-hoy b { color: var(--cl-acc); }
+@media (max-width: 760px) {
+  .cl-lt-ed { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .cl-lt-etapas { grid-auto-flow: row; gap: 0; }
+  .cl-lt-etapa, .cl-lt-hoy { padding: 0 0 22px 34px; }
+  .cl-lt-etapa::after, .cl-lt-hoy::after { top: 18px; bottom: 0; left: 8px; right: auto; border-top: 0; border-left: 2.5px solid var(--cl-ink2); }
+  .cl-lt-etapa[data-estado="futuro"]::after { border-left-style: dashed; }
+  .cl-lt-etapas > :last-child::after { display: none; }
+  .cl-lt-hoy::before { top: 2px; left: -2px; width: 22px; height: 3px; }
+}

@@ -1,0 +1,18 @@
+<section class="cl-f cl-gal" id="galeria" data-csv="${configuration.csv}" data-fotos="${configuration.fotos}" data-ext="${configuration.ext}">
+  <div class="cl-envoltura">
+    <p class="cl-ante" data-lfr-editable-id="antetitulo" data-lfr-editable-type="text">Galerías</p>
+    <h2 class="cl-h2" data-lfr-editable-id="titulo" data-lfr-editable-type="text">Las fotos premiadas de cada edición</h2>
+    <div class="cl-lead" data-lfr-editable-id="cuerpo" data-lfr-editable-type="rich-text"><p>Ganadores, menciones honoríficas y finalistas, con su título, autor y especie. Cada foto se publica con el crédito de quien la tomó.</p></div>
+    <div class="cl-gal-pestanas" role="tablist" aria-label="Edición"></div>
+    <div class="cl-gal-cuerpo" aria-live="polite"><p class="cl-gal-vacio">Cargando la galería…</p></div>
+    <p class="cl-aviso-editor" hidden></p>
+  </div>
+  <dialog class="cl-gal-visor" aria-label="Foto ampliada">
+    <figure><img alt=""><figcaption></figcaption></figure>
+    <div class="cl-gal-visor-botones">
+      <button class="cl-btn" type="button" data-ir="-1">Anterior</button>
+      <button class="cl-btn" type="button" data-ir="1">Siguiente</button>
+      <button class="cl-btn cl-solid" type="button" data-cerrar>Cerrar</button>
+    </div>
+  </dialog>
+</section>

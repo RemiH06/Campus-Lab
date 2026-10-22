@@ -1,0 +1,31 @@
+{
+  "fieldSets": [
+    {
+      "label": "Datos",
+      "fields": [
+        {
+          "name": "csv",
+          "label": "URL del CSV del Itesodex (Documentos y Medios)",
+          "type": "text",
+          "dataType": "string",
+          "defaultValue": "/documents/d/campuslab/itesodex-naturalista"
+        },
+        {
+          "name": "estado",
+          "label": "Qué se ve al abrir la página",
+          "type": "select",
+          "dataType": "string",
+          "typeOptions": {
+            "validValues": [
+              { "value": "se_busca", "label": "Las que se buscan (nadie las ha fotografiado)" },
+              { "value": "en_inaturalist", "label": "Solo en iNaturalist" },
+              { "value": "con_foto", "label": "Ya fotografiadas" },
+              { "value": "todas", "label": "Todas" }
+            ]
+          },
+          "defaultValue": "se_busca"
+        }
+      ]
+    }
+  ]
+}

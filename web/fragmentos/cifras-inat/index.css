@@ -1,0 +1,10 @@
+/* Cifras del proyecto en iNaturalist: texto a la izquierda, tres números grandes a la derecha (debajo en celular) */
+.cl-cif-caja { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(24px, 5vw, 80px); align-items: center; }
+.cl-cif-texto { display: grid; gap: 12px; justify-items: start; }
+.cl-cif-texto .cl-lead > * + * { margin-top: .7em; }
+.cl-cif-lista dl { display: grid; gap: 4px; margin: 0; }
+.cl-cif-dato { display: flex; align-items: baseline; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--cl-line); }
+.cl-cif-dato dd { order: -1; margin: 0; min-width: 5ch; font-family: var(--cl-font-b); font-size: clamp(2.4rem, 1.6rem + 3vw, 4.4rem); line-height: 1; color: var(--cl-acc); font-variant-numeric: tabular-nums; }
+.cl-cif-dato dt { font-size: 1.15rem; color: var(--cl-ink2); }
+.cl-cif-fecha { margin-top: 8px; font-size: 14px; color: var(--cl-ink2); }
+@media (max-width: 760px) { .cl-cif-caja { grid-template-columns: minmax(0, 1fr); } }

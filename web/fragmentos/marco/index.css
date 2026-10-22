@@ -49,6 +49,64 @@ html[data-cl-modo="oscuro"] { color-scheme: dark; --clm-logo: invert(1) hue-rota
   html { --clm-logo: none; }
 }
 
+/* ── (e) Base de los fragmentos Campus Lab (Portada, Pasos, Concurso, Línea de tiempo, Itesodex, Galería, Preguntas,
+   Árbol QR): los mismos tokens de web/fuentes/comun/cl-base.css, pero en <html>, así cada fragmento trae solo su
+   acomodo. La floración la pone el JS en data-cl-flor (la elegida por quien visita o la del mes); sin JS, lluvias.
+   Contraste verificado WCAG AA en los dos modos y las siete floraciones (mismos valores que cl-base.css) ── */
+:root {
+  --cl-u: clamp(16px, 10.8px + .36vw, 22px);
+  --cl-bg: light-dark(#f3f6f5, #0c171e);
+  --cl-sf: light-dark(#fbfcfc, #13222b);
+  --cl-ink: light-dark(#12283a, #e3ece9);
+  --cl-ink2: light-dark(#4a5d69, #9db0b5);
+  --cl-line: light-dark(#d2dcdb, #29404a);
+  --cl-acc: var(--f1i);
+  --cl-fill: light-dark(var(--f1i), var(--f1));
+  --cl-on-fill: light-dark(#fbfcfc, #0c171e);
+  --cl-wash: color-mix(in srgb, var(--f1) 14%, var(--cl-sf));
+  --cl-font: "Degular-Regular", "Degular", "Figtree", system-ui, sans-serif;
+  --cl-font-sb: "Degular-Semibold", "Degular", "Figtree", system-ui, sans-serif;
+  --cl-font-b: "Degular-Bold", "Degular", "Figtree", system-ui, sans-serif;
+  --cl-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --cl-r: 8px;
+  --cl-ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --f1: light-dark(#2e8a52, #6fd296); --f1i: light-dark(#297b49, #6fd296); --f2: light-dark(#3a7090, #7fbede);
+}
+html[data-cl-flor="clavellina"] { --f1: light-dark(#c2416a, #f2809c); --f1i: light-dark(#c03e67, #f2809c); --f2: light-dark(#7a5a3e, #c9a27e); }
+html[data-cl-flor="rosa-morada"] { --f1: light-dark(#c45a9c, #f08cc8); --f1i: light-dark(#b8428c, #f08cc8); --f2: light-dark(#4c7758, #86c09a); }
+html[data-cl-flor="jacaranda"] { --f1: light-dark(#7b5cc8, #b8a0f5); --f1i: light-dark(#7858c7, #b8a0f5); --f2: light-dark(#3f7a4c, #82c492); }
+html[data-cl-flor="primavera"] { --f1: light-dark(#e0ab12, #f4cc4e); --f1i: light-dark(#8b6a0b, #f4cc4e); --f2: light-dark(#5f7434, #a8c46a); }
+html[data-cl-flor="tabachin"] { --f1: light-dark(#d9431f, #ff7d55); --f1i: light-dark(#c73d1c, #ff7d55); --f2: light-dark(#3b7840, #7cc482); }
+html[data-cl-flor="galeana"] { --f1: light-dark(#e06a12, #ff9e4e); --f1i: light-dark(#b1540e, #ff9e4e); --f2: light-dark(#2e6f5c, #6ec2a6); }
+@supports not (color: light-dark(red, red)) {
+  :root { --cl-bg: #f3f6f5; --cl-sf: #fbfcfc; --cl-ink: #12283a; --cl-ink2: #4a5d69; --cl-line: #d2dcdb; --cl-fill: var(--f1i); --cl-on-fill: #fbfcfc; --f1: #2e8a52; --f1i: #297b49; --f2: #3a7090; }
+}
+/* Primitivas comunes: todo lo de los fragmentos lleva prefijo cl- para no chocar con Bootstrap/Clay del tema */
+.cl-f { background: var(--cl-bg); color: var(--cl-ink); font: var(--cl-u)/1.5 var(--cl-font); font-synthesis: none; }
+.cl-f *, .cl-f *::before, .cl-f *::after { box-sizing: border-box; }
+.cl-f :is(h1, h2, h3, h4, p, ul, ol, dl, dd, figure) { margin: 0; }
+.cl-f :is(h1, h2, h3, h4) { color: inherit; font-family: var(--cl-font-b); font-weight: 700; line-height: 1.1; letter-spacing: 0; text-transform: none; text-wrap: balance; }
+.cl-f :is(b, strong) { font-family: var(--cl-font-sb); font-weight: 600; }
+.cl-f :is(button, input, select) { font: inherit; color: inherit; }
+.cl-f a { color: inherit; }
+.cl-f :focus-visible { outline: 2px solid var(--cl-acc); outline-offset: 2px; border-radius: 4px; }
+.cl-f .cl-envoltura { max-width: 1440px; margin: 0 auto; padding: clamp(40px, 6vw, 96px) clamp(16px, 5vw, 120px); }
+.cl-f .cl-ante { font-family: var(--cl-font-sb); color: var(--cl-acc); font-size: calc(.95 * var(--cl-u)); }
+.cl-f .cl-h2 { font-size: clamp(1.7rem, 1.2rem + 2vw, 2.9rem); margin-top: 6px; }
+.cl-f .cl-lead { color: var(--cl-ink2); max-width: 62ch; margin-top: 12px; }
+.cl-f :is(.cl-sci, i, em) { font-style: italic; font-synthesis: style; } /* Degular del tema no trae cursiva: el navegador la inclina, los nombres científicos van en cursiva */
+.cl-f .cl-mono { font-family: var(--cl-mono); font-size: .86em; letter-spacing: 0; }
+.cl-f .cl-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.cl-f .cl-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 20px; border-radius: 999px; border: 1.5px solid var(--cl-line);
+  background: var(--cl-sf); color: var(--cl-ink); text-decoration: none; white-space: nowrap; cursor: pointer; line-height: 1.2; transition: transform 140ms var(--cl-ease), border-color 140ms; }
+.cl-f .cl-btn:active { transform: scale(.97); }
+.cl-f .cl-btn.cl-solid, .cl-f .cl-btn[aria-pressed="true"] { background: var(--cl-fill); border-color: var(--cl-fill); color: var(--cl-on-fill); }
+@media (hover: hover) and (pointer: fine) { .cl-f .cl-btn:hover { border-color: var(--cl-acc); text-decoration: none; } .cl-f .cl-btn.cl-solid:hover { color: var(--cl-on-fill); } }
+@media (prefers-reduced-motion: reduce) { .cl-f * { transition: none !important; animation: none !important; } }
+/* Aviso de datos (CSV con errores, archivo que no se encontró): solo lo ve quien edita la página */
+.cl-f .cl-aviso-editor { display: none; }
+.page-editor .cl-f .cl-aviso-editor:not([hidden]) { display: block; margin-top: 16px; padding: 10px 14px; border: 1.5px dashed #b1540e; border-radius: 6px; color: var(--cl-ink); background: var(--cl-sf); font-size: 15px; }
+
 /* ── (a) Header fijo sin salto. El jQuery del tema pone position:fixed en línea; !important le gana ── */
 #p_p_id_com_liferay_journal_content_web_portlet_JournalContentPortlet_INSTANCE_NAVEGACION_ {
   position: sticky; top: var(--clm-top); z-index: 1000;

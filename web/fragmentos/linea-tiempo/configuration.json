@@ -1,0 +1,16 @@
+{
+  "fieldSets": [
+    {
+      "label": "Datos",
+      "fields": [
+        {
+          "name": "csv",
+          "label": "URL del CSV de fechas (Documentos y Medios)",
+          "type": "text",
+          "dataType": "string",
+          "defaultValue": "/documents/d/campuslab/fechas-naturalista"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "titulo": "Naturalista ITESO",
+  "descripcion": "Receta de la landing campuslab.iteso.mx/naturalista: fragmentos en orden, su Configuración y lo que se escribe en sus zonas editables (solo donde cambia lo que ya trae el fragmento). Sirve para armar la página en Liferay y para la vista previa local (web/scripts/vista_pagina.py).",
+  "csv": {
+    "/documents/d/campuslab/itesodex-naturalista": "catalogo/salida/liferay_subir/naturalista/itesodex-naturalista.csv",
+    "/documents/d/campuslab/galeria-naturalista": "catalogo/salida/liferay_subir/naturalista/galeria-naturalista.csv",
+    "/documents/d/campuslab/fechas-naturalista": "catalogo/salida/liferay_subir/naturalista/fechas-naturalista.csv"
+  },
+  "documentos": "catalogo/salida/liferay_subir/naturalista/fotos",
+  "fragmentos": [
+    { "fragmento": "marco" },
+    { "fragmento": "portada" },
+    { "fragmento": "cifras-inat" },
+    { "fragmento": "pasos" },
+    { "fragmento": "concurso", "configuracion": { "etapa": "proxima", "apertura": "", "cierre": "" } },
+    { "fragmento": "linea-tiempo" },
+    { "fragmento": "itesodex", "configuracion": { "estado": "se_busca" } },
+    { "fragmento": "galeria" },
+    { "fragmento": "preguntas" },
+    {
+      "fragmento": "seccion",
+      "configuracion": { "paleta": "auto", "foto": false, "lado": "derecha", "boton": true },
+      "textos": {
+        "antetitulo": "Contacto",
+        "titulo": "Campus Lab y el Centro de Promoción Cultural",
+        "cuerpo": "<p>Naturalista ITESO lo organizan Campus Lab, un programa interdepartamental que hace del campus un espacio de conocimiento y recreación en torno a la naturaleza, y el Centro de Promoción Cultural (edificio V, piso 5, tel. 33 3669 3421).</p>",
+        "boton": { "texto": "Escribir a Campus Lab", "href": "mailto:campus.lab@iteso.mx" }
+      }
+    },
+    { "fragmento": "arbol-qr", "configuracion": { "url": "", "texto": "Naturalista ITESO" } }
+  ]
+}

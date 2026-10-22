@@ -1,0 +1,30 @@
+/* Bloque del concurso: lo que toca según la etapa (izquierda) y una ficha de campo con lo esencial (derecha).
+   Las bases completas van plegadas debajo, para que la página no crezca con texto que pocos leen completo */
+.cl-con { background: var(--cl-wash); scroll-margin-top: 90px; }
+.cl-f .cl-con-caja { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: clamp(24px, 5vw, 80px); align-items: start; padding-bottom: 32px; }
+.cl-con-texto { display: grid; gap: 12px; justify-items: start; }
+.cl-con-texto .cl-lead > * + * { margin-top: .7em; }
+.cl-con-estado { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 999px; border: 1.5px solid var(--cl-acc); color: var(--cl-ink); font-family: var(--cl-font-sb); font-size: .95rem; }
+.cl-con-vivo::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--cl-acc); animation: cl-con-late 1.6s ease-in-out infinite; }
+@keyframes cl-con-late { 50% { opacity: .3; } }
+.cl-con-registro { margin: 4px 0 0; padding-left: 1.4em; display: grid; gap: 6px; max-width: 60ch; }
+.cl-con-acciones { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+.cl-f .cl-con-cta { min-height: 52px; padding: 0 28px; font-size: 1.1rem; }
+.cl-con-cuenta { display: none; font-family: var(--cl-font-sb); color: var(--cl-ink); }
+.cl-con-cuenta-on { display: block; }
+/* la ficha de campo: etiquetas pequeñas y el dato debajo, con renglones como de libreta */
+.cl-con-ficha { margin: 0; padding: 20px 22px; border-radius: var(--cl-r); background: var(--cl-sf); border: 1px solid var(--cl-line); display: grid; }
+.cl-con-ficha > div { padding: 10px 0; border-bottom: 1px dashed var(--cl-line); }
+.cl-con-ficha > div:last-child { border-bottom: 0; }
+.cl-con-ficha dt { font-size: .88rem; color: var(--cl-ink2); }
+.cl-con-ficha dd { margin: 2px 0 0; font-family: var(--cl-font-sb); }
+.cl-f .cl-con-pie { padding-top: 0; }
+.cl-con-bases { border-top: 1px solid var(--cl-line); }
+.cl-con-bases summary { cursor: pointer; padding: 16px 0; font-family: var(--cl-font-sb); font-size: 1.1rem; list-style-position: inside; min-height: 44px; }
+.cl-con-bases-texto { max-width: 74ch; padding-bottom: 12px; color: var(--cl-ink2); }
+.cl-con-bases-texto h3 { margin-top: 1.2em; font-size: 1.1rem; color: var(--cl-ink); }
+.cl-con-bases-texto :is(p, ul, ol) { margin-top: .5em; }
+.cl-con-bases-texto li + li { margin-top: .3em; }
+@media (max-width: 860px) { .cl-f .cl-con-caja { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 520px) { .cl-con-acciones { width: 100%; } .cl-con-acciones .cl-btn { flex: 1 1 auto; } }
+@media (prefers-reduced-motion: reduce) { .cl-con-vivo::before { animation: none; } }

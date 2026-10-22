@@ -1,0 +1,17 @@
+/* Preguntas frecuentes: título a la izquierda, acordeón a la derecha (debajo en celular). Sin JS, preguntas y
+   respuestas quedan como texto normal, todo legible */
+.cl-faq-caja { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.4fr); gap: clamp(24px, 5vw, 80px); align-items: start; }
+.cl-faq-ayuda { margin-top: 14px; color: var(--cl-ink2); }
+.cl-faq-texto { color: var(--cl-ink2); }
+.cl-faq-texto:not(.cl-faq-armado) h3 { margin-top: 1.1em; color: var(--cl-ink); font-size: 1.1rem; }
+.cl-faq-texto:not(.cl-faq-armado) p { margin-top: .4em; }
+.cl-faq-item { border-bottom: 1px solid var(--cl-line); }
+.cl-faq-item:first-child { border-top: 1px solid var(--cl-line); }
+.cl-faq-item summary { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 56px; padding: 12px 0; cursor: pointer; list-style: none;
+  color: var(--cl-ink); font-family: var(--cl-font-sb); font-size: 1.08rem; }
+.cl-faq-item summary::-webkit-details-marker { display: none; }
+.cl-faq-item summary::after { content: ""; flex: none; width: 10px; height: 10px; margin-right: 6px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-3px); transition: transform 200ms var(--cl-ease); }
+.cl-faq-item[open] summary::after { transform: rotate(225deg) translateY(-3px); }
+.cl-faq-resp { padding: 0 0 16px; max-width: 66ch; }
+.cl-faq-resp > * + * { margin-top: .6em; }
+@media (max-width: 860px) { .cl-faq-caja { grid-template-columns: minmax(0, 1fr); } }

@@ -1,0 +1,16 @@
+/* Tres pasos unidos por un andador punteado (en escritorio corre de izquierda a derecha; en celular, hacia abajo).
+   El número lo pone CSS (counter), así el orden no se puede desacomodar al editar los textos */
+.cl-pas { background: var(--cl-sf); }
+.cl-pas-lista { list-style: none; margin: clamp(28px, 4vw, 48px) 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(20px, 3vw, 48px); counter-reset: paso; }
+.cl-pas-paso { position: relative; display: grid; gap: 10px; align-content: start; counter-increment: paso; padding-top: 72px; }
+.cl-pas-paso::before { content: counter(paso); position: absolute; top: 0; left: 0; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%;
+  background: var(--cl-fill); color: var(--cl-on-fill); font-family: var(--cl-font-b); font-size: 1.5rem; z-index: 1; }
+.cl-pas-paso:not(:last-child)::after { content: ""; position: absolute; top: 25px; left: 64px; right: calc(-1 * clamp(20px, 3vw, 48px) + 12px); border-top: 2.5px dashed var(--cl-line); }
+.cl-f .cl-pas-nombre { font-size: clamp(1.2rem, 1rem + .7vw, 1.55rem); }
+.cl-pas-texto { color: var(--cl-ink2); }
+.cl-pas-texto > * + * { margin-top: .6em; }
+@media (max-width: 760px) {
+  .cl-pas-lista { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .cl-pas-paso { padding: 0 0 0 68px; min-height: 52px; }
+  .cl-pas-paso:not(:last-child)::after { top: 60px; bottom: -22px; left: 25px; right: auto; border-top: 0; border-left: 2.5px dashed var(--cl-line); }
+}

@@ -1,0 +1,15 @@
+{
+  "fieldSets": [
+    {
+      "label": "Botones",
+      "fields": [
+        {
+          "name": "segundoBoton",
+          "label": "Mostrar el segundo botón",
+          "type": "checkbox",
+          "defaultValue": true
+        }
+      ]
+    }
+  ]
+}

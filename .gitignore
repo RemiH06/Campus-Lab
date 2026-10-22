@@ -18,6 +18,7 @@ web/contenidos/*
 !web/contenidos/Arboretum
 !web/contenidos/JardinSuculentas
 !web/contenidos/arboles
+!web/contenidos/naturalista
 
 web/contenidos/Arboretum/*
 !web/contenidos/Arboretum/*.html

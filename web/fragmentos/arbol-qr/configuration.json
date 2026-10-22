@@ -1,0 +1,23 @@
+{
+  "fieldSets": [
+    {
+      "label": "Código QR",
+      "fields": [
+        {
+          "name": "url",
+          "label": "A dónde lleva el QR (vacío: a esta misma página)",
+          "type": "text",
+          "dataType": "string",
+          "defaultValue": ""
+        },
+        {
+          "name": "texto",
+          "label": "Texto bajo el QR al descargarlo (vacío: el título de la página)",
+          "type": "text",
+          "dataType": "string",
+          "defaultValue": "Naturalista ITESO"
+        }
+      ]
+    }
+  ]
+}

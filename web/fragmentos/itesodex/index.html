@@ -1,0 +1,22 @@
+<section class="cl-f cl-dex" id="itesodex" data-csv="${configuration.csv}" data-estado="${configuration.estado}">
+  <div class="cl-envoltura">
+    <p class="cl-ante" data-lfr-editable-id="antetitulo" data-lfr-editable-type="text">Itesodex</p>
+    <h2 class="cl-h2" data-lfr-editable-id="titulo" data-lfr-editable-type="text">Las especies que nos faltan por fotografiar</h2>
+    <div class="cl-lead" data-lfr-editable-id="cuerpo" data-lfr-editable-type="rich-text"><p>Estas especies están en la lista oficial del ITESO, pero el archivo de Campus Lab todavía no tiene una foto confirmada de ellas. Si encuentras una, súbela a iNaturalist: nos ayudas a completar el Itesodex y la foto puede concursar.</p></div>
+    <div class="cl-dex-resumen" aria-live="polite"></div>
+    <div class="cl-dex-controles" hidden>
+      <div class="cl-dex-fila" role="group" aria-label="Qué especies mostrar" data-filtro="estado">
+        <button class="cl-btn" type="button" data-v="se_busca">Se buscan</button>
+        <button class="cl-btn" type="button" data-v="en_inaturalist">Solo en iNaturalist</button>
+        <button class="cl-btn" type="button" data-v="con_foto">Ya fotografiadas</button>
+        <button class="cl-btn" type="button" data-v="">Todas</button>
+      </div>
+      <div class="cl-dex-fila" role="group" aria-label="Grupo" data-filtro="grupo"></div>
+      <label class="cl-dex-buscar"><span class="cl-sr">Buscar especie</span><input type="search" placeholder="Busca por nombre común o científico" autocomplete="off"></label>
+    </div>
+    <ul class="cl-dex-lista" aria-busy="true"><li class="cl-dex-vacio">Cargando el Itesodex…</li></ul>
+    <p class="cl-dex-mas"></p>
+    <p class="cl-dex-nota" data-lfr-editable-id="nota" data-lfr-editable-type="text">"Solo en iNaturalist": alguien ya la observó en el ITESO, pero falta una foto para el archivo de Campus Lab. Las fotos de referencia son de iNaturalist y de quien aparece en su crédito.</p>
+    <p class="cl-aviso-editor" hidden></p>
+  </div>
+</section>

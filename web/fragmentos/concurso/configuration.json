@@ -1,0 +1,38 @@
+{
+  "fieldSets": [
+    {
+      "label": "Etapa del concurso",
+      "fields": [
+        {
+          "name": "etapa",
+          "label": "Qué se muestra",
+          "type": "select",
+          "dataType": "string",
+          "typeOptions": {
+            "validValues": [
+              { "value": "proxima", "label": "Próxima edición (entre concursos)" },
+              { "value": "abierta", "label": "Convocatoria abierta (con el botón de registro)" },
+              { "value": "jurado", "label": "Cerrada, el jurado está revisando" },
+              { "value": "resultados", "label": "Resultados (lleva a la galería)" }
+            ]
+          },
+          "defaultValue": "proxima"
+        },
+        {
+          "name": "apertura",
+          "label": "Día en que abre la convocatoria (año-mes-día, ej. 2026-11-23; vacío si no se sabe)",
+          "type": "text",
+          "dataType": "string",
+          "defaultValue": ""
+        },
+        {
+          "name": "cierre",
+          "label": "Último día para registrar fotos (año-mes-día, ej. 2027-03-12)",
+          "type": "text",
+          "dataType": "string",
+          "defaultValue": ""
+        }
+      ]
+    }
+  ]
+}

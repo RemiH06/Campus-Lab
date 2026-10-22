@@ -7,6 +7,7 @@ Cada carpeta es un fragmento del conjunto "Campus Lab".
 | `marco/` | Corrige header y footer del tema; va una vez en la Master Page | a mano (ver su README) |
 | `seccion/` | Bloque con zonas editables sin código | a mano (ver su README) |
 | `mapa3d/` | Mapa 3D de los territorios | a mano; el motor sale de `web/fuentes/mapa3d/` |
+| `portada/`, `cifras-inat/`, `pasos/`, `concurso/`, `linea-tiempo/`, `itesodex/`, `galeria/`, `preguntas/`, `arbol-qr/` | Piezas de la landing Naturalista (y de cualquier página que las necesite). Usan la base de colores del Marco y leen sus listas de CSV en Documentos y Medios | a mano; cómo se arma la página en `web/contenidos/naturalista/README.md` |
 | `prototipo-plantillas/`, `prototipo-componentes/` | Prototipos de prueba en `/temp` | **no a mano**: se regeneran con `web/scripts/preparar_para_liferay.py` desde `web/fuentes/prototipos/` |
 
 | Archivo | Pestaña del fragmento |

@@ -1,0 +1,30 @@
+{
+  "fieldSets": [
+    {
+      "label": "Datos",
+      "fields": [
+        {
+          "name": "csv",
+          "label": "URL del CSV de la galería (Documentos y Medios)",
+          "type": "text",
+          "dataType": "string",
+          "defaultValue": "/documents/d/campuslab/galeria-naturalista"
+        },
+        {
+          "name": "fotos",
+          "label": "Dónde están las fotos (se le agrega el nombre de la columna foto)",
+          "type": "text",
+          "dataType": "string",
+          "defaultValue": "/documents/d/campuslab/"
+        },
+        {
+          "name": "ext",
+          "label": "Terminación de los archivos (vacía en Documentos y Medios)",
+          "type": "text",
+          "dataType": "string",
+          "defaultValue": ""
+        }
+      ]
+    }
+  ]
+}

@@ -20,6 +20,7 @@ Sin configuración.
 - **Contraste:** el hover del menú (2.4:1) y los enlaces grises del menú de celular (2.4:1) no pasaban AA; ahora 9.5:1 y 5.4:1.
 - **Footer en celular:** sin el hueco de ~100 px antes de los acordeones.
 - **Banderas e ícono de sesión** con texto para lectores de pantalla.
+- **Base de los fragmentos** (`.cl-f`): los colores de `cl-base.css` (claro/oscuro y las siete floraciones) en `<html>`, botones y tipografía. La floración va en `data-cl-flor` (la que eligió quien visita, clave `cl-flor`, o la del mes) y cambia en vivo con el evento `cl-flor`. También deja `window.clCSV(url)`, el lector de CSV tolerante con Excel (mismo que `web/fuentes/mapa3d/datos.js`), y avisa con el evento `cl-base`. Los fragmentos de la landing Naturalista dependen de esto.
 
 Los enlaces de idioma y de inicio de sesión **no necesitaban corrección**: Liferay ya les pone el `p_l_id` y la ruta de cada página (incluido `?…`). El `p_l_id=8550&redirect=/` del inventario en `web/sitio_actual/campuslab/` es solo de la portada, que es donde se raspó.
 

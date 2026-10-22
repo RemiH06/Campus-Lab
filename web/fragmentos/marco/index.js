@@ -38,6 +38,53 @@
   window.addEventListener("storage", function (e) { if (e.key === "cl-modo") aplicarModo(); });
   document.addEventListener("cl-modo", aplicarModo); /* cl-kit avisa cuando su botón cambia el modo */
 
+  /* ── (e) Base de los fragmentos. Floración: la que eligió quien visita (clave "cl-flor", la misma del kit y de
+     Sección) o la del mes; va en <html> para que todos los fragmentos la tomen de ahí ── */
+  var POR_MES = { 12: "clavellina", 1: "clavellina", 2: "rosa-morada", 3: "jacaranda", 4: "primavera", 5: "tabachin", 6: "tabachin", 11: "galeana" };
+  function aplicarFlor() {
+    var f = store.get("cl-flor");
+    html.dataset.clFlor = f && f !== "auto" ? f : POR_MES[new Date().getMonth() + 1] || "lluvias";
+  }
+  aplicarFlor();
+  document.addEventListener("cl-flor", aplicarFlor);
+  window.addEventListener("storage", function (e) { if (e.key === "cl-flor") aplicarFlor(); });
+
+  /* CSV tolerante con lo que hace Excel (igual que web/fuentes/mapa3d/datos.js): separador ";" "," o tabulador,
+     UTF-8 o ANSI, comillas, saltos de línea en una celda. Encabezados sin acentos ni mayúsculas: "Nombre común" y
+     "nombre_comun" son la misma columna. window.CL_CSV (vista local) manda sobre la red */
+  var clave = function (s) { return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""); };
+  function leerCSV(texto) {
+    texto = texto.replace(/^﻿/, "");
+    var primera = texto.slice(0, texto.indexOf("\n") >>> 0);
+    var sep = [";", ",", "\t"].map(function (s) { return [s, primera.split(s).length]; }).sort(function (a, b) { return b[1] - a[1]; })[0][0];
+    var filas = [], fila = [], celda = "", comillas = false;
+    for (var i = 0; i < texto.length; i++) {
+      var c = texto[i];
+      if (comillas) { if (c === '"' && texto[i + 1] === '"') { celda += '"'; i++; } else if (c === '"') comillas = false; else celda += c; }
+      else if (c === '"') comillas = true;
+      else if (c === sep) { fila.push(celda); celda = ""; }
+      else if (c === "\n" || c === "\r") { if (c === "\r" && texto[i + 1] === "\n") i++; fila.push(celda); filas.push(fila); fila = []; celda = ""; }
+      else celda += c;
+    }
+    if (celda || fila.length) { fila.push(celda); filas.push(fila); }
+    var cab = (filas.shift() || []).map(clave);
+    return filas.filter(function (f) { return f.some(function (v) { return v.trim(); }); }).map(function (f, n) {
+      var o = { _fila: n + 2 }; cab.forEach(function (k, j) { if (k) o[k] = (f[j] || "").trim(); }); return o;
+    });
+  }
+  var pedidos = {};
+  window.clCSV = function (url) {
+    if (window.CL_CSV && window.CL_CSV[url] != null) return Promise.resolve(leerCSV(window.CL_CSV[url]));
+    return pedidos[url] || (pedidos[url] = fetch(url, { credentials: "same-origin" }).then(function (r) {
+      if (!r.ok || r.redirected) throw new Error("No se encontró " + url);
+      return r.arrayBuffer();
+    }).then(function (b) {
+      var t; try { t = new TextDecoder("utf-8", { fatal: true }).decode(b); } catch (e) { t = new TextDecoder("windows-1252").decode(b); } /* "CSV" normal de Excel */
+      return leerCSV(t);
+    }));
+  };
+  document.dispatchEvent(new CustomEvent("cl-base")); /* los fragmentos que cargaron antes que el Marco lo esperan */
+
   /* ── (c) Idiomas y login: Liferay ya pone el p_l_id y la ruta (con ?…) de cada página; solo les falta texto
      para lectores de pantalla (son banderas y un ícono sin alt) ── */
   [].forEach.call(document.querySelectorAll('#banner a[href*="languageId="]'), function (a) {

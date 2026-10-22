@@ -1,0 +1,27 @@
+/* Portada: foto a todo lo ancho y el texto sobre una sombra que la oscurece abajo (escritorio) o debajo de la foto (celular).
+   Desde donde empieza el texto la sombra es de 0.8 o más: aun sobre una foto blanca, antetítulo 8.3:1, título 9.5:1, crédito (0.75) 7.1:1, borde del botón 5.6:1. Colores y botones de la base del Marco (.cl-f) */
+.cl-por { position: relative; display: grid; overflow: hidden; background: #0c171e; }
+.cl-por-foto { grid-area: 1 / 1; height: min(84vh, 780px); min-height: 460px; } /* alto fijo: la foto no estira la portada y los botones quedan a la vista */
+.cl-por-foto img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; }
+.cl-por-texto { grid-area: 1 / 1; align-self: end; display: grid; gap: 14px; justify-items: start; z-index: 1;
+  padding: clamp(96px, 18vh, 220px) clamp(16px, 5vw, 120px) clamp(32px, 6vh, 64px);
+  background: linear-gradient(180deg, rgba(8, 18, 24, 0) 0, rgba(8, 18, 24, .8) clamp(96px, 18vh, 220px), rgba(8, 18, 24, .88) 100%); color: #f3f6f5; }
+.cl-f .cl-por-ante { font-family: var(--cl-font-sb); color: #dfe8e5; }
+.cl-f .cl-por-titulo { font-size: clamp(2.6rem, 1.4rem + 4.6vw, 5.6rem); line-height: .95; max-width: 14ch; }
+.cl-f .cl-por-sub { font-size: clamp(1.05rem, .95rem + .5vw, 1.35rem); max-width: 46ch; color: #e3ece9; }
+.cl-por-acciones { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+.cl-f .cl-por-sec { background: transparent; border-color: rgba(243, 246, 245, .7); color: #f3f6f5; }
+.cl-por-credito { grid-area: 1 / 1; align-self: start; justify-self: end; z-index: 1; margin: 12px clamp(16px, 2vw, 32px); padding: 4px 10px; border-radius: 999px;
+  background: rgba(8, 18, 24, .75); color: #e3ece9; font-size: 13px; max-width: calc(100% - 32px); }
+@media (hover: hover) and (pointer: fine) { .cl-f .cl-por-sec:hover { border-color: #f3f6f5; color: #f3f6f5; } }
+/* Celular: la foto arriba y el texto abajo sobre el fondo de la página, sin depender de la foto para leerse */
+@media (max-width: 720px) {
+  .cl-por { background: var(--cl-bg); }
+  .cl-por-foto { height: auto; min-height: 0; aspect-ratio: 4 / 3; }
+  .cl-por-texto { grid-area: 2 / 1; padding: 24px 16px 36px; background: none; color: var(--cl-ink); }
+  .cl-f .cl-por-ante { color: var(--cl-acc); }
+  .cl-f .cl-por-sub { color: var(--cl-ink2); }
+  .cl-f .cl-por-sec { border-color: var(--cl-line); color: var(--cl-ink); }
+  .cl-por-acciones { width: 100%; }
+  .cl-por-acciones .cl-btn { flex: 1 1 auto; }
+}

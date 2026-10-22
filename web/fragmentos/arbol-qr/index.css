@@ -1,0 +1,32 @@
+/* Árbol QR: botón fijo abajo a la derecha que abre un panel. Colores y botones de la base del Marco (.cl-f).
+   Sin JS se queda el botón sin árbol; nunca tapa nada más que su esquina. */
+.cl-aqr { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: max(16px, env(safe-area-inset-bottom, 0px)); z-index: 900;
+  display: grid; justify-items: end; gap: 10px; background: none; }
+.cl-aqr-abrir { display: grid; justify-items: center; gap: 2px; padding: 6px 6px 4px; border: 1.5px solid var(--cl-line); border-radius: var(--cl-r);
+  background: color-mix(in srgb, var(--cl-sf) 88%, transparent); color: var(--cl-ink); cursor: pointer;
+  box-shadow: 0 6px 18px -10px rgba(12, 23, 30, .55); transition: transform 160ms var(--cl-ease), border-color 160ms; }
+.cl-aqr-abrir:active { transform: scale(.96); }
+.cl-aqr-mini { display: block; width: 96px; }
+.cl-aqr-mini canvas, .cl-aqr-lienzo canvas { display: block; width: 100%; }
+.cl-aqr-etiqueta { font-family: var(--cl-font-sb); font-size: 14px; line-height: 1.2; color: var(--cl-ink2); }
+.cl-aqr[data-abierto="true"] .cl-aqr-abrir { display: none; } /* abierto, el árbol está en el panel y el panel trae su Cerrar */
+.cl-aqr-panel { width: min(340px, calc(100vw - 32px)); max-height: calc(100dvh - 140px); overflow-y: auto; padding: 14px 16px 16px; border: 1px solid var(--cl-line); border-radius: var(--cl-r);
+  background: var(--cl-sf); box-shadow: 0 14px 40px -18px rgba(12, 23, 30, .6); display: grid; gap: 10px; transform-origin: 100% 100%; }
+.cl-aqr-panel[hidden] { display: none; }
+.cl-aqr-panel:not([hidden]) { animation: cl-aqr-entra 200ms var(--cl-ease); }
+@keyframes cl-aqr-entra { from { opacity: 0; transform: scale(.92); } }
+.cl-aqr-cab { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.cl-aqr-titulo { font-family: var(--cl-font-b); font-size: 1.15rem; outline: none; }
+.cl-aqr .cl-aqr-cerrar { min-height: 36px; padding: 0 14px; }
+.cl-aqr-lienzo canvas { cursor: pointer; touch-action: manipulation; }
+.cl-aqr-nombre { font-family: var(--cl-font-sb); text-align: center; }
+.cl-aqr-pista { color: var(--cl-ink2); font-size: .92rem; text-align: center; }
+.cl-aqr-acciones { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.cl-aqr-nota { display: none; }
+@media (hover: hover) and (pointer: fine) { .cl-aqr-abrir:hover { border-color: var(--cl-acc); } }
+@media (max-width: 600px) { .cl-aqr-mini { width: 64px; } }
+@media print { .cl-aqr { display: none; } }
+/* En el editor de páginas no flota (taparía los controles): se ve como una nota para poder seleccionarlo */
+.page-editor .cl-aqr { position: static; justify-items: start; padding: 8px 0; }
+.page-editor .cl-aqr-nota { display: block; padding: 8px 12px; border: 1.5px dashed #8b96a1; border-radius: 6px; color: #4b555f; font-size: 14px; }
+.page-editor .cl-aqr-abrir { display: none; }
