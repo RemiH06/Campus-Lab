@@ -52,9 +52,9 @@
   /* CSV tolerante con lo que hace Excel (igual que web/fuentes/mapa3d/datos.js): separador ";" "," o tabulador,
      UTF-8 o ANSI, comillas, saltos de línea en una celda. Encabezados sin acentos ni mayúsculas: "Nombre común" y
      "nombre_comun" son la misma columna. window.CL_CSV (vista local) manda sobre la red */
-  var clave = function (s) { return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""); };
+  var clave = function (s) { return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""); };
   function leerCSV(texto) {
-    texto = texto.replace(/^﻿/, "");
+    texto = texto.replace(/^\uFEFF/, "");
     var primera = texto.slice(0, texto.indexOf("\n") >>> 0);
     var sep = [";", ",", "\t"].map(function (s) { return [s, primera.split(s).length]; }).sort(function (a, b) { return b[1] - a[1]; })[0][0];
     var filas = [], fila = [], celda = "", comillas = false;

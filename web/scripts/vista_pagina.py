@@ -107,6 +107,11 @@ def main(receta):
         if f["fragmento"] == "galeria":  # la galería pide sus fotos por prefijo: en local, la carpeta con .jpg
             cfg.update({"fotos": rel + "/", "ext": ".jpg", "variante": ""})
         leer = lambda x: (d / f"index.{x}").read_text(encoding="utf-8") if (d / f"index.{x}").exists() else ""  # noqa: E731
+        # Liferay daña al publicar los caracteres invisibles (marcas combinantes U+0300-036F, BOM): van como secuencia \uXXXX
+        for x in ("html", "css", "js"):
+            raros = sorted({f"U+{ord(ch):04X}" for ch in leer(x) if 0x300 <= ord(ch) <= 0x36F or ord(ch) in (0xFEFF, 0x200B, 0x200C, 0x200D)})
+            if raros:
+                print(f"AVISO: {f['fragmento']}/index.{x} trae {', '.join(raros)}; Liferay los cambia al publicar. Escríbelos como \\uXXXX.")
         html = textos(freemarker(leer("html"), cfg, f"f{i}"), f.get("textos"), fotos, rel)
         css.append(f"/* ── {f['fragmento']} ── */\n" + leer("css"))
         cuerpo.append(f'<div class="lfr-fragmento" id="f{i}" data-fragmento="{f["fragmento"]}">{html}</div>')

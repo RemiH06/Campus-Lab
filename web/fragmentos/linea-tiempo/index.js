@@ -51,5 +51,8 @@
     aviso.hidden = false; aviso.textContent = "Aviso para quien edita: " + e.message + ". Revisa la URL del CSV en la Configuración del fragmento.";
   }
   var empezar = function () { window.clCSV(url).then(pintar, error); };
+  /* sin el Marco nuevo (el que trae window.clCSV) la lista nunca llegaría: al terminar de cargar la página se avisa */
+  var sinMarco = function () { if (!window.clCSV) error(new Error("en esta página falta el Marco Campus Lab con la base de los fragmentos (la versión de octubre de 2026): sin él no hay colores ni listas")); };
+  if (document.readyState === "complete") setTimeout(sinMarco, 0); else window.addEventListener("load", sinMarco, { once: true });
   if (window.clCSV) empezar(); else document.addEventListener("cl-base", empezar, { once: true });
 })();

@@ -12,7 +12,7 @@
   var controles = sec.querySelector(".cl-dex-controles"), busca = sec.querySelector("input[type=search]"), aviso = sec.querySelector(".cl-aviso-editor");
   var POR_PAGINA = 30;
   var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
-  var norm = function (s) { return String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); };
+  var norm = function (s) { return String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); };
   var ESTADO = { con_foto: "Ya fotografiada", en_inaturalist: "Solo en iNaturalist", se_busca: "Se busca" };
   /* lo que alguien puede escribir en la columna Estado → el estado interno */
   var ALIAS = { fotografiada: "con_foto", "ya fotografiada": "con_foto", "con foto": "con_foto", con_foto: "con_foto",
@@ -118,6 +118,9 @@
   }
   /* se carga cuando la sección está por verse: el CSV pesa unos 60 KB */
   var empezar = function () { window.clCSV(url).then(cargar, error); };
+  /* sin el Marco nuevo (el que trae window.clCSV) la lista nunca llegaría: al terminar de cargar la página se avisa */
+  var sinMarco = function () { if (!window.clCSV) error(new Error("en esta página falta el Marco Campus Lab con la base de los fragmentos (la versión de octubre de 2026): sin él no hay colores ni listas")); };
+  if (document.readyState === "complete") setTimeout(sinMarco, 0); else window.addEventListener("load", sinMarco, { once: true });
   new IntersectionObserver(function (en, io) {
     if (!en[0].isIntersecting) return; io.disconnect();
     if (window.clCSV) empezar(); else document.addEventListener("cl-base", empezar, { once: true });
