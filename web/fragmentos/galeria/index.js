@@ -1,17 +1,22 @@
 /* Galería del concurso por edición. Lee un CSV editado en Excel: edicion, categoria, resultado, titulo, autor, especie,
-   nombre_cientifico, foto, album. "foto" es el nombre del archivo en Documentos y Medios sin terminación (la miniatura
-   es el mismo nombre con "-chica"); vacía = la foto aún no se sube y se muestra la ficha sin foto. "album" basta en
-   una fila de la edición; una fila con solo edición y álbum sirve para ediciones sin resultados capturados.
+   nombre_cientifico, foto, album (guía en README.md). "foto" es el nombre del archivo en Documentos y Medios (con o sin
+   terminación) o una URL completa; vacía = la foto aún no se sube y se muestra la ficha sin foto. Se pide la versión
+   de Adaptive Media de la Configuración (1000 px) y, si no existe, el archivo tal cual. "album" basta en una fila de
+   la edición; una fila con solo edición y álbum sirve para ediciones sin resultados capturados.
    El CSV lo lee el Marco (window.clCSV); si este fragmento carga antes, lo espera. */
 (function () {
   var sec = fragmentElement.querySelector(".cl-gal");
   if (!sec) return;
   var url = (sec.dataset.csv || "").trim() || "/documents/d/campuslab/galeria-naturalista";
-  var base = sec.dataset.fotos || "/documents/d/campuslab/", ext = sec.dataset.ext || "";
+  var base = sec.dataset.fotos || "/documents/d/campuslab/", ext = sec.dataset.ext || "", variante = sec.dataset.variante || "";
   var tabs = sec.querySelector(".cl-gal-pestanas"), cuerpo = sec.querySelector(".cl-gal-cuerpo"), aviso = sec.querySelector(".cl-aviso-editor");
   var visor = sec.querySelector(".cl-gal-visor"), vImg = visor.querySelector("img"), vPie = visor.querySelector("figcaption");
   var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
-  var foto = function (r, chica) { return base + encodeURIComponent(r.foto) + (chica ? "-chica" : "") + ext; };
+  /* la URL corta de Documentos y Medios no lleva terminación: "mirlo.jpg" y "mirlo" son el mismo archivo */
+  var original = function (r) { return /^https?:\/\//.test(r.foto) ? r.foto : base + encodeURIComponent(r.foto.replace(/\.(jpe?g|png|webp)$/i, "")) + ext; };
+  var foto = function (r) { return /^https?:\/\//.test(r.foto) ? r.foto : original(r) + variante; };
+  /* si Adaptive Media no tiene la versión (archivo recién subido o que no es imagen), el archivo tal cual */
+  sec.addEventListener("error", function (ev) { var i = ev.target; if (i.tagName === "IMG" && i.dataset.original && !i.dataset.reintento) { i.dataset.reintento = "1"; i.src = i.dataset.original; } }, true);
   var GRUPOS = [["Premiadas", /lugar/i], ["Menciones honoríficas", /menci/i], ["Finalistas", /finalista/i], ["Otras seleccionadas", /./]];
   var ED = {}, actual = null, conFoto = [], iv = 0;
 
@@ -21,7 +26,7 @@
     if (!r.foto) return '<li class="cl-gal-pieza cl-gal-sinfoto"><figure><div class="cl-gal-marco"><span>Foto por subir</span></div>' + txt + "</figure></li>";
     var i = conFoto.push(r) - 1;
     return '<li class="cl-gal-pieza' + (grande ? " cl-gal-grande" : "") + '"><figure><button class="cl-gal-marco" type="button" data-i="' + i + '" aria-label="Ampliar ' + esc(r.titulo) + ", de " + esc(r.autor) + '">' +
-      '<img src="' + esc(foto(r, !grande)) + '" alt="' + esc(r.especie) + " en la foto " + esc(r.titulo) + '" loading="lazy" decoding="async"></button>' + txt + "</figure></li>";
+      '<img src="' + esc(foto(r)) + '" data-original="' + esc(original(r)) + '" alt="' + esc(r.especie) + " en la foto " + esc(r.titulo) + '" loading="lazy" decoding="async"></button>' + txt + "</figure></li>";
   }
   function mostrar(k) {
     actual = k; conFoto = [];
@@ -37,7 +42,7 @@
   }
   function ver(i) {
     iv = (i + conFoto.length) % conFoto.length; var r = conFoto[iv];
-    vImg.src = foto(r, false); vImg.alt = r.especie + " en la foto " + r.titulo + ", de " + r.autor;
+    vImg.dataset.original = original(r); delete vImg.dataset.reintento; vImg.src = foto(r); vImg.alt = r.especie + " en la foto " + r.titulo + ", de " + r.autor;
     vPie.innerHTML = "<b>" + esc(r.titulo) + "</b> · " + esc(r.autor) + "<br>" + especie(r) + ' <span class="cl-gal-res">' + esc(r.resultado) + "</span>";
     if (!visor.open) visor.showModal();
   }
@@ -67,7 +72,7 @@
     if (!ks.length) { cuerpo.innerHTML = '<p class="cl-gal-vacio">Todavía no hay fotos.</p>'; return; }
     tabs.innerHTML = ks.map(function (k) { return '<button class="cl-btn" type="button" role="tab" data-ed="' + esc(k) + '">' + esc(k) + "</button>"; }).join("");
     mostrar(ks[0]);
-    if (malas.length) { aviso.hidden = false; aviso.textContent = "Aviso para quien edita: en el CSV de la galería, las filas " + malas.join(", ") + " no tienen edición y no se muestran."; }
+    if (malas.length) { aviso.hidden = false; var una = malas.length === 1; aviso.textContent = "Aviso para quien edita: en el CSV de la galería, " + (una ? "la fila " + malas[0] + " no tiene edición y no se muestra." : "las filas " + malas.join(", ") + " no tienen edición y no se muestran."); }
   }
   function error(e) {
     cuerpo.innerHTML = '<p class="cl-gal-vacio">No se pudo cargar la galería.</p>';

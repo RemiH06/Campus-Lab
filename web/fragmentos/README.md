@@ -41,3 +41,15 @@ Pegar la versión nueva y publicar el fragmento **no cambia las páginas que ya 
 3. Publicar la página.
 
 Para saber qué versión está publicada sin entrar a Liferay: abrir la página y buscar en el código fuente (Ctrl+U) algo que solo tenga la versión nueva.
+
+## Editar una lista en CSV (Línea de tiempo, Galería, Itesodex, Mapa 3D)
+
+Las listas largas no se escriben en la página: viven en un archivo CSV en Documentos y Medios que se edita en Excel. La página lo lee cada vez que alguien la abre, así que no hay que tocar el fragmento.
+
+1. **Bajar el archivo actual:** Documentos y Medios > carpeta de Campus Lab > el archivo (por ejemplo `fechas-naturalista`) > Descargar. Trabajar siempre sobre la última versión, no sobre una copia vieja de tu computadora.
+2. **Editarlo en Excel:** doble clic lo abre con acentos. Una fila por cosa; no cambiar los nombres de las columnas de la primera fila (sí da igual si llevan mayúsculas o acentos). Las columnas que la guía del fragmento marca como opcionales se pueden dejar vacías.
+3. **Guardarlo:** Archivo > Guardar como > tipo **"CSV UTF-8 (delimitado por comas)"**. Si Excel avisa que se perderán funciones, aceptar: el CSV solo guarda el texto.
+4. **Subirlo como nueva versión del mismo archivo:** en Documentos y Medios, menú del archivo > Editar > elegir el archivo nuevo > Publicar. **No subirlo como archivo nuevo**: cambiaría su dirección y la página dejaría de encontrarlo.
+5. **Revisar:** abrir la página (recargar con Ctrl+F5). Si una fila tiene un error (una fecha mal escrita, un estado que no existe), esa fila no aparece y, en el editor de páginas, el fragmento muestra un aviso punteado que dice qué fila revisar.
+
+Si la página dice "No se pudo cargar…", el archivo se subió como nuevo o se movió: revisar la URL en la Configuración del fragmento.

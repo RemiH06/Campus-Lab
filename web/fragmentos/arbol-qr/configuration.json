@@ -5,7 +5,7 @@
       "fields": [
         {
           "name": "url",
-          "label": "A dónde lleva el QR (vacío: a esta misma página)",
+          "label": "A dónde lleva el QR: una URL completa o del sitio, como /web/campuslab/orquideas (vacío: a esta misma página)",
           "type": "text",
           "dataType": "string",
           "defaultValue": ""

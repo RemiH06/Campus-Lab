@@ -14,8 +14,8 @@ Una sola página en Campus Lab (`campuslab.iteso.mx/naturalista`) que junta el r
 | 4 | Pasos | Prepárate en 3 pasos | clic en cada paso |
 | 5 | Concurso | Lo que toca según la etapa (próxima, abierta con botón de registro, jurado, resultados), ficha y bases | Configuración > etapa y fechas; clic en textos y en el botón de registro (la liga al formulario) |
 | 6 | Línea de tiempo | Fechas de cada edición, con "hoy" | Excel: `fechas-naturalista.csv` |
-| 7 | Itesodex | Las 526 especies de la lista oficial y cuáles faltan por fotografiar | se regenera desde la base de datos (ver abajo) |
-| 8 | Galería | Premiadas, menciones y finalistas por edición | Excel: `galeria-naturalista.csv` + fotos en Documentos y Medios |
+| 7 | Itesodex | Las 526 especies de la lista oficial y cuáles faltan por fotografiar | Excel: `itesodex-naturalista.csv` |
+| 8 | Galería | Premiadas, menciones y finalistas por edición | Excel: `galeria-naturalista.csv` + una foto por resultado en Documentos y Medios |
 | 9 | Preguntas | Acordeón de preguntas frecuentes | clic en el texto: cada pregunta es un "Encabezado 3" y su respuesta va debajo |
 | 10 | Sección | Contacto (el fragmento `seccion` de siempre, sin foto) | clic en el texto |
 | 11 | Árbol QR | Árbol en la esquina inferior derecha; al abrirlo su copa se vuelve el QR de la página | Configuración > a dónde lleva y texto de la descarga |
@@ -28,7 +28,7 @@ El árbol QR cambia solo con el tema del sitio: es el árbol de la floración el
 2. **Fragmentos nuevos** en el conjunto Campus Lab (Nuevo > Fragmento básico, pegar cada archivo en su pestaña): Portada, Cifras iNaturalist, Pasos, Concurso, Línea de tiempo, Itesodex, Galería, Preguntas, Árbol QR (carpetas con el mismo nombre en `web/fragmentos/`).
 3. **Documentos y Medios**, carpeta pública de Campus Lab:
    - `fechas-naturalista.csv`, `galeria-naturalista.csv`, `itesodex-naturalista.csv` (de `catalogo/salida/liferay_subir/naturalista/`). Su URL corta queda como `/documents/d/campuslab/fechas-naturalista`, que es la que traen los fragmentos.
-   - Las fotos de `catalogo/salida/liferay_subir/naturalista/fotos/` (grande y "-chica" de cada una), con el mismo nombre de archivo.
+   - Las fotos de `catalogo/salida/liferay_subir/naturalista/fotos/` (una por resultado, 1600 px), con el mismo nombre de archivo. La página pide sola la versión de 1000 px (Adaptive Media).
 4. **Página de contenido** nueva, URL amigable `/naturalista`, con la Master Page que tenga el Marco. Arrastrar los fragmentos en el orden de la tabla; en Sección (contacto) escribir los textos de `pagina.json` y quitar la foto en su Configuración.
 5. Antes de publicar: revisar con `launch-checklist` (título, descripción e imagen para redes).
 
@@ -36,10 +36,12 @@ Para probar sin Liferay: `python web/scripts/vista_pagina.py web/contenidos/natu
 
 ## Actualizar datos
 
+Cada fragmento tiene su guía (qué se edita, columnas del CSV, qué hacer si algo sale mal) en `web/fragmentos/<fragmento>/README.md`, y los pasos para editar cualquier CSV están en `web/fragmentos/README.md`.
+
 - **Fechas de la edición 2027:** abrir `fechas-naturalista.csv` en Excel, cambiar la fila de 2027 (fechas como `2026-11-23`; si solo se sabe el mes, `2026-11`), guardar como "CSV UTF-8" y subirlo como **nueva versión del mismo archivo**. Poner también las fechas en la Configuración del fragmento Concurso para la cuenta regresiva.
 - **Al abrir la convocatoria:** Concurso > Configuración > etapa "Convocatoria abierta" y escribir la liga del formulario nuevo en el botón "Registrar mi foto" (la de 2025 era `https://forms.office.com/r/BnS1NGdmYk`).
 - **Ganadores:** agregar filas a `galeria-naturalista.csv` (edicion, categoria, resultado, titulo, autor, especie, nombre_cientifico, foto, album). Sin correos ni datos de contacto.
-- **Itesodex:** cuando cambien las fotos confirmadas, correr `python web/scripts/generar_naturalista.py` y subir el CSV nuevo como nueva versión. No se edita a mano.
+- **Itesodex:** cuando se confirme la foto de una especie que se buscaba, cambiar su Estado a `Fotografiada` en `itesodex-naturalista.csv`. El script solo sembró los CSV una vez; volver a correrlo con `--forzar` pisa lo editado.
 
 ## Pendiente
 

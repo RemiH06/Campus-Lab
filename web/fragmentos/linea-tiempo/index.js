@@ -44,7 +44,7 @@
     }).join("");
     lista.innerHTML = html || '<li class="cl-lt-cargando">Todavía no hay fechas.</li>';
     lista.removeAttribute("aria-busy");
-    if (malas.length) { aviso.hidden = false; aviso.textContent = "Aviso para quien edita: en el CSV de fechas, las filas " + malas.join(", ") + " no tienen edición o la fecha no es año-mes-día (2025-04-22) ni año-mes (2026-11). No se muestran."; }
+    if (malas.length) { aviso.hidden = false; var una = malas.length === 1; aviso.textContent = "Aviso para quien edita: en el CSV de fechas, " + (una ? "la fila " : "las filas ") + malas.join(", ") + (una ? " no tiene" : " no tienen") + " edición o una fecha que no es año-mes-día (2025-04-22) ni año-mes (2026-11). No se " + (una ? "muestra." : "muestran."); }
   }
   function error(e) {
     lista.innerHTML = '<li class="cl-lt-cargando">No se pudieron cargar las fechas.</li>'; lista.removeAttribute("aria-busy");

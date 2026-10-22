@@ -19,10 +19,17 @@
         },
         {
           "name": "ext",
-          "label": "Terminación de los archivos (vacía en Documentos y Medios)",
+          "label": "Terminación que se agrega al nombre (vacía en Documentos y Medios; solo para pruebas locales)",
           "type": "text",
           "dataType": "string",
           "defaultValue": ""
+        },
+        {
+          "name": "variante",
+          "label": "Tamaño que se pide a Adaptive Media (?imagePreview=1 da 1000 px; ?imageThumbnail=1, 300 px)",
+          "type": "text",
+          "dataType": "string",
+          "defaultValue": "?imagePreview=1"
         }
       ]
     }

@@ -1,13 +1,17 @@
 """
-Datos de la landing Naturalista ITESO: tres CSV para Documentos y Medios y las fotos de la galería en tamaño web.
+Siembra los datos de la landing Naturalista ITESO: tres CSV para Documentos y Medios y las fotos de la galería.
 
-  itesodex-naturalista.csv  Todas las especies de la lista oficial y si ya tienen foto. Sale de la BD: se REHACE cada
-                            vez (no se edita a mano; si una especie cambia, se corrige en la BD y se vuelve a correr).
-  galeria-naturalista.csv   Ganadores, menciones y finalistas por edición, y el álbum completo de cada una. Se siembra una vez con 2025 (evaluación
-                            final del jurado + fotos de promoción); después se edita en Excel. No se pisa sin --forzar.
-  fechas-naturalista.csv    Línea de tiempo del concurso. Se siembra una vez y se edita en Excel. No se pisa sin --forzar.
-  fotos/                    Las fotos de la galería a 1600 px (grande) y 480 px (miniatura, "-chica"), JPEG calidad 82.
-                            Se suben a Documentos y Medios con el mismo nombre; la galería las pide por la URL corta.
+Se corre UNA vez. Desde ahí cada CSV es la fuente de la verdad: se edita en Excel y se sube como nueva versión del
+mismo archivo (la guía de cada fragmento en web/fragmentos/<fragmento>/README.md). Volver a correrlo pisaría esas
+ediciones, por eso no escribe un CSV que ya existe (pasar --forzar para rehacerlos a propósito).
+
+  itesodex-naturalista.csv  Todas las especies de la lista oficial y si ya tienen foto (de la BD y del cruce con iNaturalist).
+  galeria-naturalista.csv   Ganadores, menciones y finalistas por edición, y el álbum completo de cada una (2025: evaluación
+                            final del jurado + fotos de promoción).
+  fechas-naturalista.csv    Línea de tiempo del concurso.
+  fotos/                    Las fotos de la galería a 1600 px, JPEG calidad 82. Se suben a Documentos y Medios con el mismo
+                            nombre; la página pide la versión de 1000 px de Adaptive Media (?imagePreview=1).
+Los encabezados van en palabras ("Nombre común"); los fragmentos los leen sin acentos ni mayúsculas.
 
 Uso (desde la raíz del repo):  python web/scripts/generar_naturalista.py [--forzar]
 Salida (gitignorada): catalogo/salida/liferay_subir/naturalista/
@@ -65,7 +69,7 @@ def escribir(ruta, columnas, filas, forzar=True):
     print(f"  {ruta.name}: {len(filas)} filas")
 
 
-def itesodex():
+def itesodex(forzar):
     c = sqlite3.connect(RUTA_BD)
     c.row_factory = sqlite3.Row
     nombres, oficiales = nuestros_nombres(c)
@@ -89,7 +93,7 @@ def itesodex():
         clave = binomio(r["nombre_inat"]) if r and r["nombre_inat"] else b
         if not limpio(original):
             continue
-        estado = "con_foto" if confirmadas[b] else ("en_inaturalist" if obs[clave] else "se_busca")
+        estado = "Fotografiada" if confirmadas[b] else ("Solo en iNaturalist" if obs[clave] else "Se busca")
         donde = jardines.get(b) or jardines.get(clave) or Counter()
         filas.append([GRUPOS[grupo], (comun or "").strip(), limpio(original), estado, confirmadas[b], obs[clave],
                       f"https://mexico.inaturalist.org/taxa/{r['taxon_id']}" if r and r["taxon_id"] else "",
@@ -97,18 +101,16 @@ def itesodex():
     orden = {g: i for i, g in enumerate(GRUPOS.values())}
     filas.sort(key=lambda f: (orden[f[0]], f[1].lower() or f[2].lower()))
     escribir(SALIDA / "itesodex-naturalista.csv",
-             ["grupo", "nombre_comun", "nombre_cientifico", "estado", "fotos_campus_lab", "observaciones_inaturalist", "enlace_inaturalist", "donde_buscar"], filas)
+             ["Grupo", "Nombre común", "Nombre científico", "Estado", "Fotos en Campus Lab", "Observaciones en iNaturalist", "Enlace a iNaturalist", "Dónde buscar"], filas, forzar)
     print("   por estado:", Counter(f[3] for f in filas), "· por grupo:", Counter((f[0], f[3]) for f in filas))
 
 
 def foto_web(origen, nombre):
     (SALIDA / "fotos").mkdir(parents=True, exist_ok=True)
-    for lado, sufijo in ((1600, ""), (480, "-chica")):
-        destino = SALIDA / "fotos" / f"{nombre}{sufijo}.jpg"
-        if destino.exists():
-            continue
+    destino = SALIDA / "fotos" / f"{nombre}.jpg"
+    if not destino.exists():  # 1600 px: suficiente para la página y sin publicar el original de 4-10 MB
         im = ImageOps.exif_transpose(Image.open(origen)).convert("RGB")
-        im.thumbnail((lado, lado), Image.LANCZOS)
+        im.thumbnail((1600, 1600), Image.LANCZOS)
         im.save(destino, "JPEG", quality=82, optimize=True, progressive=True)
     return nombre
 
@@ -138,7 +140,7 @@ def galeria(forzar):
     filas = [f + [ALBUMES["2025"] if i == 0 else ""] for i, f in enumerate(filas)]
     filas.append(["2023", "", "", "", "", "", "", "", ALBUMES["2023"]])
     escribir(SALIDA / "galeria-naturalista.csv",
-             ["edicion", "categoria", "resultado", "titulo", "autor", "especie", "nombre_cientifico", "foto", "album"], filas, forzar)
+             ["Edición", "Categoría", "Resultado", "Título", "Autor", "Especie", "Nombre científico", "Foto", "Álbum"], filas, forzar)
 
 
 def fechas(forzar):
@@ -152,13 +154,13 @@ def fechas(forzar):
         ["2025", "2025-04-22", "", "Premiación", "Primero y segundo lugar, menciones honoríficas y exposición de finalistas."],
         ["2027", "2026-11", "", "Convocatoria", "Fechas por confirmar. Mientras, puedes ir registrando especies en iNaturalist."],
     ]
-    escribir(SALIDA / "fechas-naturalista.csv", ["edicion", "desde", "hasta", "etapa", "detalle"], filas, forzar)
+    escribir(SALIDA / "fechas-naturalista.csv", ["Edición", "Desde", "Hasta", "Etapa", "Detalle"], filas, forzar)
 
 
 if __name__ == "__main__":
     forzar = "--forzar" in sys.argv
     SALIDA.mkdir(parents=True, exist_ok=True)
     print(f"Salida: {SALIDA}")
-    itesodex()
+    itesodex(forzar)
     galeria(forzar)
     fechas(forzar)

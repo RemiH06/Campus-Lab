@@ -361,7 +361,7 @@
     var POR_FLOR = { "rosa-morada": 0, jacaranda: 1, primavera: 2, tabachin: 3, galeana: 4, clavellina: 5 };
     var POR_MES = { 12: "clavellina", 1: "clavellina", 2: "rosa-morada", 3: "jacaranda", 4: "primavera", 5: "tabachin", 6: "tabachin", 11: "galeana" };
     var S = { e: 3, temp: "lluvias", t: 0, noche: false };
-    function destino() { return cfg.url || location.origin + location.pathname; } /* sin URL configurada, la de esta página sin ?… ni # */
+    function destino() { return elegirUrl().url; }
     function tema() {
       var f = html.dataset.clFlor || POR_MES[new Date().getMonth() + 1] || "lluvias", e = POR_FLOR[f];
       var noche = html.dataset.clModo ? html.dataset.clModo === "oscuro" : sistema.matches;
@@ -407,7 +407,23 @@
     medir(); tema();
   }
 
-  /* el motor (unos 60 ms) espera a que la página termine de cargar; en el editor de páginas no se monta */
-  if (enEditor) return;
+  /* a dónde lleva el QR: la URL de la Configuración, completa (https://…) o del sitio (/web/campuslab/naturalista), o si
+     está vacía, esta misma página sin ?… ni #. El QR admite unos 210 caracteres: si no cabe o está mal escrita se usa
+     esta página, y quien edita ve el aviso en el editor */
+  function elegirUrl() {
+    var pagina = location.origin + location.pathname, t = (cfg.url || "").trim(), u;
+    if (!t) return { url: pagina };
+    try { u = new URL(t, location.href).href; } catch (e) { return { url: pagina, aviso: "la URL \"" + t + "\" no es válida" }; }
+    try { qrCodigo(u); } catch (e) { return { url: pagina, aviso: "la URL tiene " + u.length + " caracteres y el QR admite unos 210; usa una más corta" }; }
+    return { url: u };
+  }
+
+  /* el motor (unos 60 ms) espera a que la página termine de cargar; en el editor de páginas no se monta, solo dice a dónde lleva */
+  if (enEditor) {
+    var d = elegirUrl();
+    el.querySelector(".cl-aqr-nota").textContent = "Árbol QR: en la página publicada flota en la esquina inferior derecha y lleva a " +
+      ((cfg.url || "").trim() && !d.aviso ? d.url : "esta misma página") + "." + (d.aviso ? " Aviso: " + d.aviso + "." : "");
+    return;
+  }
   if (document.readyState === "complete") arbolQR(); else window.addEventListener("load", arbolQR, { once: true });
 })();

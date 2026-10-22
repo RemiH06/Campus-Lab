@@ -105,7 +105,7 @@ def main(receta):
         d = FRAG / f["fragmento"]
         cfg = configuracion(d, f.get("configuracion"))
         if f["fragmento"] == "galeria":  # la galería pide sus fotos por prefijo: en local, la carpeta con .jpg
-            cfg.update({"fotos": rel + "/", "ext": ".jpg"})
+            cfg.update({"fotos": rel + "/", "ext": ".jpg", "variante": ""})
         leer = lambda x: (d / f"index.{x}").read_text(encoding="utf-8") if (d / f"index.{x}").exists() else ""  # noqa: E731
         html = textos(freemarker(leer("html"), cfg, f"f{i}"), f.get("textos"), fotos, rel)
         css.append(f"/* ── {f['fragmento']} ── */\n" + leer("css"))

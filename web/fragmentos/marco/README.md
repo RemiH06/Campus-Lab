@@ -10,6 +10,14 @@ Corrige el header y el footer del tema ITESO-4 **encima**, sin reemplazarlos: lo
 
 Sin configuración.
 
+## Para quien edita páginas
+
+El Marco **no se edita** y no se ve: en el editor aparece como un aviso punteado ("Marco Campus Lab…"). Va una vez, arriba, en la Master Page, y de él dependen el modo claro/oscuro del header y el footer, los colores de floración y que las listas en CSV (fechas, galería, Itesodex) se carguen.
+
+- **No borrarlo ni moverlo abajo.** Si falta, los fragmentos de Campus Lab salen sin colores y las listas se quedan en "Cargando…".
+- Si una página nueva se ve sin colores, lo primero es revisar que use la Master Page que trae el Marco.
+- Cambiarlo (pegar una versión nueva) le toca a quien mantiene el código, y después hay que Propagar (ver `web/fragmentos/README.md`).
+
 ## Qué corrige
 
 - **Salto al hacer scroll.** El jQuery del tema ponía `position: fixed` a la barra superior al primer pixel de scroll: el contenido subía 50 px de golpe (56 en celular) y aparecía otra barra encima. Ahora el header es `sticky`; al bajar se pliegan la barra superior y la de "Programas…" y el header toma ese mismo alto como margen, así el contenido no se mueve (medido: 0 px). Con sesión iniciada se acomoda bajo el menú de control de Liferay.
