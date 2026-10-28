@@ -10,7 +10,8 @@ Orígenes, según la columna "Origen (local, relativo)":
   - "VOLUMEN: <ruta>" → volumen de fotos, Y:\\<ruta> (solo dentro de la red de ITESO)
   - cualquier otra    → biblioteca sincronizada de SharePoint (config: ruta_sharepoint_sincronizado)
 
-Se copian las filas cuya Accion empieza con "COPIAR" (incluye "COPIAR SIN TOCAR" del SIG).
+Se copian las filas con "Accion v2" MOVER o COPIAR, a su "Destino v2" (estructura v2 del 27-oct: numeración
+seguida 01-12 y sin archivos sueltos junto a carpetas). "Destino propuesto" y "Accion" quedan como la versión 1.
 
 Resumible: cada copia se escribe como .tmp, se verifica por SHA-1 contra el origen, se renombra y
 se anota en _manifiesto.csv del destino. Al volver a correr, lo que ya está en el manifiesto y en
@@ -73,10 +74,10 @@ def main():
 
     plan = pd.read_excel(PLAN)
     col_origen = plan.columns[0]
-    copiar = plan[plan["Accion"].str.startswith("COPIAR", na=False)]
-    if copiar["Destino propuesto"].isna().any():
-        raise SystemExit("Hay filas a COPIAR sin 'Destino propuesto'.")
-    repetidos = copiar["Destino propuesto"][copiar["Destino propuesto"].duplicated()]
+    copiar = plan[plan["Accion v2"].isin(["MOVER", "COPIAR"])]
+    if copiar["Destino v2"].isna().any():
+        raise SystemExit("Hay filas a copiar sin 'Destino v2'.")
+    repetidos = copiar["Destino v2"][copiar["Destino v2"].str.casefold().duplicated()]  # Windows no distingue mayúsculas
     if len(repetidos):
         raise SystemExit(f"{len(repetidos)} destinos repetidos (se pisarían): {list(repetidos)[:5]}")
 
@@ -84,7 +85,7 @@ def main():
     manifiesto_ruta = destino_raiz / "_manifiesto.csv"
     manifiesto = leer_manifiesto(manifiesto_ruta)
     filas = []
-    for origen_txt, destino_rel in zip(copiar[col_origen], copiar["Destino propuesto"]):
+    for origen_txt, destino_rel in zip(copiar[col_origen], copiar["Destino v2"]):
         if origen_txt.startswith("VOLUMEN: ") and hay_volumen is None:
             hay_volumen = red_iteso_disponible()
         if origen_txt.startswith("VOLUMEN: ") and not hay_volumen:
