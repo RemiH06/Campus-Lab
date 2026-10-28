@@ -7,7 +7,8 @@ fruto y flor según aplique) y cuáles faltan por fotografiar.
 No preclasifica con BioCLIP: se probó (8-oct) y acertó ~5 de 15.
 
 Especie de árbol = nombre científico en una ficha de árbol del sitio (fichas.json) o en
-Lista_Arboles_ITESO.csv, comparado por binomio normalizado. Solo fotos confirmadas.
+Lista_Arboles_ITESO.csv, comparado por binomio normalizado, o foto de Luis Ponciano (fotos_originales).
+Solo fotos confirmadas.
 
 "Detalle" (micro/macro, 21-oct) va cuando a simple vista no se reconoce de qué parte es
 (textura de corteza, tricomas, insecto sobre la hoja); si se reconoce la flor, es "flor".
@@ -83,8 +84,10 @@ NOMBRES_ARBOLES = nombres_de_arboles()
 def fotos_de_arboles(c, especie_id=None):
     filas = c.execute("""
         SELECT f.id AS foto_id, f.ruta_actual, e.id AS especie_id, e.nombre_cientifico,
-               e.nombre_comun, g.grupo_id, p.parte, d.foto_id IS NOT NULL AS destacada
+               e.nombre_comun, g.grupo_id, p.parte, d.foto_id IS NOT NULL AS destacada,
+               o.foto_id IS NOT NULL AS de_luis
         FROM fotos f
+        LEFT JOIN fotos_originales o ON o.foto_id = f.id AND o.fuente = 'onedrive_luis_ponciano'
         JOIN especies e ON e.id = f.especie_id
         LEFT JOIN especimen_grupos_confirmados g ON g.foto_id = f.id
         LEFT JOIN partes_arbol_etiquetas p ON p.foto_id = f.id
@@ -94,7 +97,8 @@ def fotos_de_arboles(c, especie_id=None):
           AND (? IS NULL OR e.id = ?)
         ORDER BY f.id
     """, (especie_id, especie_id)).fetchall()
-    return [f for f in filas if binomio(f["nombre_cientifico"]) in NOMBRES_ARBOLES]
+    # las de Luis Ponciano son todas del Bosque ITESO aunque la lista use otro nombre (Melaleuca/Callistemon)
+    return [f for f in filas if binomio(f["nombre_cientifico"]) in NOMBRES_ARBOLES or f["de_luis"]]
 
 
 @app.get("/api/especies")
