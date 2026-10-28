@@ -1,0 +1,31 @@
+# Hojas de campo en el WSL de Pixilate (~/srv/hojas-campo). Solo loopback; lo publica
+# `tailscale serve --https=8049` (en Windows) a la tailnet. Marcas en el volumen `marcas`.
+# Usuarios permitidos en ${HOME}/.config/hojas-campo.env (fuera del repo, chmod 600):
+#   HOJAS_CAMPO_USUARIOS=usuario@github
+services:
+  hojas-campo:
+    build: .
+    image: hojas-campo:local
+    container_name: hojas-campo
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8049:8049"
+    env_file: ${HOME}/.config/hojas-campo.env
+    environment:
+      HOJAS_CAMPO_DATOS: /app/datos_campo.json
+      HOJAS_CAMPO_MARCAS: /datos/marcas.jsonl
+    volumes:
+      - ./datos/datos_campo.json:/app/datos_campo.json:ro
+      - marcas:/datos
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8049/salud', timeout=3)"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  marcas:

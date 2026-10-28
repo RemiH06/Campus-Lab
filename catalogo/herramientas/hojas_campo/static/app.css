@@ -1,0 +1,97 @@
+/* Libreta de levantamiento (misma paleta que rutas_jardines, contraste WCAG verificado ahí):
+   papel claro para leer al sol, tinta verde oscura, violeta 290° para lo seleccionado. */
+:root {
+  --papel: #f3f4ec; --papel-2: #e6e9dc; --tinta: #183224; --tinta-2: #45594c; --linea: #c3c9b6;
+  --edificio: #d4d6cb; --violeta: #7a2d8a; --esta: #165029; --no-esta: #b3263f; --no-esta-mapa: #d7425b;
+  --fuente: "Atkinson Hyperlegible", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--papel); color: var(--tinta); font: 17px/1.4 var(--fuente); }
+button, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--violeta); outline-offset: 2px; }
+[hidden] { display: none !important; }
+a { color: var(--violeta); }
+
+.barra { position: sticky; top: 0; z-index: 3; display: flex; gap: 10px; align-items: center; padding: 8px 16px; padding-top: max(8px, env(safe-area-inset-top)); background: var(--papel); border-bottom: 1px solid var(--linea); }
+.barra h1 { font-size: 1.1rem; margin: 0; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sync { border: 1px solid var(--tinta-2); background: var(--papel); border-radius: 99px; padding: 6px 12px; min-height: 40px; font-size: .85rem; white-space: nowrap; }
+.sync.pendiente { border-color: var(--no-esta); color: var(--no-esta); }
+.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 8px 14px; border: 1px solid var(--tinta-2); border-radius: 8px; background: var(--papel); text-decoration: none; color: var(--tinta); cursor: pointer; }
+.btn.primario { background: var(--tinta); color: var(--papel); border-color: var(--tinta); }
+.btn[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--violeta); }
+
+main { padding: 12px 16px 96px; }
+.nota { color: var(--tinta-2); font-size: .92rem; margin: 6px 0; }
+.barra-prog { height: 8px; border-radius: 99px; background: var(--papel-2); overflow: hidden; }
+.barra-prog i { display: block; height: 100%; background: var(--esta); }
+
+.controles { position: sticky; top: 106px; z-index: 2; background: var(--papel); padding: 6px 0 8px; display: grid; gap: 8px; border-bottom: 1px solid var(--linea); }
+.progreso { margin: 0; font-weight: 700; }
+.filtros { display: flex; gap: 6px; }
+.filtros button { flex: 1; min-height: 44px; border: 1px solid var(--tinta-2); background: var(--papel); border-radius: 8px; }
+.filtros button[aria-pressed="true"] { background: var(--tinta); color: var(--papel); }
+.fila { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 6px; align-items: end; }
+.buscar span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.buscar input { width: 100%; min-height: 48px; padding: 8px 10px; border: 1px solid var(--tinta-2); border-radius: 8px; background: var(--papel); }
+
+.lista { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+.arbol { display: grid; grid-template-columns: minmax(0, 1fr) auto; border: 1px solid var(--linea); border-radius: 10px; overflow: hidden; }
+.arbol .toque { display: grid; grid-template-columns: 2.2em minmax(4.4em, max-content) minmax(0, 1fr); width: 100%; gap: 8px; align-items: center; text-align: left; padding: 10px 8px; min-height: 64px; border: 0; background: none; cursor: pointer; }
+.arbol .n { font: 500 .8rem var(--mono); color: var(--tinta-2); }
+.arbol .placa { font: 500 1.15rem var(--mono); }
+.arbol .nom b { display: block; font-weight: 700; }
+.arbol .nom i { display: block; color: var(--tinta-2); font-size: .88rem; }
+.arbol .nom small { display: block; font-size: .82rem; color: var(--no-esta); }
+.arbol .nom small.previo { color: var(--tinta-2); }
+.arbol .mas { min-width: 64px; border: 0; border-left: 1px solid var(--linea); background: var(--papel-2); cursor: pointer; font-size: .9rem; }
+.arbol.revisado { background: #e3eedf; border-color: var(--esta); }
+.arbol.revisado .n::after { content: " ✓"; color: var(--esta); font-weight: 700; }
+.arbol.no_esta { border-color: var(--no-esta); }
+.arbol.no_esta .n::after { content: " ✗"; color: var(--no-esta); font-weight: 700; }
+.arbol.otra { border-color: var(--violeta); }
+.arbol.otra .n::after { content: " ≠"; color: var(--violeta); font-weight: 700; }
+.arbol.nuevo { border-color: var(--violeta); border-style: dashed; }
+.arbol.foco { box-shadow: 0 0 0 3px var(--violeta); }
+.estado-txt { display: block; font-size: .82rem; font-weight: 700; }
+.revisado .estado-txt { color: var(--esta); } .no_esta .estado-txt { color: var(--no-esta); } .otra .estado-txt, .nuevo .estado-txt { color: var(--violeta); }
+
+.mapa-caja { margin-top: 8px; }
+#mapa { width: 100%; height: 52vh; display: block; border: 1px solid var(--linea); border-radius: 10px; background: var(--papel); touch-action: manipulation; }
+.m-edificio { fill: var(--edificio); stroke: var(--linea); stroke-width: .5; }
+.m-arbol { fill: var(--papel); stroke: var(--tinta-2); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+.m-arbol.revisado { fill: var(--esta); stroke: var(--esta); }
+.m-arbol.no_esta { fill: var(--no-esta-mapa); stroke: var(--no-esta-mapa); }
+.m-arbol.otra, .m-arbol.nuevo { fill: var(--papel); stroke: var(--violeta); stroke-width: 3; }
+.m-arbol.foco { stroke: var(--violeta); stroke-width: 3.5; }
+.m-yo { fill: #2a5fb0; stroke: var(--papel); stroke-width: 2; vector-effect: non-scaling-stroke; }
+
+dialog { border: 0; padding: 0; border-radius: 12px; background: var(--papel); color: var(--tinta); width: min(94vw, 480px); max-height: 92vh; }
+dialog::backdrop { background: rgb(24 50 36 / .55); }
+.dlg { display: grid; gap: 10px; padding: 16px; }
+.dlg h2 { margin: 0; font: 500 1.3rem var(--mono); }
+.dlg .especie { margin: 0; }
+.dlg label { display: grid; gap: 4px; font-size: .92rem; color: var(--tinta-2); }
+.dlg input, .dlg textarea { width: 100%; min-height: 48px; padding: 8px 10px; border: 1px solid var(--tinta-2); border-radius: 8px; background: var(--papel); color: var(--tinta); }
+.estados { display: grid; gap: 6px; }
+.estados button { min-height: 52px; border: 1px solid var(--tinta-2); border-radius: 8px; background: var(--papel); text-align: left; padding: 8px 12px; }
+.estados button[aria-pressed="true"] { background: var(--tinta); color: var(--papel); }
+.acciones { display: flex; flex-wrap: wrap; gap: 6px; }
+.acciones .btn { flex: 1 1 40%; }
+
+.aviso { position: fixed; left: 12px; right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); z-index: 5; display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 8px 8px 8px 14px; border-radius: 10px; background: var(--tinta); color: var(--papel); box-shadow: 0 6px 20px rgb(24 50 36 / .25); }
+.aviso .btn { background: var(--papel); color: var(--tinta); min-height: 44px; }
+@media (min-width: 760px) { main { max-width: 760px; margin: 0 auto; } }
+
+/* Pestañas, tarjetas y selectores (zonas y especies) */
+.pestanas { position: sticky; top: 57px; z-index: 3; display: flex; background: var(--papel); border-bottom: 1px solid var(--linea); }
+.pestanas a { flex: 1; text-align: center; padding: 12px 4px; min-height: 48px; text-decoration: none; color: var(--tinta-2); font-weight: 700; border-bottom: 3px solid transparent; }
+.pestanas a[aria-current="page"] { color: var(--tinta); border-bottom-color: var(--violeta); }
+.tarjetas { list-style: none; margin: 12px 0; padding: 0; display: grid; gap: 8px; }
+.tarjetas a { display: grid; gap: 4px; padding: 12px; border: 1px solid var(--linea); border-radius: 10px; text-decoration: none; color: var(--tinta); }
+.tarjetas b { font-size: 1.02rem; }
+.tarjetas a > i { color: var(--tinta-2); font-size: .9rem; }
+.tarjetas span { color: var(--tinta-2); font-size: .9rem; }
+.controles label { display: grid; gap: 2px; font-size: .85rem; color: var(--tinta-2); }
+.controles select { width: 100%; min-height: 48px; padding: 6px 8px; border: 1px solid var(--tinta-2); border-radius: 8px; background: var(--papel); color: var(--tinta); font: inherit; }
+.fila2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; }
+.dlg select { width: 100%; min-height: 48px; padding: 6px 8px; border: 1px solid var(--tinta-2); border-radius: 8px; background: var(--papel); color: var(--tinta); font: inherit; }

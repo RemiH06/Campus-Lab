@@ -31,6 +31,7 @@ XLSX_MAESTRO = SALIDA / "Inventario_Maestro.xlsx"
 OSM_CACHE = SALIDA / "osm_campus.json"
 PLANTILLA = AQUI / "plantilla.html"
 DESTINO = SALIDA / "rutas_jardines.html"
+ORDEN = SALIDA / "orden_recorrido.json"  # lo leen las hojas de campo (herramientas/hojas_campo)
 
 CAJA = (20.6015, -103.4235, 20.6125, -103.4095)  # sur, oeste, norte, este (campus Tlaquepaque)
 LAT0, LON0 = 20.607, -103.416
@@ -267,6 +268,12 @@ def construir():
     html = PLANTILLA.read_text(encoding="utf-8").replace(
         "/*__DATOS__*/null", json.dumps(datos, ensure_ascii=False, separators=(",", ":")))
     DESTINO.write_text(html, encoding="utf-8")
+    # Orden del recorrido por jardín y contornos de edificios, para las hojas de campo
+    ORDEN.write_text(json.dumps({
+        "generado": datos["generado"],
+        "jardines": {j["nombre"]: [arboles[k]["placa"] for k in j["arboles"]] for j in jardines},
+        "edificios": [[[round(la, 6), round(lo, 6)] for la, lo in (latlon(x, y) for x, y in pl)] for pl in polis],
+    }, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     print(f"Nodos de camino OSM: {n_camino}, árboles: {len(arboles)}, aristas: {len(aristas)}")
     print(f"Árboles sin vecino ni camino (enganchados a la fuerza): {sin_conexion}; fuera del grafo principal: {len(fuera)} {fuera[:10]}")
     print(f"Escrito {DESTINO} ({DESTINO.stat().st_size/1e6:.1f} MB)")

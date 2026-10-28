@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f3f4ec">
+<title>Hojas de campo</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icono.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.bunny.net">
+<link rel="stylesheet" href="https://fonts.bunny.net/css?family=atkinson-hyperlegible:400,700|ibm-plex-mono:500&display=swap">
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+<header class="barra">
+  <h1 id="titulo">Hojas de campo</h1>
+  <button id="sync" class="sync" type="button" aria-live="polite">Cargando…</button>
+</header>
+<nav class="pestanas" aria-label="Vistas">
+  <a href="#/" data-v="zonas">Zonas</a>
+  <a href="#/arboles" data-v="arboles">Árboles</a>
+  <a href="#/especies" data-v="especies">Especies</a>
+</nav>
+
+<main id="v-zonas" hidden>
+  <p class="nota">Toca un árbol para marcarlo como revisado (está y es esa especie). Usa <b>Más</b> para "no está", "otra especie" o una nota.</p>
+  <ul id="zonas" class="tarjetas"></ul>
+  <p class="nota"><a href="/api/exportar.csv">Descargar CSV de marcas</a> (necesita conexión)</p>
+</main>
+
+<main id="v-arboles" hidden>
+  <div class="controles">
+    <div class="fila2">
+      <label>Zona<select id="f-zona" class="sel-zona"></select></label>
+      <label>Especie<select id="f-especie"></select></label>
+    </div>
+    <p class="progreso" id="progreso"></p>
+    <div class="filtros" role="group" aria-label="Qué árboles mostrar">
+      <button type="button" data-f="pendientes" aria-pressed="true">Pendientes</button>
+      <button type="button" data-f="todos" aria-pressed="false">Todos</button>
+      <button type="button" data-f="marcados" aria-pressed="false">Con marca</button>
+    </div>
+    <div class="fila">
+      <label class="buscar"><span>Placa</span><input id="buscar" type="search" inputmode="numeric" autocomplete="off" placeholder="Buscar placa"></label>
+      <button type="button" id="ver-mapa" class="btn" aria-pressed="false">Mapa</button>
+      <button type="button" id="nuevo" class="btn primario">+ Árbol nuevo</button>
+    </div>
+  </div>
+  <div id="mapa-caja" class="mapa-caja" hidden>
+    <svg id="mapa" role="img" aria-label="Mapa con los árboles de la lista por estado"></svg>
+    <p class="nota" id="mapa-nota"></p>
+  </div>
+  <ol id="lista" class="lista"></ol>
+  <p class="nota" id="lista-nota"></p>
+</main>
+
+<main id="v-especies" hidden>
+  <div class="controles">
+    <label>Zona<select id="e-zona" class="sel-zona"></select></label>
+    <label class="buscar"><span>Buscar especie</span><input id="e-buscar" type="search" autocomplete="off" placeholder="Buscar especie o nombre común"></label>
+    <p class="progreso" id="e-resumen"></p>
+  </div>
+  <ul id="especies" class="tarjetas"></ul>
+</main>
+
+<dialog id="opciones" aria-labelledby="o-titulo">
+  <form method="dialog" class="dlg">
+    <h2 id="o-titulo"></h2>
+    <p id="o-especie" class="especie"></p>
+    <p id="o-extra" class="nota"></p>
+    <div class="estados" role="group" aria-label="Estado en campo">
+      <button type="button" data-e="revisado">Está, es esa especie</button>
+      <button type="button" data-e="no_esta">No está</button>
+      <button type="button" data-e="otra">Otra especie</button>
+    </div>
+    <label id="o-real-caja" hidden>Especie que es en realidad<input id="o-real" type="text" autocomplete="off" maxlength="120"></label>
+    <label>Nota<textarea id="o-nota" rows="2" maxlength="500"></textarea></label>
+    <label>Núm. de foto en SW Maps (si tomaste)<input id="o-foto" type="text" inputmode="numeric" autocomplete="off" maxlength="40"></label>
+    <p class="nota" id="o-gps"></p>
+    <div class="acciones">
+      <button type="button" id="o-gps-btn" class="btn">Guardar mi ubicación</button>
+      <button type="button" id="o-quitar" class="btn">Quitar marca</button>
+      <button type="button" id="o-guardar" class="btn primario">Guardar</button>
+      <button value="cancelar" class="btn">Cerrar</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlg-nuevo" aria-labelledby="n-titulo">
+  <form method="dialog" class="dlg">
+    <h2 id="n-titulo">Árbol nuevo</h2>
+    <p class="nota">Toma también la foto en SW Maps; Juan Gabriel identifica la especie después.</p>
+    <label>Zona<select id="n-zona"></select></label>
+    <label>Placa (si tiene)<input id="n-placa" type="text" inputmode="numeric" autocomplete="off" maxlength="12"></label>
+    <label>Especie (si la sabes)<input id="n-especie" type="text" autocomplete="off" maxlength="120"></label>
+    <label>Núm. de foto en SW Maps<input id="n-foto" type="text" inputmode="numeric" autocomplete="off" maxlength="40"></label>
+    <label>Nota<textarea id="n-nota" rows="2" maxlength="500"></textarea></label>
+    <p class="nota" id="n-gps">Buscando tu ubicación…</p>
+    <div class="acciones">
+      <button type="button" id="n-guardar" class="btn primario">Guardar árbol nuevo</button>
+      <button value="cancelar" class="btn">Cancelar</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="aviso" class="aviso" role="status" hidden><span id="aviso-texto"></span><button type="button" id="deshacer" class="btn">Deshacer</button></div>
+<noscript><p class="nota">Esta hoja necesita JavaScript.</p></noscript>
+<script src="/app.js" defer></script>
+</body>
+</html>
