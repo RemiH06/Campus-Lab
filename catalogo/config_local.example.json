@@ -3,5 +3,7 @@
   "nombre_revisor": "TU_NOMBRE",
   "ruta_excel_base_datos_general": "../listas/BASE_DATOS_GENERAL.xlsx",
   "ruta_espejo_local_fotos": "",
-  "inaturalist_token": "TOKEN_DE_INATURALIST_DURA_24_HORAS"
+  "inaturalist_token": "TOKEN_DE_INATURALIST_DURA_24_HORAS",
+  "ruta_sharepoint_sincronizado": "RUTA_A_LA_BIBLIOTECA_SINCRONIZADA_DE_SHAREPOINT",
+  "ruta_destino_reestructura": "RUTA_DE_LA_CARPETA_NUEVA_FUERA_DE_ONEDRIVE"
 }
