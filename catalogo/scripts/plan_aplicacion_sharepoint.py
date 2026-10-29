@@ -80,6 +80,10 @@ TIPOS = {
 }
 CARPETAS_POR_TIPO = set(TIPOS)
 
+# Paso 0 de la F2: en la carpeta del libro de octubre se acortan dos nombres para que OneDrive pueda bajar sus
+# archivos (rutas de hasta 280 caracteres). (nombre corto, nombre original); el plan sigue usando el original.
+ALIAS_PASO0 = [("LC", "Libro aves Capítulos"), ("G6", "6. Guía para observar las aves")]
+
 # Carpetas que la F2 crea vacías (ningún archivo las genera): la bandeja de entrada del mapa y una por página del
 # mapa del sitio del retrabajo, para la copia de sus textos.
 _TEXTOS = "03. Sitio Web Campus Lab/Textos del sitio (retrabajo)"
@@ -282,6 +286,8 @@ def main():
             acciones[r] = ("POR BORRAR", f"{POR_BORRAR}/{r}", "copia de la ilustración en Ilustraciones finales")
         elif r.startswith(LIBRO_NUEVO):
             sub = r[len(LIBRO_NUEVO):]
+            for corto, largo in ALIAS_PASO0:  # carpetas acortadas en el paso 0 de la F2
+                sub = re.sub(rf"(^|/){re.escape(corto)}/", rf"\g<1>{largo}/", sub)
             datos = leer(p)
             if datos is None:
                 acciones[r] = ("REVISAR", "", "OneDrive no lo baja (ruta de 260 caracteres o más): se lee después de "
@@ -299,7 +305,7 @@ def main():
             dest, dudoso = destino_libro(sub)
             if clave(dest) in destinos_planeados or por_nombre.get(clave(nombre)):  # mismo nombre, otro contenido
                 base = PurePosixPath(dest)
-                dest = str(base.with_name(f"{base.stem} (subida oct-2026){base.suffix}"))
+                dest = str(base.with_name(f"{base.stem} (oct-2026){base.suffix}"))
                 motivo = "otro contenido con el mismo nombre: se conservan las dos versiones"
             else:
                 motivo = "nuevo en la subida de octubre"
@@ -314,8 +320,10 @@ def main():
 
     # 5. Árbol final: sin destinos repetidos y sin sueltos junto a carpetas (salvo excepciones). Los sueltos que
     #    queden junto a subcarpetas van a una carpeta por tipo de archivo, como en la estructura v2.
-    filas = [{"ruta_actual": r, "accion": a, "destino": d, "motivo": m, "bytes": hoy[r].stat().st_size}
-             for r, (a, d, m) in acciones.items()]
+    # ruta_actual va normalizada (NFC) para comparar; ruta_disco es como está escrita en disco, que es la que hay
+    # que usar para abrir o mover: muchos nombres subidos desde Mac traen el acento como carácter aparte (NFD).
+    filas = [{"ruta_actual": r, "ruta_disco": str(hoy[r].relative_to(sp)).replace(os.sep, "/"), "accion": a,
+              "destino": d, "motivo": m, "bytes": hoy[r].stat().st_size} for r, (a, d, m) in acciones.items()]
     filas += [{"ruta_actual": o, "accion": a, "destino": d, "motivo": m, "bytes": None} for o, a, d, m in subir]
     filas += [{"ruta_actual": "", "accion": "CREAR CARPETA", "destino": c, "motivo": "carpeta vacía de la estructura nueva",
                "bytes": None} for c in CARPETAS_VACIAS]
