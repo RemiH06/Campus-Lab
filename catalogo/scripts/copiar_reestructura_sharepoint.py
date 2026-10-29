@@ -10,8 +10,8 @@ Orígenes, según la columna "Origen (local, relativo)":
   - "VOLUMEN: <ruta>" → volumen de fotos, Y:\\<ruta> (solo dentro de la red de ITESO)
   - cualquier otra    → biblioteca sincronizada de SharePoint (config: ruta_sharepoint_sincronizado)
 
-Se copian las filas con "Accion v2" MOVER o COPIAR, a su "Destino v2" (estructura v2 del 27-oct: numeración
-seguida 01-12 y sin archivos sueltos junto a carpetas). "Destino propuesto" y "Accion" quedan como la versión 1.
+Se copian las filas con "Accion v2" MOVER o COPIAR, a la columna "Destino vN" más nueva (v3 del 29-oct: 01-11,
+Actividades con Avistamientos, Comunicación y Difusión, Referencias Interno/Externo). Las anteriores quedan de historial.
 
 Resumible: cada copia se escribe como .tmp, se verifica por SHA-1 contra el origen, se renombra y
 se anota en _manifiesto.csv del destino. Al volver a correr, lo que ya está en el manifiesto y en
@@ -23,6 +23,7 @@ Uso: python copiar_reestructura_sharepoint.py   (plan en seco: salida/Plan_Copia
 import csv
 import hashlib
 import os
+import re
 import shutil
 import sys
 from datetime import datetime
@@ -74,10 +75,12 @@ def main():
 
     plan = pd.read_excel(PLAN)
     col_origen = plan.columns[0]
+    # la versión más nueva de la estructura: "Destino v3" gana a "Destino v2"
+    col_destino = max((c for c in plan.columns if re.fullmatch(r"Destino v\d+", c)), key=lambda c: int(c[9:]))
     copiar = plan[plan["Accion v2"].isin(["MOVER", "COPIAR"])]
-    if copiar["Destino v2"].isna().any():
-        raise SystemExit("Hay filas a copiar sin 'Destino v2'.")
-    repetidos = copiar["Destino v2"][copiar["Destino v2"].str.casefold().duplicated()]  # Windows no distingue mayúsculas
+    if copiar[col_destino].isna().any():
+        raise SystemExit(f"Hay filas a copiar sin '{col_destino}'.")
+    repetidos = copiar[col_destino][copiar[col_destino].str.casefold().duplicated()]  # Windows no distingue mayúsculas
     if len(repetidos):
         raise SystemExit(f"{len(repetidos)} destinos repetidos (se pisarían): {list(repetidos)[:5]}")
 
@@ -85,7 +88,7 @@ def main():
     manifiesto_ruta = destino_raiz / "_manifiesto.csv"
     manifiesto = leer_manifiesto(manifiesto_ruta)
     filas = []
-    for origen_txt, destino_rel in zip(copiar[col_origen], copiar["Destino v2"]):
+    for origen_txt, destino_rel in zip(copiar[col_origen], copiar[col_destino]):
         if origen_txt.startswith("VOLUMEN: ") and hay_volumen is None:
             hay_volumen = red_iteso_disponible()
         if origen_txt.startswith("VOLUMEN: ") and not hay_volumen:
